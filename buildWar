@@ -1,0 +1,8 @@
+#!/bin/bash
+
+npm run build 
+
+mkdir -p  $(dirname $0)/dist
+cd $(dirname $0)/build
+
+jar cf ../dist/lazerwiki-ui.war *
