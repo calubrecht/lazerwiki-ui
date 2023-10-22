@@ -32,4 +32,18 @@ export default class DataService
     return fetch(
       this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.text());
   }
+
+  getUIVersion() 
+  {
+    return fetch('/meta.json')
+      .then((response) => response.json());
+  }
+  
+  getVersion() 
+  {
+    return fetch(
+      this.baseRequest + 'version')
+         .then(this.handleErrors)
+         .then(res => res.text().then(r=> {return r}));
+  }
 }

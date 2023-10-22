@@ -8,12 +8,13 @@ export class RootFrame extends Component
     super(props);
     this.state = {pageData:''}
     this.data = new DataService();
-    this.setPageDate = this.setPageData.bind();
   }
 
   componentDidMount()
   {
-    this.data.fetchPage('anyPage').then((pageData) => this.setPageData(pageData));
+    this.data.getUIVersion().then(meta => console.log(`UI-version - ${meta.version}`));
+    this.data.getVersion().then(res => console.log(`Server-version - ${res}`));
+    this.data.fetchPage('anyPage').then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
   }
 
   setPageData(pageData) {
@@ -23,5 +24,9 @@ export class RootFrame extends Component
   render()
   {
     return <div className="RootFrame"> this page state should be {HTMLReactParser(this.state.pageData)} or something </div>;
+  }
+
+  handleError(error) {
+    console.log(error);
   }
 }
