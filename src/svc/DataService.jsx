@@ -3,7 +3,8 @@ export default class DataService
   constructor()
   {
     this.handleErrors = this.handleErrors.bind(this);
-    this.apiServer = process.env.REACT_APP_API_SERVER;
+    //this.apiServer = import.meta.env.VITE_REACT_APP_API_SERVER;
+    this.apiServer = '/app';
     this.baseRequest = this.apiServer + '/api/';
   }
   
