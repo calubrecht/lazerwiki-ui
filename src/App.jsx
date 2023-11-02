@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {RootFrame} from './rootFrame';
+import RootFrame from './rootFrame';
 
 function App() {
   return (

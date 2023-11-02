@@ -1,11 +1,29 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
 import App from './App';
+import {setInstance as set_DS_instance} from './svc/DataService';
+
 
 /**
- * Replace this. Should mock out svc so fetch never gets called here
+ * Move these to test for rootFrame
  */
-global.fetch = jest.fn( () =>  new Promise ( () => {}));
-test('renders ', () => {
-    render(<App />);
+var ds = {
+  getUIVersion: () => Promise.resolve({version: "TEST"}),
+  getVersion: () => Promise.resolve({version: "TEST"}),
+  fetchPage: () => Promise.resolve("data")
+};
+
+//set_DS_instance(ds);
+
+jest.mock("./rootFrame", () => () => {
+  return <div className="RootFrame">Mocked Root</div>;
+});
+
+test('renders ', async () => {
+    //render(<App />);
+    await waitFor( () => {
+      render(<App />);
+    });
+    let rootFrame = screen.getByRole('RootFrame');
+    expect(rootFrame).not().toBeNull(); 
 }
 );

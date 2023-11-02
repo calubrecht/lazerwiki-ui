@@ -1,3 +1,5 @@
+var INSTANCE = null;
+
 export default class DataService
 {
   constructor()
@@ -47,4 +49,22 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.text().then(r=> {return r}));
   }
+
+  getUser() {
+    return fetch(
+      this.baseRequest + 'sessions/username')
+         .then(this.handleErrors)
+         .then(res => res.text().then(r=> {return r}));
+  }
+}
+
+export function instance() {
+    if (INSTANCE == null) {
+      INSTANCE = new DataService();
+    }
+    return INSTANCE;
+}
+
+export function setInstance(instance) {
+    INSTANCE = instance;
 }

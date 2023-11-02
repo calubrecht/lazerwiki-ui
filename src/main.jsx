@@ -2,7 +2,7 @@ import React, {createContext} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-//import UserWidget from './UserWidget';
+import UserWidget from './UserWidget';
 
 function Toolbar()
   {
@@ -17,7 +17,7 @@ const toolbar = ReactDOM.createRoot(document.getElementById('toolbar'));
 toolbar.render(
     <Toolbar />
 );
-/*const userWidget = ReactDOM.createRoot(document.getElementById('userWidget'));
-toolbar.render(
+const userWidget = ReactDOM.createRoot(document.getElementById('userWidget'));
+userWidget.render(
     <UserWidget />
-);*/
+);
