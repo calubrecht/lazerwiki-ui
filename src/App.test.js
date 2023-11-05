@@ -23,7 +23,7 @@ test('renders ', async () => {
     await waitFor( () => {
       render(<App />);
     });
-    let rootFrame = screen.getByRole('RootFrame');
-    expect(rootFrame).not().toBeNull(); 
+    let rootFrame = screen.getByText('Mocked Root');
+    expect(rootFrame).not.toBeNull(); 
 }
 );
