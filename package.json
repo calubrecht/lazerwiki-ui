@@ -61,8 +61,8 @@
       "cobertura"
     ],
     "collectCoverageFrom": [
-      "src/**/*.js",
-      "!src/index.js"
+      "src/**/*.jsx",
+      "!src/main.jsx"
     ]
   }
 }
