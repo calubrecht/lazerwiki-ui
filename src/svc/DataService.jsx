@@ -9,6 +9,14 @@ export default class DataService
     //this.apiServer = '/app';
     this.baseRequest = this.apiServer + '/api/';
   }
+
+  /**
+   * Make sure we have an CSRF token
+   */
+  init() {
+    fetch(this.baseRequest + 'csrf')
+         .then(this.handleErrors);
+  }
   
   
   handleErrors(response)
@@ -55,6 +63,32 @@ export default class DataService
       this.baseRequest + 'sessions/username')
          .then(this.handleErrors)
          .then(res => res.text().then(r=> {return r}));
+  }
+  
+  login(username, password)
+  {
+    return fetch(
+      this.baseRequest + 'sessions/login',
+       {method: 'post', body: JSON.stringify({username: username, password:password}), credentials: 'include',
+         headers: this.getPostHeaders() })
+         .then(this.handleErrors)
+         .then(response => response.text());
+  }
+  
+  getTokenCookie()
+  {
+    let cookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('XSRF-TOKEN='));
+    return cookie ? cookie.split('=')[1] : null;
+  }
+  
+  getPostHeaders()
+  {
+    return {
+      'Content-Type': 'application/json',
+      'x-xsrf-token': this.getTokenCookie()
+    }
   }
 }
 

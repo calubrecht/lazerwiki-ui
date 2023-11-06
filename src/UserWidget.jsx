@@ -2,12 +2,14 @@ import React, {useEffect, useState} from 'react';
 import './App.css';
 import {instance as DS_instance} from './svc/DataService';
 import {instance as US_instance} from './svc/UserService';
+import LoginFrame from './LoginFrame';
 
 
 function UserWidget() {
   const [initted, setInitted] = useState(false);
   const [userName, setUserName] = useState(null);
   useEffect( () => {
+    US_instance().addListener({setUser: setUserName});
     DS_instance().getUser().then(user => {
        setInitted(true);
        setUserName(user);
@@ -32,7 +34,10 @@ function UserWidget() {
           userName ? (
              <span>Hi, {userName}</span>
           ) :
-             <span>Hi, Guest - Please login</span>
+             <div>
+               <div><span>Hi, Guest</span></div>
+               <LoginFrame/>
+             </div>
         ) : 
         <span>Loading, please wait</span>
       }
