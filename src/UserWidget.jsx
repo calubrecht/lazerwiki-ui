@@ -5,6 +5,10 @@ import {instance as US_instance} from './svc/UserService';
 import LoginFrame from './LoginFrame';
 
 
+function logout() {
+    DS_instance().logout().then(() => US_instance().setUser(null));
+}
+
 function UserWidget() {
   const [initted, setInitted] = useState(false);
   const [userName, setUserName] = useState(null);
@@ -32,7 +36,7 @@ function UserWidget() {
       {
         initted ? ( 
           userName ? (
-             <span>Hi, {userName}</span>
+             <div><span>Hi, {userName}</span> <span className="logout" onClick={logout}>LogOut</span></div>
           ) :
              <div>
                <div><span>Hi, Guest</span></div>

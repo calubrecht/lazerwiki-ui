@@ -75,6 +75,16 @@ export default class DataService
          .then(response => response.text());
   }
   
+  logout()
+  {
+    return fetch(
+      this.baseRequest + 'sessions/logout',
+       {method: 'post',  credentials: 'include',
+         headers: this.getPostHeaders() })
+         .then(this.handleErrors)
+         .then(response => response.text());
+  }
+  
   getTokenCookie()
   {
     let cookie = document.cookie
