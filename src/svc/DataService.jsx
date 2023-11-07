@@ -43,6 +43,12 @@ export default class DataService
     return fetch(
       this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.text());
   }
+  
+  fetchSource(pageDescriptor)
+  {
+    return fetch(
+      this.baseRequest + 'page/' + pageDescriptor + '/source').then(this.handleErrors).then(response => response.text());
+  }
 
   getUIVersion() 
   {
@@ -62,7 +68,7 @@ export default class DataService
     return fetch(
       this.baseRequest + 'sessions/username')
          .then(this.handleErrors)
-         .then(res => res.text().then(r=> {return r}));
+         .then(res => res.text().then(r=> {return {user: r, roles: ['ROLE_USER']}}));
   }
   
   login(username, password)

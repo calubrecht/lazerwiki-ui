@@ -1,3 +1,7 @@
+body {
+  background: #0080dd;
+}
+
 .App {
   text-align: center;
 }
@@ -35,4 +39,39 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+div#toolbar {
+  float: left;
+  background: #dddddd;
+  margin: 200px 10px 0px 20px;
+  padding:10px;
+  border-color:black;
+  border-style:solid;
+}
+
+div#root {
+  margin-left: 120px;
+}
+
+div.RootBody {
+  background: white;
+  margin: 40px;
+  margin-bottom: 0px;
+  max-width: 1000px;
+  border-color:black;
+  border-style:solid;
+}
+
+div.RootMenu {
+  text-align: left;
+  margin-left: 40px
+}
+
+div.RootMenu span {
+  background: white;
+  padding: 2px 3px 5px 3px;
+  border-width: 0px 2px 2px 2px;
+  border-style: solid;
+  margin: 0px 6px 0px 0px;
 }

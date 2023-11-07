@@ -7,7 +7,7 @@ export default class RootFrame extends Component
 {
   constructor(props) {
     super(props);
-    this.state = {pageData:''}
+    this.state = {pageData:'', stage:'viewing'}
     this.data = DS_instance();
     this.userService = US_instance();
   }
@@ -32,13 +32,28 @@ export default class RootFrame extends Component
     this.setState({user: user});
   }
 
+  loggedIn() {
+    return this.state.user != null;
+  }
+
   render()
   {
-    let user = this.state.user ? this.state.user : "GUEST";
-    return <div className="RootFrame"> this page state should be {HTMLReactParser(this.state.pageData)} or something. You are {user} </div>;
+    let user = this.state.user ? this.state.user.user : "GUEST";
+    let createAction = "Create Page";
+    if (this.state.stage === 'viewing') {
+      return <div className="RootFrame">
+        <div className="RootBody">this page state should be {HTMLReactParser(this.state.pageData)} or something. You are {user} </div>
+        {this.loggedIn() && <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span><span>Delete Page</span></div>}</div>;
+    }
+      return <div>This will be an edit frame</div>;
+
   }
 
   handleError(error) {
     console.log(error);
+  }
+
+  editPage() {
+    this.setState({"stage": "editing"});
   }
 }
