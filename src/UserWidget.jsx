@@ -13,7 +13,9 @@ function UserWidget() {
   const [initted, setInitted] = useState(false);
   const [userName, setUserName] = useState(null);
   useEffect( () => {
-    US_instance().addListener({setUser: (user) => user && setUserName(user.user)});
+    US_instance().addListener({setUser: (user) => {
+      setUserName(user ? user.user : null);
+    }});
     DS_instance().getUser().then(user => {
        setInitted(true);
        setUserName(user.user);

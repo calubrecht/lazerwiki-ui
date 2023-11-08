@@ -8,7 +8,7 @@ export default class LoginFrame extends Component
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleError = this.handleError.bind(this);
-    this.state = {error:'', username:'', password:''};
+    this.state = {error:'', username:'', password:'', disabled: ''};
   }
 
   render()
@@ -17,8 +17,8 @@ export default class LoginFrame extends Component
       <div className="loginComponent" onKeyDown={this.handleKeyDown}>
       <div className="loginHeader">Please Log in</div>
       <div className="loginForm">
-        <div><span className="inputLabel">Username:</span><input type="text" placeholder="Username" name="Username" onChange={evt => this.onChangeField(evt, "username")} ></input></div>
-        <div><span className="inputLabel">Password:</span><input type="password" placeholder="Password" name="Password" onChange={evt => this.onChangeField(evt, "password")} ></input></div>
+        <div><span className="inputLabel">Username:</span><input type="text" placeholder="Username" name="Username" onChange={evt => this.onChangeField(evt, "username")} disabled= {this.state.disabled} ></input></div>
+        <div><span className="inputLabel">Password:</span><input type="password" placeholder="Password" name="Password" onChange={evt => this.onChangeField(evt, "password")} disabled= {this.state.disabled} ></input></div>
         <div className='errorText'>{this.state.error}</div>
       </div>
       </div>)
@@ -26,9 +26,11 @@ export default class LoginFrame extends Component
   
   attemptLogin()
   {
-    this.setState({error:''});
+    this.setState({error:'', disabled: 'disabled'});
     DS_instance().login(this.state.username, this.state.password)
-      .then((user) => { US_instance().setUser(user); })
+      .then((user) => {
+        this.setState({disabled: ''});
+        US_instance().setUser(user); })
       .catch(this.handleError);
   }
 
@@ -44,7 +46,7 @@ export default class LoginFrame extends Component
 
   handleError()
   {
-    this.setState({error:'Invalid username or password'});
+    this.setState({error:'Invalid username or password', disabled: ''});
   }
 
   onChangeField(evt, field) {

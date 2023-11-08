@@ -78,7 +78,7 @@ export default class DataService
        {method: 'post', body: JSON.stringify({username: username, password:password}), credentials: 'include',
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
-         .then(response => response.text());
+         .then(res => res.text().then(r=> {return {user: r, roles: ['ROLE_USER']}}));
   }
   
   logout()
