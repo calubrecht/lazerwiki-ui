@@ -9,7 +9,18 @@ export default class RootFrame extends Component
   constructor(props) {
     super(props);
     this.userService = US_instance();
-    this.pageName = 'anyPage';
+    let url =  window.location.pathname;
+    if (url != '/' && !url.startsWith("/page/")) {
+      window.location.pathname = '/';
+      return;
+    }
+    let p = url.split('/');
+    if (p.length > 3) {
+      window.location.pathname = '/';
+      return;
+    }
+
+    this.pageName = p.length > 2 ? p[2] : "";
     this.state = {pageData: {rendered: 'Loading'}, stage:'viewing', user: this.userService.getUser(), loaded:false};
     this.data = DS_instance();
   }
