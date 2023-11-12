@@ -30,6 +30,7 @@ div.RootBody {
   border-style:solid;
   min-height: 400px;
   padding: .5em;
+  border-width: 3px;
 }
 
 div.RootMenu {
@@ -39,7 +40,7 @@ div.RootMenu {
 
 div.RootMenu span {
   background: white;
-  padding: 3px 3px 5px 3px;
+  padding: 2.8px 3px 5px 3px;
   border-width: 0px 2px 2px 3px;
   border-style: solid;
   margin: 0px 6px 0px 0px;
@@ -49,4 +50,30 @@ div#userWidget {
   text-align: right;
   margin: 1em 1em 0 0;
   height:90px
+}
+
+a.wikiLink:link, a.wikiLink:visited {
+  color: blue;
+}
+a.wikiLinkMissing:link, a.wikiLinkMissing:visited {
+  color: red;
+}
+a.wikiLinkExternal:link, a.wikiLinkExternal:visited {
+  color: green;
+}
+
+img.media, img.mediacenter, img.mediaright, img.medialeft {
+  vertical-align: middle
+}
+
+img.mediaright {
+  float: right;
+}
+img.medialeft {
+  float: left;
+}
+img.mediacenter {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

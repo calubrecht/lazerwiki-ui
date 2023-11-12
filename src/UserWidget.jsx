@@ -14,11 +14,11 @@ function UserWidget() {
   const [userName, setUserName] = useState(null);
   useEffect( () => {
     US_instance().addListener({setUser: (user) => {
-      setUserName(user ? user.user : null);
+      setUserName(user ? user.userName : null);
     }});
     DS_instance().getUser().then(user => {
        setInitted(true);
-       setUserName(user.user);
+       setUserName(user.userName);
        US_instance().setUser(user);
     }).
     catch((e) => {

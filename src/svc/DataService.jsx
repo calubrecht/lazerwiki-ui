@@ -6,7 +6,6 @@ export default class DataService
   {
     this.handleErrors = this.handleErrors.bind(this);
     this.apiServer = import.meta.env.VITE_REACT_APP_API_SERVER;
-    //this.apiServer = '/app';
     this.baseRequest = this.apiServer + '/api/';
   }
 
@@ -62,7 +61,7 @@ export default class DataService
     return fetch(
       this.baseRequest + 'sessions/username')
          .then(this.handleErrors)
-         .then(res => res.text().then(r=> {return {user: r, roles: ['ROLE_USER']}}));
+         .then(res => res.json());
   }
   
   login(username, password)
@@ -72,7 +71,7 @@ export default class DataService
        {method: 'post', body: JSON.stringify({username: username, password:password}), credentials: 'include',
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
-         .then(res => res.text().then(r=> {return {user: r, roles: ['ROLE_USER']}}));
+         .then(res => res.json());
   }
   
   logout()

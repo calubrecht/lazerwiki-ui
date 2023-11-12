@@ -51,7 +51,7 @@ export default class RootFrame extends Component
 
   render()
   {
-    let user = this.state.user ? this.state.user.user : "GUEST";
+    let user = this.state.user ? this.state.user.userName : "GUEST";
     let createAction = "Create Page";
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">

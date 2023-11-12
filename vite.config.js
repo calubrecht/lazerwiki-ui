@@ -16,6 +16,11 @@ export default defineConfig({
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/app/, ''),
       },
+      '/_media':
+      {
+          target: 'http://app-server:8080',
+          changeOrigin: true
+      },
     }
   },
   build: {
