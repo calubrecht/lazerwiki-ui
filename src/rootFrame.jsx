@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import EditableTextbox from './EditableTextbox';
 import {instance as US_instance} from './svc/UserService';
 import HTMLReactParser from 'html-react-parser';
 
@@ -7,9 +8,10 @@ export default class RootFrame extends Component
 {
   constructor(props) {
     super(props);
-    this.state = {pageData:'', stage:'viewing'}
-    this.data = DS_instance();
     this.userService = US_instance();
+    this.pageName = 'anyPage';
+    this.state = {pageData: {rendered: 'Loading'}, stage:'viewing', user: this.userService.getUser(), loaded:false};
+    this.data = DS_instance();
   }
 
   componentDidMount()
@@ -17,7 +19,7 @@ export default class RootFrame extends Component
     this.userService.addListener(this);
     this.data.getUIVersion().then(meta => console.log(`UI-version - ${meta.version}`));
     this.data.getVersion().then(res => console.log(`Server-version - ${res}`));
-    this.data.fetchPage('anyPage').then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
+    this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
   }
 
   componentWillUnmount() {
@@ -25,7 +27,7 @@ export default class RootFrame extends Component
   }
 
   setPageData(pageData) {
-    this.setState({pageData: pageData});
+    this.setState({pageData: pageData, loaded:true});
   }
 
   setUser(user) {
@@ -42,10 +44,13 @@ export default class RootFrame extends Component
     let createAction = "Create Page";
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
-        <div className="RootBody">this page state should be {HTMLReactParser(this.state.pageData)} or something. You are {user} </div>
+        <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  </div>
         {this.loggedIn() && <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span><span>Delete Page</span></div>}</div>;
     }
-      return <div>This will be an edit frame</div>;
+      return <div className="RootFrame">
+      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} registerTextCB={data => this.setGetEditCB(data)} /> </div>
+      <div className="RootMenu"><span onClick={ev => this.savePage(ev)}>Save Page</span><span onClick={ev => this.cancelEdit(ev)}>Cancel</span></div>
+      </div>;
 
   }
 
@@ -55,5 +60,22 @@ export default class RootFrame extends Component
 
   editPage() {
     this.setState({"stage": "editing"});
+  }
+
+  cancelEdit(ev) {
+    ev && ev.preventDefault();
+    this.setState({"stage": "viewing"});
+  }
+  
+  savePage(ev) {
+    ev.preventDefault();
+    this.data.savePage(this.pageName, this.getText()).then((pageData) => {
+      this.setPageData(pageData);
+      this.cancelEdit(); }).catch(e => this.handleError(e));
+  }
+
+ 
+  setGetEditCB(cb) {
+    this.getText = cb;
   }
 }

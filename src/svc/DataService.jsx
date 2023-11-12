@@ -41,15 +41,9 @@ export default class DataService
   fetchPage(pageDescriptor)
   {
     return fetch(
-      this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.text());
+      this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
   
-  fetchSource(pageDescriptor)
-  {
-    return fetch(
-      this.baseRequest + 'page/' + pageDescriptor + '/source').then(this.handleErrors).then(response => response.text());
-  }
-
   getUIVersion() 
   {
     return fetch('/meta.json')
@@ -89,6 +83,16 @@ export default class DataService
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
          .then(response => response.text());
+  }
+  
+  savePage(pageName, text)
+  {
+    return fetch(
+      this.baseRequest + 'page/' + pageName + '/savePage',
+       {method: 'post', body: JSON.stringify({pageName: pageName, text: text}), credentials: 'include',
+         headers: this.getPostHeaders() })
+         .then(this.handleErrors)
+         .then(res => res.json());
   }
   
   getTokenCookie()
