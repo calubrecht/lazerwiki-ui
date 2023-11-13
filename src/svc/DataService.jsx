@@ -7,6 +7,7 @@ export default class DataService
     this.handleErrors = this.handleErrors.bind(this);
     this.apiServer = import.meta.env.VITE_REACT_APP_API_SERVER;
     this.baseRequest = this.apiServer + '/api/';
+    this.baseMediaRequest = this.apiServer + '/_media/';
   }
 
   /**
@@ -92,6 +93,18 @@ export default class DataService
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
          .then(res => res.json());
+  }
+  
+  saveMedia(files)
+  {
+    let formData = new FormData();
+    formData.append("file", files[0]);
+    return fetch(
+      this.baseMediaRequest + 'upload',
+       {method: 'post', body: formData, credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.text());
   }
   
   getTokenCookie()
