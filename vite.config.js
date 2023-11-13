@@ -19,6 +19,10 @@ export default defineConfig({
       {
           target: 'http://app-server:8080',
       },
+      '/_resources':
+      {
+          target: 'http://app-server:8080',
+      },
     }
   },
   build: {
