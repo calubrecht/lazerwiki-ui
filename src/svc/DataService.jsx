@@ -43,7 +43,11 @@ export default class DataService
     return fetch(
       this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
-  
+    
+  fetchImageList() {
+    return Promise.resolve( ['Firbolg-5e.webp', 'someImage.jpg']);
+  }
+
   getUIVersion() 
   {
     return fetch('/meta.json')
