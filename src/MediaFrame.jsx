@@ -16,11 +16,15 @@ export default class MediaFrame extends Component
   componentDidMount()
   {
     this.userService.addListener(this);
-    this.dataService.fetchImageList().then( (imgs) => this.setState({serverImages: imgs}));
+    this.fetchImageList();
   }
 
   componentWillUnmount() {
     this.userService.removeListener(this);
+  }
+
+  fetchImageList() {
+    this.dataService.fetchImageList().then( (imgs) => this.setState({serverImages: imgs.map(img => img.fileName)}));
   }
 
   
@@ -33,8 +37,8 @@ export default class MediaFrame extends Component
       {this.state.user && <form className="uploadBox">
         <div><input id="mediaFileUpload" type="file"/> <button onClick={(ev) => this.uploadFile(ev)} >Upload</button></div>
       </form>}
-      <div className="imageFrame"></div>
       <div className="mediaList">
+        <div className="imageFrame"></div>
         {
           this.state.serverImages.map( img => {
             counter++;
@@ -49,8 +53,9 @@ export default class MediaFrame extends Component
   }
 
   uploadFile(ev) {
-    this.dataService.saveMedia(mediaFileUpload.files).then((e) => console.log("uploaded " + e));
     ev.preventDefault();
+    this.dataService.saveMedia(mediaFileUpload.files).then(
+      (e) => this.fetchImageList());
   }
   
   setUser(user) {

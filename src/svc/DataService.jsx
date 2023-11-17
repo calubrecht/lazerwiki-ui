@@ -45,7 +45,8 @@ export default class DataService
   }
     
   fetchImageList() {
-    return Promise.resolve( ['Firbolg-5e.webp', 'someImage.jpg']);
+    return fetch(
+      this.baseMediaRequest + 'list').then(this.handleErrors).then(response => response.json());
   }
 
   getUIVersion() 
@@ -98,7 +99,7 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
-  
+
   saveMedia(files)
   {
     let formData = new FormData();

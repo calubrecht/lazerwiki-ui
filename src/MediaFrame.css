@@ -33,7 +33,7 @@ div.imageFrame {
 
 div.mediaListItem img.hoverImg {
   position: absolute;
-  bottom: 44px;
+  top: 0px;
   left: 2px;
   height:125px;
   width:125px;
