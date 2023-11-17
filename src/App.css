@@ -81,3 +81,18 @@ img.mediacenter {
 .uploadBox {
   margin-bottom: 1em;
 }
+
+span.bold {
+  font-weight: bold;
+}
+
+span.italic {
+  font-style: italic;
+}
+
+pre.code {
+  padding: .5em;
+  border: 1px dashed ;
+  font-family: monospace;
+  background-color: #f0f0f0;
+}
