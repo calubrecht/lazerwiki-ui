@@ -21,7 +21,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading'}, stage:'viewing', user: this.userService.getUser(), loaded:false};
+    this.state = {pageData: {rendered: 'Loading', exists:false}, stage:'viewing', user: this.userService.getUser(), loaded:false};
     this.data = DS_instance();
   }
 
@@ -52,17 +52,27 @@ export default class RootFrame extends Component
   render()
   {
     let user = this.state.user ? this.state.user.userName : "GUEST";
-    let createAction = "Create Page";
+    let createAction = this.state.pageData.exists ? "Edit Page" : "Create Page";
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
         <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  </div>
-        {this.loggedIn() && <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span><span>Delete Page</span></div>}</div>;
+        { this.renderMenu(createAction) }</div>;
     }
       return <div className="RootFrame">
-      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} registerTextCB={data => this.setGetEditCB(data)} /> </div>
-      <div className="RootMenu"><span onClick={ev => this.savePage(ev)}>Save Page</span><span onClick={ev => this.cancelEdit(ev)}>Cancel</span></div>
+      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} /> </div>
+      <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span></div>
       </div>;
 
+  }
+
+  renderMenu(createAction) {
+        if ( !this.state.loaded) {
+          return <div className="RootMenu"></div>;
+        }
+        if (! this.loggedIn() ){
+          return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span></div>;
+        }
+        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.exists && <span>Delete Page</span>}</div>;
   }
 
   handleError(error) {
@@ -71,6 +81,10 @@ export default class RootFrame extends Component
 
   editPage() {
     this.setState({"stage": "editing"});
+  }
+  
+  viewSource() {
+    this.setState({"stage": "viewingSource"});
   }
 
   cancelEdit(ev) {

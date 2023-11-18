@@ -12,7 +12,10 @@ export default class EditableTextbox extends Component
 
   render()
   {
-    return <div><textarea rows="25" cols="80" name="message" className="message" value={this.state.text} onChange={ev => this.onChangeText(ev) }></textarea></div>
+    if (!this.props.editable) {
+      return <div><textarea rows="25" cols="80" name="message" className="message" value={this.state.text}  disabled></textarea></div>;
+    }
+    return <div><textarea rows="25" cols="80" name="message" className="message" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea></div>
   }
 
   onChangeText(ev)

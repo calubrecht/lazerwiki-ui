@@ -64,6 +64,10 @@ div.RootBody {
   border-width: 3px;
 }
 
+div.RootBody div {
+  margin-bottom: .5em;
+}
+
 div.RootMenu {
   text-align: left;
   margin-left: 40px
