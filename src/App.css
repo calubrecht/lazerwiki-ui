@@ -24,6 +24,12 @@ div#userWidget {
   text-align: right;
   height:90px;
   vertical-align:top;
+  margin-top:1em;
+}
+
+div.UserWidget {
+  background: lightgray;
+  padding:10px;
 }
 
 
