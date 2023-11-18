@@ -3,13 +3,21 @@ body {
   background-image: url("img-/Back.png");
 }
 
+div#banner {
+  width:800px;
+  height:200px;
+  background-image:url("/_resources/Banner.png"), linear-gradient(to right, red, white);
+  border: black 1px solid;
+}
+
+
 div#appWrapper {
   max-width:1200px;
 }
 
 div#toolbar {
   position: absolute;
-  top: 200px;
+  top: 400px;
   background: #dddddd;
   padding: 1em;
   border-color:black;
@@ -50,7 +58,8 @@ div.RootMenu span {
 div#userWidget {
   text-align: right;
   margin: 1em 1em 0 0;
-  height:90px
+  height:90px;
+  float: right;
 }
 
 a.wikiLink:link, a.wikiLink:visited {
