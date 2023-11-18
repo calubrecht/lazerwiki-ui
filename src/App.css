@@ -3,11 +3,27 @@ body {
   background-image: url("img-/Back.png");
 }
 
+div#bannerHeader {
+  max-width:1200px;
+  display: flex;
+  justify-content: space-between;
+}
+
+
 div#banner {
   width:800px;
   height:200px;
   background-image:url("/_resources/Banner.png"), linear-gradient(to right, red, white);
   border: black 1px solid;
+  display: inline-block;
+}
+
+
+div#userWidget {
+  display: inline-block;
+  text-align: right;
+  height:90px;
+  vertical-align:top;
 }
 
 
@@ -53,13 +69,6 @@ div.RootMenu span {
   border-width: 0px 2px 2px 3px;
   border-style: solid;
   margin: 0px 6px 0px 0px;
-}
-
-div#userWidget {
-  text-align: right;
-  margin: 1em 1em 0 0;
-  height:90px;
-  float: right;
 }
 
 a.wikiLink:link, a.wikiLink:visited {
