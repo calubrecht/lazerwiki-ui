@@ -27,13 +27,17 @@ div.imageFrame {
   border-width:2px;
   border-style:solid;
   border-color:black;
-  z-index: 10;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: grey;
 }
 
 
 div.mediaListItem img.hoverImg {
   position: absolute;
-  top: 0px;
+  top: 2px;
   left: 2px;
   height:125px;
   width:125px;
@@ -45,4 +49,3 @@ div.mediaListItem img.hoverImg {
 div.mediaListItem:hover img.hoverImg {
   opacity:1;
 }
-

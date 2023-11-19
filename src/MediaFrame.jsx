@@ -27,18 +27,18 @@ export default class MediaFrame extends Component
     this.dataService.fetchImageList().then( (imgs) => this.setState({serverImages: imgs.map(img => img.fileName)}));
   }
 
-  
+
   render()
   {
     let counter = 0;
     return <div className="mediaFrame">
       <div onClick={() => this.props.doClose()} className="close">X</div>
-      <div className="title">MediaBox</div>
+      <h2 className="title">Media Viewer</h2>
       {this.state.user && <form className="uploadBox">
         <div><input id="mediaFileUpload" type="file"/> <button onClick={(ev) => this.uploadFile(ev)} >Upload</button></div>
       </form>}
       <div className="mediaList">
-        <div className="imageFrame"></div>
+        <div className="imageFrame">Image Preview</div>
         {
           this.state.serverImages.map( img => {
             counter++;
@@ -57,7 +57,7 @@ export default class MediaFrame extends Component
     this.dataService.saveMedia(mediaFileUpload.files).then(
       (e) => this.fetchImageList());
   }
-  
+
   setUser(user) {
     this.setState({user: user});
   }

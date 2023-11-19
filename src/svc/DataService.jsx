@@ -49,6 +49,11 @@ export default class DataService
       this.baseMediaRequest + 'list').then(this.handleErrors).then(response => response.json());
   }
 
+  fetchPageList() {
+    return fetch(
+      this.baseRequest + 'page/listPages').then(this.handleErrors).then(response => response.json());
+  }
+
   getUIVersion() 
   {
     return fetch('/meta.json')
