@@ -109,18 +109,16 @@ export default class PageFrame extends Component
   }
 
   renderNSTree() {
-    console.log("renderNSTree");
     return <ul className="nsTree">{this.renderNSSubtree(this.state.nsTree, 1)}</ul>;
   }
 
   renderNSSubtree(tree, level) {
     let name = tree.displayName ? tree.displayName : "<ROOT>";
-    console.log("renderNSSubTree:" + name);
     if (!tree.children || tree.children.length == 0) {
-      return <li className="terminal" key={tree.name}><span className="dot" onClick={evt => evt.stopPropagation()}> </span><span onClick={(evt => this.selectNS(evt, tree.fullName))}>{name}</span></li>;
+      return <li className="terminal" key={tree.fullName}><span className="dot" onClick={evt => evt.stopPropagation()}> </span><span onClick={(evt => this.selectNS(evt, tree.fullName))}>{name}</span></li>;
     }
     let subTreeClass = level <= 1 ? "open" : "closed";
-    return <li className={subTreeClass} key={tree.name} onClick= {(evt => this.toggleTreeClass(evt))}><span className="dot"> </span><span onClick={(evt => this.selectNS(evt, tree.fullName))}>{name}</span><ul className="nsTree">{
+    return <li className={subTreeClass} key={tree.fullName} onClick= {(evt => this.toggleTreeClass(evt))}><span className="dot"> </span><span onClick={(evt => this.selectNS(evt, tree.fullName))}>{name}</span><ul className="nsTree">{
       tree.children.map( c => this.renderNSSubtree(c))
     }</ul></li>;
   }
