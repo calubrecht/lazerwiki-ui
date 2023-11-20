@@ -25,7 +25,7 @@ export default class MediaFrame extends Component
 
   fetchImageList() {
     this.dataService.fetchImageList().then(
-      (imgs) => this.setState({serverImages: imgs.map(img => img.fileName), enabled:true})).catch(
+      (imgs) => this.setState({serverImages: imgs, enabled:true})).catch(
       e => this.setState({"message": e, "errorMessage": true, enabled:true}));
   }
 
@@ -47,13 +47,24 @@ export default class MediaFrame extends Component
           this.state.serverImages.map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
-              <div>{img}</div>
-              <img className="hoverImg" src={"/_media/" + img} loading="lazy"/>
+              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {img.width}x{img.height} - uploaded by {img.uploadedBy}</div>
+              <img className="hoverImg" src={"/_media/" + img.fileName} loading="lazy"/>
             </div>;
           })
         }
       </div>
     </div>;
+  }
+
+  renderFileSize(size) {
+    if (size < 1024) {
+      return size + " bytes";
+    }
+    const kb = size/1024.0;
+    if (kb < 1024) {
+      return kb.toFixed(2) + " kb";
+    }
+    return (kb/1024.0).toFixed(2) + " mb";
   }
 
   uploadFile(ev) {
