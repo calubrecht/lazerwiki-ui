@@ -7,7 +7,7 @@ export default class DataService
     this.handleErrors = this.handleErrors.bind(this);
     this.apiServer = import.meta.env.VITE_REACT_APP_API_SERVER;
     this.baseRequest = this.apiServer + '/api/';
-    this.baseMediaRequest = this.apiServer + '/_media/';
+    this.baseMediaRequest = '/_media/';
   }
 
   /**
