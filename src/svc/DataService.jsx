@@ -121,6 +121,17 @@ export default class DataService
          .then(res => res.text());
   }
 
+  deleteFile(fileName)
+    {
+
+      return fetch(
+        this.baseMediaRequest + fileName,
+         {method: 'delete', credentials: 'include',
+           headers: {'x-xsrf-token': this.getTokenCookie() }})
+           .then(this.handleErrors)
+           .then(res => res.text());
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

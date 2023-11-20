@@ -58,3 +58,7 @@ div#message {
   margin-bottom: 1em;
   height:12px;
 }
+
+span.delete {
+  color: red;
+}
