@@ -49,3 +49,12 @@ div.mediaListItem img.hoverImg {
 div.mediaListItem:hover img.hoverImg {
   opacity:1;
 }
+
+div#message.error {
+  color: red;
+}
+
+div#message {
+  margin-bottom: 1em;
+  height:12px;
+}

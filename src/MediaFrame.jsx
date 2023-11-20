@@ -10,7 +10,7 @@ export default class MediaFrame extends Component
     super(props);
     this.dataService = DS_instance();
     this.userService = US_instance();
-    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[]};
+    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:true};
   }
 
   componentDidMount()
@@ -24,19 +24,23 @@ export default class MediaFrame extends Component
   }
 
   fetchImageList() {
-    this.dataService.fetchImageList().then( (imgs) => this.setState({serverImages: imgs.map(img => img.fileName)}));
+    this.dataService.fetchImageList().then(
+      (imgs) => this.setState({serverImages: imgs.map(img => img.fileName), enabled:true})).catch(
+      e => this.setState({"message": e, "errorMessage": true, enabled:true}));
   }
 
 
   render()
   {
     let counter = 0;
+    let messageClass = this.state.errorMessage ? "error" : message;
     return <div className="mediaFrame">
       <div onClick={() => this.props.doClose()} className="close">X</div>
       <h2 className="title">Media Viewer</h2>
       {this.state.user && <form className="uploadBox">
-        <div><input id="mediaFileUpload" type="file"/> <button onClick={(ev) => this.uploadFile(ev)} >Upload</button></div>
+        <div><input id="mediaFileUpload" type="file" disabled={!this.state.enabled}/> <button onClick={(ev) => this.uploadFile(ev)} disabled={!this.state.enabled}>Upload</button></div>
       </form>}
+      <div id="message" className={messageClass}>{this.state.message}</div>
       <div className="mediaList">
         <div className="imageFrame">Image Preview</div>
         {
@@ -54,8 +58,17 @@ export default class MediaFrame extends Component
 
   uploadFile(ev) {
     ev.preventDefault();
+    this.setState({"message": "Uploading", "errorMessage":false, "enabled": false});
     this.dataService.saveMedia(mediaFileUpload.files).then(
-      (e) => this.fetchImageList());
+      (e) => { this.setState({"message": "Upload Complete", "errorMessage": true, enabled:true}); this.fetchImageList();}).catch(
+      e => {
+        if (e.message) {
+          this.setState({"message": e.message, "errorMessage": true, enabled:true})
+        }
+        else {
+          e.promise.then(msg => this.setState({"message": msg, "errorMessage": true, enabled:true})  )
+        }
+        });
   }
 
   setUser(user) {

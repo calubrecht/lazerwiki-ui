@@ -17,33 +17,33 @@ export default class DataService
     fetch(this.baseRequest + 'csrf')
          .then(this.handleErrors);
   }
-  
-  
+
+
   handleErrors(response)
   {
     if (!response.ok)
     {
       if (response.status === 403)
       {
-        throw Error('403');
+        throw Error('Operation Not Permitted');
       }
       if (response.status === 400)
       {
          let e = Error();
-         e.message = response.text().then( r=> {return r});
+         e.promise = response.text();
          throw e;
       }
       throw Error(response.statusText);
     }
     return response;
-  } 
+  }
 
   fetchPage(pageDescriptor)
   {
     return fetch(
       this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
-    
+
   fetchImageList() {
     return fetch(
       this.baseMediaRequest + 'list').then(this.handleErrors).then(response => response.json());
@@ -54,13 +54,13 @@ export default class DataService
       this.baseRequest + 'page/listPages').then(this.handleErrors).then(response => response.json());
   }
 
-  getUIVersion() 
+  getUIVersion()
   {
     return fetch('/meta.json')
       .then((response) => response.json());
   }
-  
-  getVersion() 
+
+  getVersion()
   {
     return fetch(
       this.baseRequest + 'version')
@@ -74,7 +74,7 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
-  
+
   login(username, password)
   {
     return fetch(
@@ -84,7 +84,7 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
-  
+
   logout()
   {
     return fetch(
@@ -94,7 +94,7 @@ export default class DataService
          .then(this.handleErrors)
          .then(response => response.text());
   }
-  
+
   savePage(pageName, text)
   {
     return fetch(
@@ -116,7 +116,7 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.text());
   }
-  
+
   getTokenCookie()
   {
     let cookie = document.cookie
@@ -124,7 +124,7 @@ export default class DataService
       .find(row => row.startsWith('XSRF-TOKEN='));
     return cookie ? cookie.split('=')[1] : null;
   }
-  
+
   getPostHeaders()
   {
     return {
