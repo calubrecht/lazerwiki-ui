@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import NsTree from './NsTree';
 
 import './PageFrame.css';
 
@@ -21,11 +22,11 @@ export default class PageFrame extends Component
   }
 
   structurePageData(pageData) {
-    let tree = {};
+    /*let tree = {};
     this.parseTree(tree, pageData, "", "");
     let nsPages = {};
-    this.parsePages(nsPages, pageData);
-    this.setState({nsTree: tree, pageData: nsPages})
+    this.parsePages(nsPages, pageData); */
+    this.setState({nsTree: pageData.namespaces, pageData: pageData.pages})
   }
 
   parseTree(tree, pageData, fullName, displayName) {
@@ -72,7 +73,7 @@ export default class PageFrame extends Component
         <div className="pageFrameContent">
         <div className="nsTreeSelector">
           <h3>Namespace</h3>
-          {this.renderNSTree()}
+          <NsTree nsTree={this.state.nsTree} selectNS={(ns) => this.selectNS(ns)} />
         </div>
         <div className="pageSelector">
           <h3>Pages - [{this.state.namespace}]</h3>
@@ -107,32 +108,11 @@ export default class PageFrame extends Component
 
     return <div></div>;
   }
-
-  renderNSTree() {
-    return <ul className="nsTree">{this.renderNSSubtree(this.state.nsTree, 1)}</ul>;
-  }
-
-  renderNSSubtree(tree, level) {
-    let name = tree.displayName ? tree.displayName : "<ROOT>";
-    if (!tree.children || tree.children.length == 0) {
-      return <li className="terminal" key={tree.fullName}><span className="dot" onClick={evt => evt.stopPropagation()}> </span><span onClick={(evt => this.selectNS(evt, tree.fullName))}>{name}</span></li>;
-    }
-    let subTreeClass = level <= 1 ? "open" : "closed";
-    return <li className={subTreeClass} key={tree.fullName} onClick= {(evt => this.toggleTreeClass(evt))}><span className="dot"> </span><span onClick={(evt => this.selectNS(evt, tree.fullName))}>{name}</span><ul className="nsTree">{
-      tree.children.map( c => this.renderNSSubtree(c))
-    }</ul></li>;
-  }
-
-  toggleTreeClass(evt) {
-    evt.stopPropagation();
-    evt.currentTarget.classList.toggle("open");
-    evt.currentTarget.classList.toggle("closed");
-  }
-
-  selectNS(evt, ns) {
-    evt.stopPropagation();
+  
+  selectNS(ns) {
     this.setState({namespace: ns});
   }
+
 
   asLinks() {
     return !this.props.editorWidget;
