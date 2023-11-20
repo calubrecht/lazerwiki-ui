@@ -109,10 +109,11 @@ export default class DataService
          .then(res => res.json());
   }
 
-  saveMedia(files)
+  saveMedia(files, namespace)
   {
     let formData = new FormData();
     formData.append("file", files[0]);
+    formData.append("namespace", namespace);
     return fetch(
       this.baseMediaRequest + 'upload',
        {method: 'post', body: formData, credentials: 'include',

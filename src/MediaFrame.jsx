@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
 import UserService, {instance as US_instance} from './svc/UserService';
+import NsTree from './NsTree';
 
 import './MediaFrame.css';
 
@@ -10,7 +11,7 @@ export default class MediaFrame extends Component
     super(props);
     this.dataService = DS_instance();
     this.userService = US_instance();
-    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:false, displayDeleteDlg: false};
+    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:false, displayDeleteDlg: false, namespace:"", nsTree:{children:[]}, uploadNS: ""};
   }
 
   componentDidMount()
@@ -25,36 +26,54 @@ export default class MediaFrame extends Component
 
   fetchImageList() {
     this.dataService.fetchImageList().then(
-      (imgs) => this.setState({serverImages: imgs, enabled:true})).catch(
+      (imgs) => this.setState({serverImages: imgs.media, nsTree: imgs.namespaces, enabled:true})).catch(
       e => this.setState({"message": e, "errorMessage": false, enabled:true}));
   }
 
 
   render()
   {
-    let counter = 0;
     let messageClass = this.state.errorMessage ? "error" : "message";
     return <div className="mediaFrame">
       <div onClick={() => this.props.doClose()} className="close">X</div>
       <h2 className="title">Media Viewer</h2>
+      <div className="mediaFrameContent">
+      <div className="nsTreeSelector">
+          <h3>Namespace</h3>
+          <NsTree nsTree={this.state.nsTree} selectNS={(ns) => this.selectNS(ns)} />
+      </div>
+      <div className="mediaSelector">
+          <h3>Media - [{this.state.namespace}]</h3>
       {this.state.user && <form className="uploadBox">
-        <div><input id="mediaFileUpload" type="file" disabled={!this.state.enabled}/> <button onClick={(ev) => this.uploadFile(ev)} disabled={!this.state.enabled}>Upload</button></div>
+        <div><input id="mediaFileUpload" type="file" disabled={!this.state.enabled}/>
+        <span className="label">NS</span><input id="mediaFileUploadNS" disabled={!this.state.enabled} onChange={evt => this.setState({uploadNS: evt.target.value})} value={this.state.uploadNS}></input><button onClick={(ev) => this.uploadFile(ev)} disabled={!this.state.enabled}>Upload</button></div>
       </form>}
       <div id="message" className={messageClass}>{this.state.message}</div>
-      <div className="mediaList">
+      {this.state.displayDeleteDlg && this.renderDeleteDialog() }
+      {this.renderList()}
+      </div>
+      </div>
+    </div>;
+  }
+
+  renderList() {
+      if (!  this.state.serverImages[this.state.namespace]) {
+        return <div className="mediaList"> <div className="imageFrame">Image Preview</div></div>;
+      }
+      let counter = 0;
+      let nsPrefix = this.state.namespace ? this.state.namespace + ":" : '';
+      return <div className="mediaList">
         <div className="imageFrame">Image Preview</div>
         {
-          this.state.serverImages.map( img => {
+          this.state.serverImages[this.state.namespace].map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
-              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(img)}>Delete</span>}</div>
-              <img className="hoverImg" src={"/_media/" + img.fileName} loading="lazy"/>
+              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</span>}</div>
+              <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
             </div>;
           })
         }
       </div>
-      {this.state.displayDeleteDlg && this.renderDeleteDialog() }
-    </div>;
   }
 
   renderFileSize(size) {
@@ -80,18 +99,20 @@ export default class MediaFrame extends Component
   uploadFile(ev) {
     ev.preventDefault();
     this.setState({"message": "Uploading", "errorMessage":false, "enabled": false});
-    this.dataService.saveMedia(mediaFileUpload.files).then(
+    this.dataService.saveMedia(mediaFileUpload.files, mediaFileUploadNS.value).then(
       (e) => { this.setState({"message": "Upload Complete", "errorMessage": false, enabled:true}); this.fetchImageList();}).catch(
       e => this.handleError(e));
   }
 
-  doDelete(img) {
-    this.setState({displayDeleteDlg: true, deleteImage:img});
+  doDelete(namespace, img) {
+    const fileName = namespace ? namespace + ":" + img.fileName : img.fileName;
+    const displayName = img.fileName;
+    this.setState({displayDeleteDlg: true, deleteImage:{fileName, displayName}});
   }
 
   renderDeleteDialog() {
     return (<dialog className="deleteDialog" open>
-    <div>Are you sure you want to delete {this.state.deleteImage.fileName}?</div>
+    <div>Are you sure you want to delete {this.state.deleteImage.displayName}?</div>
     <div>The file will be removed from the server</div>
     <div><button onClick={  ()=> this.requestDelete(this.state.deleteImage.fileName).then(() => this.closeDeleteDialog("File Deleted")).
   catch(e => {this.handleError(e); this.closeDeleteDialog()})}>Delete</button><button onClick={() => this.closeDeleteDialog()}>Cancel</button></div>
@@ -114,5 +135,9 @@ export default class MediaFrame extends Component
 
   setUser(user) {
     this.setState({user: user});
+  }
+  
+  selectNS(ns) {
+    this.setState({namespace: ns, uploadNS: ns});
   }
 }

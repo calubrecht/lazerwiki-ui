@@ -1,6 +1,6 @@
 div.toolbar div.mediaFrame {
   position:absolute;
-  width:500px;
+  width:900px;
   height:500px;
   left: 152px;
   top: 10px;
@@ -61,4 +61,34 @@ div#message {
 
 span.delete {
   color: red;
+}
+
+div.mediaFrameContent {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+div.nsTreeSelector {
+  display:inline-block;
+  vertical-align: top;
+  width:300px;
+}
+
+div.mediaSelector {
+  display:inline-block;
+  vertical-align: top;
+  width:800px;
+}
+
+span.label {
+  color:#0000a0;
+}
+
+input#mediaFileUploadNS {
+  margin: 0 .5em 0 .25em;
+}
+
+dialog.deleteDialog {
+  z-index:10;
 }
