@@ -1,7 +1,11 @@
 var INSTANCE = null;
 
+
+export const FOUR_O_THREE = 'Operation Not Permitted';
+
 export default class DataService
 {
+
   constructor()
   {
     this.handleErrors = this.handleErrors.bind(this);
@@ -25,7 +29,7 @@ export default class DataService
     {
       if (response.status === 403)
       {
-        throw Error('Operation Not Permitted');
+        throw Error(FOUR_O_THREE);
       }
       if (response.status === 400)
       {

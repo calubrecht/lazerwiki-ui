@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {instance as DS_instance} from './svc/DataService';
+import {instance as DS_instance, FOUR_O_THREE} from './svc/DataService';
 import {instance as US_instance} from './svc/UserService';
 import LoginFrame from './LoginFrame';
 
@@ -22,7 +22,7 @@ function UserWidget() {
        US_instance().setUser(user);
     }).
     catch((e) => {
-      if (e.message == 403) {
+      if (e.message == FOUR_O_THREE) {
         console.log("Not logged in. Reset login state");
         US_instance().setUser(null);
         setInitted(true);
@@ -36,7 +36,7 @@ function UserWidget() {
   return (
     <div className="UserWidget">
       {
-        initted ? ( 
+        initted ? (
           userName ? (
              <div><span>Hi, {userName}</span> <span className="logout" onClick={logout}>LogOut</span></div>
           ) :
@@ -44,7 +44,7 @@ function UserWidget() {
                <div><span>Hi, Guest</span></div>
                <LoginFrame/>
              </div>
-        ) : 
+        ) :
         <span>Loading, please wait</span>
       }
     </div>
