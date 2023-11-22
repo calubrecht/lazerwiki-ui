@@ -34,6 +34,7 @@ export default class MediaFrame extends Component
   render()
   {
     let messageClass = this.state.errorMessage ? "error" : "message";
+    let enableUpload = this.enableUpload();
     return <div className="mediaFrame">
       <div onClick={() => this.props.doClose()} className="close">X</div>
       <h2 className="title">Media Viewer</h2>
@@ -45,8 +46,8 @@ export default class MediaFrame extends Component
       <div className="mediaSelector">
           <h3>Media - [{this.state.namespace}]</h3>
       {this.state.user && <form className="uploadBox">
-        <div><input id="mediaFileUpload" type="file" disabled={!this.state.enabled}/>
-        <span className="label">NS</span><input id="mediaFileUploadNS" disabled={!this.state.enabled} onChange={evt => this.setState({uploadNS: evt.target.value})} value={this.state.uploadNS}></input><button onClick={(ev) => this.uploadFile(ev)} disabled={!this.state.enabled}>Upload</button></div>
+        <div><input id="mediaFileUpload" type="file" disabled={!enableUpload}/>
+        <span className="label">NS</span><input id="mediaFileUploadNS" disabled={!enableUpload} onChange={evt => this.setState({uploadNS: evt.target.value})} value={this.state.uploadNS}></input><button onClick={(ev) => this.uploadFile(ev)} disabled={!enableUpload}>Upload</button></div>
       </form>}
       <div id="message" className={messageClass}>{this.state.message}</div>
       {this.state.displayDeleteDlg && this.renderDeleteDialog() }
@@ -85,6 +86,27 @@ export default class MediaFrame extends Component
       return kb.toFixed(2) + " kb";
     }
     return (kb/1024.0).toFixed(2) + " mb";
+  }
+
+  enableUpload() {
+    if (!this.state.enabled) {
+      return false;
+    }
+    const node = this.findNode(this.state.nsTree, this.state.namespace);
+    return node && node.writable;
+  }
+
+  findNode(tree, namespace) {
+    if (tree.namespace == namespace) {
+      return tree;
+    }
+    for (let subtree of tree.children) {
+      let node = this.findNode(subtree, namespace);
+      if (node) {
+        return node;
+      }
+    }
+    return null;
   }
 
   handleError(e) {
@@ -135,6 +157,7 @@ export default class MediaFrame extends Component
 
   setUser(user) {
     this.setState({user: user});
+    this.fetchImageList();
   }
   
   selectNS(ns) {

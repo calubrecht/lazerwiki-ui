@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import UserService, {instance as US_instance} from './svc/UserService';
 import NsTree from './NsTree';
 
 import './PageFrame.css';
@@ -9,13 +10,20 @@ export default class PageFrame extends Component
   constructor(props) {
     super(props);
     this.dataService = DS_instance();
+    this.userService = US_instance();
     this.state = {nsTree: {}, pageData: {}, namespace: "" };
   }
 
   componentDidMount()
   {
+    this.userService.addListener(this);
     this.fetchPageList();
   }
+  
+  componentWillUnmount() {
+    this.userService.removeListener(this);
+  }
+
 
   fetchPageList() {
     this.dataService.fetchPageList().then( (data) => this.structurePageData(data));
@@ -107,6 +115,11 @@ export default class PageFrame extends Component
     }
 
     return <div></div>;
+  }
+  
+  setUser(user) {
+    this.setState({user: user});
+    this.fetchPageList();
   }
   
   selectNS(ns) {

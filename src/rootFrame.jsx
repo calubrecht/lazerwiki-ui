@@ -31,6 +31,7 @@ export default class RootFrame extends Component
     this.data.getUIVersion().then(meta => console.log(`UI-version - ${meta.version}`));
     this.data.getVersion().then(res => console.log(`Server-version - ${res}`));
     this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
+    this.fetchPageData();
   }
 
   componentWillUnmount() {
@@ -43,10 +44,16 @@ export default class RootFrame extends Component
 
   setUser(user) {
     this.setState({user: user});
+    this.fetchPageData();
   }
 
   loggedIn() {
     return this.state.user != null;
+  }
+
+  fetchPageData() {
+    this.state = {pageData: {rendered: 'Loading', exists:false}, stage:'viewing', loaded:false};
+    this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
   }
 
   render()
@@ -69,7 +76,7 @@ export default class RootFrame extends Component
         if ( !this.state.loaded) {
           return <div className="RootMenu"></div>;
         }
-        if (! this.loggedIn() ){
+        if (! this.loggedIn() || !this.state.pageData.userCanWrite ){
           return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span></div>;
         }
         return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.exists && <span>Delete Page</span>}</div>;
