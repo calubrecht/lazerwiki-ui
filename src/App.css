@@ -118,6 +118,14 @@ span.italic {
   font-style: italic;
 }
 
+span.underline {
+  text-decoration: underline;
+}
+
+span.monospace {
+  font-family: monospace;
+}
+
 pre.code {
   padding: .5em;
   border: 1px dashed ;
