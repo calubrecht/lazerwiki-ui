@@ -21,7 +21,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading', exists:false}, stage:'viewing', user: this.userService.getUser(), loaded:false};
+    this.state = {pageData: {rendered: 'Loading', exists:false, tags:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false};
     this.data = DS_instance();
   }
 
@@ -52,7 +52,7 @@ export default class RootFrame extends Component
   }
 
   fetchPageData() {
-    this.state = {pageData: {rendered: 'Loading', exists:false}, stage:'viewing', loaded:false};
+    this.setState({pageData: {rendered: 'Loading', exists:false, tags:[]}, stage:'viewing', loaded:false});
     this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
   }
 
@@ -62,11 +62,13 @@ export default class RootFrame extends Component
     let createAction = this.state.pageData.exists ? "Edit Page" : "Create Page";
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
-        <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  </div>
+        <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
+        { this.renderTags() }
+        </div>
         { this.renderMenu(createAction) }</div>;
     }
       return <div className="RootFrame">
-      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} /> </div>
+      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} /> </div>
       <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span></div>
       </div>;
 
@@ -80,6 +82,13 @@ export default class RootFrame extends Component
           return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span></div>;
         }
         return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.exists && <span>Delete Page</span>}</div>;
+  }
+
+  renderTags() {
+    return <div className="tagList"> {
+      this.state.pageData.tags.map((t) => <span key={t}>{t}</span> )
+    }
+      </div>
   }
 
   handleError(error) {

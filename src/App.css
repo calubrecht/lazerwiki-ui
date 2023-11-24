@@ -53,6 +53,7 @@ div#root {
 }
 
 div.RootBody {
+  position:relative;
   background: white;
   margin: 40px;
   margin-bottom: 0px;
@@ -69,6 +70,7 @@ div.RootBody div {
 }
 
 div.RootMenu {
+  position:relative;
   text-align: left;
   margin-left: 40px
 }
@@ -79,6 +81,18 @@ div.RootMenu span {
   border-width: 0px 2px 2px 3px;
   border-style: solid;
   margin: 0px 6px 0px 0px;
+}
+
+div.tagList {
+  position:absolute;
+  bottom:0px;
+  right:0px;
+}
+
+div.tagList span {
+  padding-right: 5px;
+  color: #AA0010;
+  font-weight: bold;
 }
 
 a.wikiLink:link, a.wikiLink:visited {

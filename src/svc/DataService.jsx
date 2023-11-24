@@ -45,7 +45,7 @@ export default class DataService
   fetchPage(pageDescriptor)
   {
     return fetch(
-      this.baseRequest + 'page/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
+      this.baseRequest + 'page/get/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
 
   fetchImageList() {
@@ -56,6 +56,11 @@ export default class DataService
   fetchPageList() {
     return fetch(
       this.baseRequest + 'page/listPages').then(this.handleErrors).then(response => response.json());
+  }
+  
+  fetchTagList() {
+    return fetch(
+      this.baseRequest + 'page/listTags').then(this.handleErrors).then(response => response.json());
   }
 
   getUIVersion()
@@ -99,11 +104,11 @@ export default class DataService
          .then(response => response.text());
   }
 
-  savePage(pageName, text)
+  savePage(pageName, pageData)
   {
     return fetch(
       this.baseRequest + 'page/' + pageName + '/savePage',
-       {method: 'post', body: JSON.stringify({pageName: pageName, text: text}), credentials: 'include',
+       {method: 'post', body: JSON.stringify({pageName: pageName, text: pageData.text, tags:pageData.tags}), credentials: 'include',
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
          .then(res => res.json());
