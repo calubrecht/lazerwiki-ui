@@ -7,6 +7,7 @@ div.toolbar div.mediaFrame {
   background:white;
   border-style:solid;
   padding:5px;
+  z-index: 1;
 }
 
 div.mediaFrame div.close {
