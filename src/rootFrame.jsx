@@ -30,8 +30,9 @@ export default class RootFrame extends Component
     this.userService.addListener(this);
     this.data.getUIVersion().then(meta => console.log(`UI-version - ${meta.version}`));
     this.data.getVersion().then(res => console.log(`Server-version - ${res}`));
-    this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
-    this.fetchPageData();
+    if (this.state.user) {
+      this.fetchPageData();
+    }
   }
 
   componentWillUnmount() {
