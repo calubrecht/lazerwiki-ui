@@ -1,0 +1,69 @@
+div#root div.pageSearchFrame {
+  position:absolute;
+  width:400px;
+  height:500px;
+  right: 60px;
+  bottom: 60px;
+  background:white;
+  border-style:solid;
+  padding:8px;
+  z-index: 1;
+}
+
+div.pageSearchFrame div.close {
+  float:right;
+  margin:1px 3px;
+  color: red;
+  font-weight: bold;
+}
+
+div.pageSearchFrameContent {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+div.nsTreeSelector {
+  display:inline-block;
+  vertical-align: top;
+  width:300px;
+}
+
+div.pageSelector {
+  display:inline-block;
+  vertical-align: top;
+  width:300px;
+}
+
+div.pageList div  {
+  margin-bottom: .25em;
+}
+
+div.pageList a, div.pageList a:visited {
+  color: blue;
+  text-decoration: none;
+}
+
+ul.nsTree {
+  list-style:none;
+  padding-left: 20px;
+}
+
+ul.nsTree li.terminal > span.dot:before{
+  content: url("/_resources/dot.png");
+
+}
+
+ul.nsTree li.open > span.dot:before{
+  content: url("/_resources/minus.png");
+
+}
+
+ul.nsTree li.closed > span.dot:before{
+  content: url("/_resources/plus.png");
+
+}
+
+ul.nsTree li.closed ul {
+  display:none;
+}

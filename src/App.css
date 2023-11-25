@@ -52,6 +52,10 @@ div#root {
   margin-left: 120px;
 }
 
+div.RootFrame {
+  position:relative;
+}
+
 div.RootBody {
   position:relative;
   background: white;

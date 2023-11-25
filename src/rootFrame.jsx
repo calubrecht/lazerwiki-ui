@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import PageSearchFrame from './PageSearchFrame';
 import EditableTextbox from './EditableTextbox';
 import {instance as US_instance} from './svc/UserService';
 import HTMLReactParser from 'html-react-parser';
@@ -21,7 +22,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading', exists:false, tags:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false};
+    this.state = {pageData: {rendered: 'Loading', exists:false, tags:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null};
     this.data = DS_instance();
   }
 
@@ -66,7 +67,9 @@ export default class RootFrame extends Component
         <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
         { this.renderTags() }
         </div>
-        { this.renderMenu(createAction) }</div>;
+        { this.renderMenu(createAction) }
+        { this.renderTagSearch() }
+        </div>;
     }
       return <div className="RootFrame">
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} /> </div>
@@ -87,9 +90,17 @@ export default class RootFrame extends Component
 
   renderTags() {
     return <div className="tagList"> {
-      this.state.pageData.tags.map((t) => <span key={t}>{t}</span> )
+      this.state.pageData.tags.map((t) => <span key={t} onClick={ev => this.toggleSearchTag(t)}>{t}</span> )
     }
       </div>
+  }
+
+  renderTagSearch() {
+    return this.state.searchTag && <PageSearchFrame searchTag={this.state.searchTag} doClose={() => this.setState({searchTag:null})}/>
+  }
+
+  toggleSearchTag(t) {
+    this.setState({searchTag: (this.state.searchTag ? null : t)});
   }
 
   handleError(error) {

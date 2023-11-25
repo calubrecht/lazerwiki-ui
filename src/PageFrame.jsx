@@ -30,10 +30,6 @@ export default class PageFrame extends Component
   }
 
   structurePageData(pageData) {
-    /*let tree = {};
-    this.parseTree(tree, pageData, "", "");
-    let nsPages = {};
-    this.parsePages(nsPages, pageData); */
     this.setState({nsTree: pageData.namespaces, pageData: pageData.pages})
   }
 

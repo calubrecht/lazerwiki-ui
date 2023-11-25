@@ -58,6 +58,11 @@ export default class DataService
       this.baseRequest + 'page/listPages').then(this.handleErrors).then(response => response.json());
   }
   
+  doPageSearch(searchTerm) {
+    return fetch(
+      this.baseRequest + 'page/searchPages?search='+ encodeURIComponent(searchTerm) ).then(this.handleErrors).then(response => response.json());
+  }
+  
   fetchTagList() {
     return fetch(
       this.baseRequest + 'page/listTags').then(this.handleErrors).then(response => response.json());
