@@ -22,7 +22,7 @@ export default class EditableTextbox extends Component
     if (!this.props.editable) {
       return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
     }
-    return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {
@@ -37,6 +37,19 @@ export default class EditableTextbox extends Component
   onChangeText(ev)
   {
     this.setState({text: ev.target.value, error:""});
+  }
+
+  onKeydown(ev) {
+    if (ev.ctrlKey && ev.key === 's') {
+      ev.preventDefault();
+      this.props.savePage(ev);
+      return;
+    }
+    if (ev.ctrlKey && ev.key === 'c' || ev.key === "Escape") {
+      ev.preventDefault();
+      this.props.cancelEdit(ev);
+      return;
+    }
   }
 
   newTagBox(ev) {
