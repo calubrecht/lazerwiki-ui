@@ -33,6 +33,7 @@ div.imageFrame {
   justify-content: center;
   align-items: center;
   color: grey;
+  z-index:2;
 }
 
 
