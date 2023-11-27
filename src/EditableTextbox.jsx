@@ -45,7 +45,7 @@ export default class EditableTextbox extends Component
       this.props.savePage(ev);
       return;
     }
-    if (ev.ctrlKey && ev.key === 'c' || ev.key === "Escape") {
+    if (ev.ctrlKey && ev.altKey && ev.key === 'c' || ev.key === "Escape") {
       ev.preventDefault();
       this.props.cancelEdit(ev);
       return;
