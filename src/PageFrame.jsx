@@ -109,8 +109,10 @@ export default class PageFrame extends Component
 
       </div>);
     }
+    return (<div className="pageList">
+        {pages.map( p => <div key={p.pagename}><a onClick={ev => this.doAction(ev, p)}>{this.renderLinkName(p)}</a></div>)}
 
-    return <div></div>;
+      </div>);
   }
   
   setUser(user) {
@@ -124,6 +126,12 @@ export default class PageFrame extends Component
 
 
   asLinks() {
-    return !this.props.editorWidget;
+    return !this.props.selectItem;
+  }
+
+  doAction(ev, p) {
+    let name = p.namespace === '' ? p.pagename : p.namespace + ":" + p.pagename;
+    this.props.selectItem(name);
+    ev.preventDefault();
   }
 }

@@ -63,6 +63,21 @@ export default class MediaFrame extends Component
       }
       let counter = 0;
       let nsPrefix = this.state.namespace ? this.state.namespace + ":" : '';
+      if (this.props.selectItem) {
+      return <div className="mediaList">
+        <div className="imageFrame">Image Preview</div>
+        {
+          this.state.serverImages[this.state.namespace].map( img => {
+            counter++;
+            return <div className="mediaListItem" key={"media" + counter}>
+              <div><a onClick={(ev) => this.doAction(ev, nsPrefix + img.fileName)}>{img.fileName}</a> - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</span>}</div>
+              <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
+            </div>;
+          })
+        }
+        </div>
+
+      }
       return <div className="mediaList">
         <div className="imageFrame">Image Preview</div>
         {
@@ -169,5 +184,10 @@ export default class MediaFrame extends Component
   
   selectNS(ns) {
     this.setState({namespace: ns, uploadNS: ns});
+  }
+
+  doAction(ev, img) {
+    this.props.selectItem(img);
+    ev.preventDefault();
   }
 }

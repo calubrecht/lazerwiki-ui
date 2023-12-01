@@ -1,14 +1,17 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import PageFrame from './PageFrame';
+import MediaFrame from './MediaFrame';
 
 import './EditableTextbox.css';
 
 
 
-export default class EditableToolbar extends Component
+export default class EditToolbar extends Component
 {
   constructor(props) {
     super(props);
+    this.state= {showFrame: null};
     this.buttons = [
       {name:"Add Header", icon:"header.png", click:() => {
          let area = this.getTextArea();
@@ -41,19 +44,32 @@ export default class EditableToolbar extends Component
          let listLevel = ' '; // Lookback for previous level
          this.replaceSelectionText(startNLIfNeeded + listLevel + '*', '\n', 'List Item');
       }},
+      {name:"Page Link", icon:"addPage.png", click:() => {
+        this.setState({showFrame:PageFrame, selectItem:p => this.addPageLink(p)});
+      }},
+      {name:"Image", icon:"addImage.png", click:() => {
+        this.setState({showFrame:MediaFrame, selectItem: p => this.addImageLink(p)});
+      }},
       
     ]
   }
   
   render()
   {
-    return <div className="editToolbar">{this.renderButtons()}</div>
+    return <div className="editToolbar">{this.renderButtons()}{this.renderFrames()}</div>
   }
 
   renderButtons() {
     return this.buttons.map( (def) => <span className="button" onClick={def.click} title={def.name} key={def.name}>
       <img src={"/_resources/" + def.icon} alt={def.name}/></span>);
 
+  }
+
+  renderFrames() {
+    if (!this.state.showFrame) {
+      return ;
+    }
+    return <this.state.showFrame doClose={() => this.setState({showFrame: null})} selectItem={this.state.selectItem}/>
   }
 
   
@@ -76,4 +92,13 @@ export default class EditableToolbar extends Component
        this.props.setText(currentText);
   }
 
+  addPageLink(p) {
+    this.setState({showFrame:null});
+    this.replaceSelectionText('[[' + p + '|', ']]', '');
+  }
+  
+  addImageLink(i) {
+    this.setState({showFrame:null});
+    this.replaceSelectionText('{{' + i + '|', '}}', '');
+  }
 }
