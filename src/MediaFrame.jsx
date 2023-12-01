@@ -11,7 +11,8 @@ export default class MediaFrame extends Component
     super(props);
     this.dataService = DS_instance();
     this.userService = US_instance();
-    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:false, displayDeleteDlg: false, namespace:"", nsTree:{children:[]}, uploadNS: ""};
+    let initialNS = this.props.namespace ? this.props.namespace : "";
+    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:false, displayDeleteDlg: false, namespace: initialNS, nsTree:{children:[]}, uploadNS: initialNS};
   }
 
   componentDidMount()
@@ -112,7 +113,7 @@ export default class MediaFrame extends Component
       return false;
     }
     const node = this.findNode(this.state.nsTree, this.state.namespace);
-    return node && node.writable;
+    return !node || node.writable;
   }
 
   findNode(tree, namespace) {

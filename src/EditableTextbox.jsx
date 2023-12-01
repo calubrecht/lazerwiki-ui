@@ -8,7 +8,8 @@ export default class EditableTextbox extends Component
 {
   constructor(props) {
     super(props);
-    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:""};
+    let namespace = this.props.pageName.slice(0, this.props.pageName.lastIndexOf(':'));
+    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace};
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]};});
     this.data = DS_instance();
   }
@@ -23,7 +24,7 @@ export default class EditableTextbox extends Component
     if (!this.props.editable) {
       return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {

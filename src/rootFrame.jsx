@@ -72,7 +72,7 @@ export default class RootFrame extends Component
         </div>;
     }
       return <div className="RootFrame">
-      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)}/> </div>
+      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
       <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span></div>
       </div>;
 

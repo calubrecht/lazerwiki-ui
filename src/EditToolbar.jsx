@@ -69,7 +69,7 @@ export default class EditToolbar extends Component
     if (!this.state.showFrame) {
       return ;
     }
-    return <this.state.showFrame doClose={() => this.setState({showFrame: null})} selectItem={this.state.selectItem}/>
+    return <this.state.showFrame doClose={() => this.setState({showFrame: null})} selectItem={this.state.selectItem} namespace={this.props.namespace}/>
   }
 
   

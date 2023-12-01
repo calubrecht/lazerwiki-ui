@@ -11,7 +11,8 @@ export default class PageFrame extends Component
     super(props);
     this.dataService = DS_instance();
     this.userService = US_instance();
-    this.state = {nsTree: {}, pageData: {}, namespace: "" };
+    let initialNS = this.props.namespace ? this.props.namespace : "";
+    this.state = {nsTree: {}, pageData: {}, namespace: initialNS}
   }
 
   componentDidMount()
