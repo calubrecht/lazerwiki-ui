@@ -1,5 +1,7 @@
 textarea.pageSource {
   background-color: lightgray;
+  width: 98%;
+  max-width:98%;
 }
 
 div.editableTagList {
