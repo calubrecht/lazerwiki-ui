@@ -9,26 +9,39 @@ export default class EditableToolbar extends Component
 {
   constructor(props) {
     super(props);
-    this.getTextArea = () => document.getElementById("pageSource");
     this.buttons = [
-      {name:"Add Header", icon:"toolbar/addHeader.png", click:() => {
+      {name:"Add Header", icon:"header.png", click:() => {
          let area = this.getTextArea();
          let currentText = this.props.getCurrentText();
          let selectStart = area.selectionStart;
-         let selectEnd = area.selectionEnd;
          let startNLIfNeeded = selectStart == 0 || currentText[selectStart-1] == '\n' ? '' : '\n';
          // Get current level of header....
          let headerLevel = "======";
-         if (selectStart == selectEnd) {
-           // No selection, add header at this point
-           currentText = currentText.slice(0, selectStart) + startNLIfNeeded  + headerLevel + "Header" + headerLevel + "\n" + currentText.slice(selectStart);
-         }
-         else {
-           // No selection, add header at this point
-           currentText = currentText.slice(0, selectStart) + startNLIfNeeded  + headerLevel + currentText.slice(selectStart, selectEnd) + headerLevel + "\n" + currentText.slice(selectEnd);
-         }
-         this.props.setText(currentText);
-      }}
+         this.replaceSelectionText(startNLIfNeeded + headerLevel, headerLevel + '\n', "Header");
+      }},
+      {name:"Bold", icon:"bold.png", click:() => {
+         this.replaceSelectionText("**","**", "Bold");
+      }},
+      {name:"Italic", icon:"italic.png", click:() => {
+         this.replaceSelectionText("//","//", "Italic");
+      }},
+      {name:"Ordered List", icon:"olist.png", click:() => {
+         let area = this.getTextArea();
+         let currentText = this.props.getCurrentText();
+         let selectStart = area.selectionStart;
+         let startNLIfNeeded = selectStart == 0 || currentText[selectStart-1] == '\n' ? '' : '\n';
+         let listLevel = ' '; // Lookback for previous level
+         this.replaceSelectionText(startNLIfNeeded + listLevel + '-', '\n', 'List Item');
+      }},
+      {name:"Unordered List", icon:"ulist.png", click:() => {
+         let area = this.getTextArea();
+         let currentText = this.props.getCurrentText();
+         let selectStart = area.selectionStart;
+         let startNLIfNeeded = selectStart == 0 || currentText[selectStart-1] == '\n' ? '' : '\n';
+         let listLevel = ' '; // Lookback for previous level
+         this.replaceSelectionText(startNLIfNeeded + listLevel + '*', '\n', 'List Item');
+      }},
+      
     ]
   }
   
@@ -38,9 +51,29 @@ export default class EditableToolbar extends Component
   }
 
   renderButtons() {
-    return this.buttons.map( (def) => <span onClick={def.click} title={def.name} key={def.name}>{def.name}</span>);
+    return this.buttons.map( (def) => <span className="button" onClick={def.click} title={def.name} key={def.name}>
+      <img src={"/_resources/" + def.icon} alt={def.name}/></span>);
 
   }
 
+  
+  getTextArea() {
+    return document.getElementById("pageSource");
+  }
+  replaceSelectionText(startToken, endToken, defaultInside) {
+       let area = this.getTextArea();
+       let currentText = this.props.getCurrentText();
+       let selectStart = area.selectionStart;
+       let selectEnd = area.selectionEnd;
+       if (selectStart == selectEnd) {
+         // No selection, add header at this point
+         currentText = currentText.slice(0, selectStart) + startToken + defaultInside +  endToken + currentText.slice(selectStart);
+       }
+       else {
+         // No selection, add header at this point
+         currentText = currentText.slice(0, selectStart) + startToken + currentText.slice(selectStart, selectEnd) + endToken + currentText.slice(selectEnd);
+       }
+       this.props.setText(currentText);
+  }
 
 }
