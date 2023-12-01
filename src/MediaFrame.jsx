@@ -69,7 +69,7 @@ export default class MediaFrame extends Component
           this.state.serverImages[this.state.namespace].map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
-              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</span>}</div>
+              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</span>}</div>
               <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
             </div>;
           })
@@ -86,6 +86,10 @@ export default class MediaFrame extends Component
       return kb.toFixed(2) + " kb";
     }
     return (kb/1024.0).toFixed(2) + " mb";
+  }
+
+  renderDownloadLink(fileName, filePath) {
+    return <a download={fileName} href={filePath}><img src="/_resources/download.png"/></a>;
   }
 
   enableUpload() {
@@ -122,7 +126,10 @@ export default class MediaFrame extends Component
     ev.preventDefault();
     this.setState({"message": "Uploading", "errorMessage":false, "enabled": false});
     this.dataService.saveMedia(mediaFileUpload.files, mediaFileUploadNS.value).then(
-      (e) => { this.setState({"message": "Upload Complete", "errorMessage": false, enabled:true}); this.fetchImageList();}).catch(
+      (e) => {
+        mediaFileUpload.value = null;
+        this.setState({"message": "Upload Complete", "errorMessage": false, enabled:true});
+        this.fetchImageList();}).catch(
       e => this.handleError(e));
   }
 

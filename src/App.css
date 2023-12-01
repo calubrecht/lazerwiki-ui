@@ -115,9 +115,12 @@ img.media, img.mediacenter, img.mediaright, img.medialeft {
 
 img.mediaright {
   float: right;
+  margin-left:1em;
+  margin.bottom:.5em;
 }
 img.medialeft {
   float: left;
+  margin-right:1em;
 }
 img.mediacenter {
   display: block;
@@ -149,5 +152,6 @@ pre.code {
   border: 1px dashed ;
   font-family: monospace;
   background-color: #f0f0f0;
+  clear:both;
 }
 
