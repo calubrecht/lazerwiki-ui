@@ -59,7 +59,7 @@ export default class MediaFrame extends Component
 
   renderList() {
       if (!  this.state.serverImages[this.state.namespace]) {
-        return <div className="mediaList"> <div className="imageFrame">Image Preview</div></div>;
+        return <div className="mediaList"> <div className="imageFrame" title="Hover over filename to preview">Image Preview</div></div>;
       }
       let counter = 0;
       let nsPrefix = this.state.namespace ? this.state.namespace + ":" : '';

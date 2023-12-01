@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import EditToolbar from './EditToolbar';
 
 import './EditableTextbox.css';
 
@@ -22,7 +23,7 @@ export default class EditableTextbox extends Component
     if (!this.props.editable) {
       return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {
@@ -37,6 +38,11 @@ export default class EditableTextbox extends Component
   onChangeText(ev)
   {
     this.setState({text: ev.target.value, error:""});
+  }
+  
+  setText(text)
+  {
+    this.setState({text: text, error:""});
   }
 
   onKeydown(ev) {
