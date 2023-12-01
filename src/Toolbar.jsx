@@ -6,7 +6,8 @@ import {useState} from 'react';
   export default function Toolbar() {
     let [showMedia, setShowMedia] = useState(false);
     return <div className="toolbar">
-       <div>I'm a toolbar</div>
+       <div class="bold">Toolbar</div>
+       <div><a href="/">Home</a></div>
        <DrawerLink title="Media List" component={MediaFrame} />
        <DrawerLink title="Page List" component={PageFrame} />
       </div>
