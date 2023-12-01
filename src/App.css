@@ -116,7 +116,7 @@ img.media, img.mediacenter, img.mediaright, img.medialeft {
 img.mediaright {
   float: right;
   margin-left:1em;
-  margin.bottom:.5em;
+  margin-bottom:.5em;
 }
 img.medialeft {
   float: left;

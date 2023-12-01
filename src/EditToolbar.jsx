@@ -19,7 +19,7 @@ export default class EditToolbar extends Component
          let selectStart = area.selectionStart;
          let startNLIfNeeded = selectStart == 0 || currentText[selectStart-1] == '\n' ? '' : '\n';
          // Get current level of header....
-         let headerLevel = "======";
+         let headerLevel = this.getHeaderLevel(currentText, selectStart);
          this.replaceSelectionText(startNLIfNeeded + headerLevel, headerLevel + '\n', "Header");
       }},
       {name:"Bold", icon:"bold.png", click:() => {
@@ -33,7 +33,7 @@ export default class EditToolbar extends Component
          let currentText = this.props.getCurrentText();
          let selectStart = area.selectionStart;
          let startNLIfNeeded = selectStart == 0 || currentText[selectStart-1] == '\n' ? '' : '\n';
-         let listLevel = ' '; // Lookback for previous level
+         let listLevel = this.getListLevel(currentText, selectStart);
          this.replaceSelectionText(startNLIfNeeded + listLevel + '-', '\n', 'List Item');
       }},
       {name:"Unordered List", icon:"ulist.png", click:() => {
@@ -41,7 +41,7 @@ export default class EditToolbar extends Component
          let currentText = this.props.getCurrentText();
          let selectStart = area.selectionStart;
          let startNLIfNeeded = selectStart == 0 || currentText[selectStart-1] == '\n' ? '' : '\n';
-         let listLevel = ' '; // Lookback for previous level
+         let listLevel = this.getListLevel(currentText, selectStart);
          this.replaceSelectionText(startNLIfNeeded + listLevel + '*', '\n', 'List Item');
       }},
       {name:"Page Link", icon:"addPage.png", click:() => {
@@ -100,5 +100,50 @@ export default class EditToolbar extends Component
   addImageLink(i) {
     this.setState({showFrame:null});
     this.replaceSelectionText('{{' + i + '|', '}}', '');
+  }
+  
+  getPreviousLine(text, start) {
+    if (start == 0) {
+      return ["", -1];
+    }
+    let newlines = [];
+    for (let i = start; i >= 0; i--) {
+      if (text[i] == '\n') {
+        newlines.push(i);
+      }
+      if (newlines.length == 2) {
+        return [text.slice(newlines[1]+1, newlines[0]-1), newlines[1]];
+      }
+    }
+    if (newlines.length ==1) {
+      return [text.slice(0, start-1), 0];
+    }
+    return [text.slice(0, start), 0];
+  }
+
+  getHeaderLevel(fullText, selectionStart) {
+    let [previousLine, newPosition] = this.getPreviousLine(fullText, selectionStart);
+    const headerRE = /^ *(={2,6}).*={2,6} *$/;
+    while (newPosition >= 0) {
+      let m = previousLine.match(headerRE);
+      if (m) {
+        return m[1];
+      }
+      [previousLine, newPosition] = this.getPreviousLine(fullText, newPosition);
+    }
+    return "======"
+  }
+  
+  getListLevel(fullText, selectionStart) {
+    if (fullText[selectionStart] == '\n') {
+      selectionStart = selectionStart -1;
+    }
+    let [previousLine, newPosition] = this.getPreviousLine(fullText, selectionStart);
+    const headerRE = /^( *)[-*].*$/;
+    let m = previousLine.match(headerRE);
+    if (m) {
+      return m[1];
+    }
+    return " "
   }
 }
