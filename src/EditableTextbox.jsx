@@ -24,7 +24,7 @@ export default class EditableTextbox extends Component
     if (!this.props.editable) {
       return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev) } ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {
@@ -108,5 +108,22 @@ export default class EditableTextbox extends Component
     ev.preventDefault();
     this.setState({text:null, error:""});
     this.props.doCancel()
+  }
+
+  handleAutoIndent(ev) {
+    if (ev.code == 'Enter') {
+      ev.preventDefault();
+      let el = ev.target;
+      let val = el.value;
+      let start = el.selectionStart;
+      let currentLine = val.slice(0, start).split('\n').pop();
+      let newlineIndent = '\n' + currentLine.match(/^\s*/)[0];
+      let newVal = val.slice(0, start) + newlineIndent + val.slice(start);
+      el.value = newVal;
+      el.selectionStart = start + newlineIndent.length;
+      el.selectionEnd = start + newlineIndent.length;
+
+      this.setState({text: newVal, error:""});
+    }
   }
 }
