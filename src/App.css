@@ -180,3 +180,10 @@ div.RootMenu div.drawerPull  {
   margin: -3px 6px 0px 0px;
 }
 
+dialog.deletePageDialog {
+  position: absolute;
+  z-index:10;
+  bottom:60px;
+  left: -200px;
+  background: grey;
+}

@@ -24,7 +24,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading', exists:false, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null};
+    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:''};
     this.data = DS_instance();
   }
 
@@ -56,16 +56,17 @@ export default class RootFrame extends Component
   }
 
   fetchPageData() {
-    this.setState({pageData: {rendered: 'Loading', exists:false, tags:[]}, stage:'viewing', loaded:false});
+    this.setState({pageData: {rendered: 'Loading', flags:{exists:false}, tags:[]}, stage:'viewing', loaded:false});
     this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
   }
 
   render()
   {
     let user = this.state.user ? this.state.user.userName : "GUEST";
-    let createAction = this.state.pageData.exists ? "Edit Page" : "Create Page";
+    let createAction = this.state.pageData.flags.exists ? "Edit Page" : "Create Page";
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
+        {this.state.displayDeleteDlg && this.renderDeleteDialog() }
         <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
         { this.renderTags() }
         </div>
@@ -84,10 +85,10 @@ export default class RootFrame extends Component
         if ( !this.state.loaded) {
           return <div className="RootMenu"></div>;
         }
-        if (! this.loggedIn() || !this.state.pageData.userCanWrite ){
+        if (! this.loggedIn() || !this.state.pageData.flags.userCanWrite ){
           return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/></div>;
         }
-        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.exists && <span>Delete Page</span>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/></div>;
+        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&  <span onClick={() => this.doDelete()}>Delete Page</span>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/></div>;
   }
 
   renderTags() {
@@ -133,4 +134,30 @@ export default class RootFrame extends Component
   setGetEditCB(cb) {
     this.getText = cb;
   }
+  
+  renderDeleteDialog() {
+    return (<dialog className="deletePageDialog" open>
+    <div>Are you sure you want to delete this page?</div>
+    <div><button onClick={  ()=> this.requestDelete().then(() => this.closeDeleteDialog("Page Deleted")).
+  catch(e => {this.handleError(e); this.closeDeleteDialog()})}>Delete</button><button onClick={() => this.closeDeleteDialog()}>Cancel</button></div>
+    </dialog>);
+  }
+  
+  doDelete() {
+    this.setState({displayDeleteDlg: true});
+  }
+
+ closeDeleteDialog(msg) {
+   if (msg) {
+        this.setState({displayDeleteDlg: false, message: msg, errorMessage:false});
+        this.fetchPageData();
+        return;
+   }
+   this.setState({displayDeleteDlg: false});
+ }
+
+ requestDelete() {
+   return this.data.deletePage(this.pageName);
+ }
+
 }
