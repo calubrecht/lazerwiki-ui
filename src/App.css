@@ -168,3 +168,15 @@ pre.code {
   clear:both;
 }
 
+div.RootMenu div.drawer, div.RootMenu div.drawerPull  {
+  display: inline-block;
+}
+
+div.RootMenu div.drawerPull  {
+  background: white;
+  padding: 3px 3px 5px 3px;
+  border-width: 0px 2px 2px 3px;
+  border-style: solid;
+  margin: -3px 6px 0px 0px;
+}
+

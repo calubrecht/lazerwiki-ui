@@ -4,6 +4,8 @@ import PageSearchFrame from './PageSearchFrame';
 import EditableTextbox from './EditableTextbox';
 import {instance as US_instance} from './svc/UserService';
 import HTMLReactParser from 'html-react-parser';
+import DrawerLink from './DrawerLink';
+import BacklinksFrame from './BacklinksFrame'
 
 export default class RootFrame extends Component
 {
@@ -22,7 +24,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading', exists:false, tags:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null};
+    this.state = {pageData: {rendered: 'Loading', exists:false, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null};
     this.data = DS_instance();
   }
 
@@ -83,9 +85,9 @@ export default class RootFrame extends Component
           return <div className="RootMenu"></div>;
         }
         if (! this.loggedIn() || !this.state.pageData.userCanWrite ){
-          return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span></div>;
+          return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/></div>;
         }
-        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.exists && <span>Delete Page</span>}</div>;
+        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.exists && <span>Delete Page</span>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/></div>;
   }
 
   renderTags() {

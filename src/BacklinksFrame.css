@@ -1,0 +1,47 @@
+div.RootMenu div.backlinksFrame {
+  position:absolute;
+  width:300px;
+  height:500px;
+  left: 180px;
+  bottom: 60px;
+  background:white;
+  border-style:solid;
+  padding:5px;
+  z-index: 1;
+}
+
+div.backlinksFrame div.close {
+  float:right;
+  margin:1px 3px;
+  color: red;
+  font-weight: bold;
+}
+
+div.backlinksFrameContent {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+div.nsTreeSelector {
+  display:inline-block;
+  vertical-align: top;
+  width:300px;
+}
+
+div.pageList  {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height:350px;
+  width:300px;
+  margin-left: 1.5em;
+}
+
+div.pageList div  {
+  margin-bottom: .25em;
+}
+
+div.pageList a, div.pageList a:visited {
+  color: blue;
+  text-decoration: none;
+}
