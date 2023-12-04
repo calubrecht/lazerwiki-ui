@@ -36,6 +36,7 @@ export default class RootFrame extends Component
     if (this.state.user) {
       this.fetchPageData();
     }
+    this.data.getSiteName().then(res => document.title = res);
   }
 
   componentWillUnmount() {

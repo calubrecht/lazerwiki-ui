@@ -81,6 +81,14 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.text().then(r=> {return r}));
   }
+  
+  getSiteName()
+  {
+    return fetch(
+      this.baseRequest + 'site/')
+         .then(this.handleErrors)
+         .then(res => res.text().then(r=> {return r}));
+  }
 
   getUser() {
     return fetch(
