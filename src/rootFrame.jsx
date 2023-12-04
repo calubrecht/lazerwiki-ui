@@ -44,7 +44,8 @@ export default class RootFrame extends Component
   }
 
   setPageData(pageData) {
-    this.setState({pageData: pageData, loaded:true});
+    let stage = (window.location.hash=="#Edit" && pageData.flags.userCanWrite) ? "editing" : "viewing";
+    this.setState({pageData: pageData, loaded:true, stage});
   }
 
   setUser(user) {
@@ -121,11 +122,13 @@ export default class RootFrame extends Component
 
   cancelEdit(ev) {
     ev && ev.preventDefault();
+    window.location.hash='';
     this.setState({"stage": "viewing"});
   }
   
   savePage(ev) {
     ev.preventDefault();
+    window.location.hash='';
     this.data.savePage(this.pageName, this.getText()).then((pageData) => {
       this.setPageData(pageData);
       this.cancelEdit(); }).catch(e => this.handleError(e));

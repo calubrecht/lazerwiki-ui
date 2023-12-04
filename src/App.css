@@ -66,6 +66,7 @@ div.RootBody {
   border-style:solid;
   min-height: 400px;
   padding: .5em;
+  padding-bottom: 2em;
   border-width: 3px;
   overflow:auto;
 }
