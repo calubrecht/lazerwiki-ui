@@ -187,3 +187,23 @@ dialog.deletePageDialog {
   left: -200px;
   background: grey;
 }
+
+table.lazerTable, table.lazerTable td, table.lazerTable th {
+  border: 1px solid;
+}
+table.lazerTable {
+  border-collapse:collapse;
+  empty-cells:show;
+  border-spacing:0;
+}
+table.lazerTable th {
+ background: lightgrey;
+ padding: 0 .5em 0 .5em;
+}
+ table.lazerTable td {
+ padding: 0 .5em 0 .5em;
+}
+
+table.lazerTable tr:hover {
+ background: #ffe0a0;
+}
