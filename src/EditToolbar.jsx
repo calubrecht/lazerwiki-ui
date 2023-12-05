@@ -51,7 +51,38 @@ export default class EditToolbar extends Component
         this.setState({showFrame:MediaFrame, selectItem: p => this.addImageLink(p)});
       }},
       
-    ]
+    ];
+    let pluginActions = LAZERWIKI_PLUGINS;
+    for (let action of pluginActions) {
+      let btn = {name: action.name, icon: action.icon,
+        click: () => {
+         let area = this.getTextArea();
+         let currentText = this.props.getCurrentText();
+         let selectStart = area.selectionStart;
+         let selectEnd = area.selectionEnd;
+         let actionReturn = action.script(currentText, selectStart, selectEnd);
+         let replacement = currentText;
+         if (actionReturn.action === 'insert') {
+           if (actionReturn.location === -1) {
+             replacement = currentText + actionReturn.value;
+           }
+           else {
+             replacement = currentText.slice(0, actionReturn.location) + actionReturn.value + currentText.slice(actionReturn.location);
+           }
+         }
+         if (actionReturn.action === 'replace') {
+             replacement = currentText.slice(0, actionReturn.location) + actionReturn.value + currentText.slice(actionReturn.locationEnd);
+         }
+         if (actionReturn.action === 'replaceAll') {
+             replacement = actionReturn.value;
+         }
+         if (actionReturn.action === 'none') {
+           return;
+         }
+         this.props.setText(replacement);
+        }};
+      this.buttons.push(btn);
+    }
   }
   
   render()
@@ -89,6 +120,15 @@ export default class EditToolbar extends Component
          // No selection, add header at this point
          currentText = currentText.slice(0, selectStart) + startToken + currentText.slice(selectStart, selectEnd) + endToken + currentText.slice(selectEnd);
        }
+       this.props.setText(currentText);
+  }
+  
+  replaceWholeSelectionText(replacement) {
+       let area = this.getTextArea();
+       let currentText = this.props.getCurrentText();
+       let selectStart = area.selectionStart;
+       let selectEnd = area.selectionEnd;
+       currentText = currentText.slice(0, selectStart) + replacement + currentText.slice(selectEnd);
        this.props.setText(currentText);
   }
 

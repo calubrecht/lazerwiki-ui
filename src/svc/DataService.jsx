@@ -90,6 +90,14 @@ export default class DataService
          .then(res => res.text().then(r=> {return r}));
   }
 
+  getPluginMenus()
+  {
+    return fetch(
+      this.baseRequest + 'plugin/editPagePlugins')
+         .then(this.handleErrors)
+         .then(res => res.json().then(r=> {return r}));
+  }
+
   getUser() {
     return fetch(
       this.baseRequest + 'sessions/username')
