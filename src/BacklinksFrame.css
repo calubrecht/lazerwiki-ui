@@ -29,7 +29,7 @@ div.nsTreeSelector {
   width:300px;
 }
 
-div.pageList  {
+div.backlinkspageList  {
   overflow-y: auto;
   overflow-x: hidden;
   height:350px;
@@ -37,11 +37,11 @@ div.pageList  {
   margin-left: 1.5em;
 }
 
-div.pageList div  {
+div.backlinkspageList div  {
   margin-bottom: .25em;
 }
 
-div.pageList a, div.pageList a:visited {
+div.backlinkspageList a, div.backlinkspageList a:visited {
   color: blue;
   text-decoration: none;
 }

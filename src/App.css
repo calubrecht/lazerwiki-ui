@@ -1,6 +1,6 @@
 body {
   background: lightgray;
-  background-image: url("img-/Back.png");
+  background-image: url("/_resurces/Back.png");
 }
 
 div#bannerHeader {
@@ -123,6 +123,7 @@ img.mediaright {
 img.medialeft {
   float: left;
   margin-right:1em;
+  margin-bottom:.5em;
 }
 img.mediacenter {
   display: block;

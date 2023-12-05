@@ -35,7 +35,7 @@ export default class BacklinksFrame extends Component
     if (!pages || pages.length == 0) {
       return <div>No links to this page</div>;
     }
-    return (<div className="pageList">
+    return (<div className="backlinkspageList">
         {pages.map( p => <div key={p.pagename}><a href={this.renderLinkURL(p)}>{this.renderLinkName(p)}</a></div>)}
 
       </div>);
