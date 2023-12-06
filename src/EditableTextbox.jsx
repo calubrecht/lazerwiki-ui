@@ -8,8 +8,13 @@ export default class EditableTextbox extends Component
 {
   constructor(props) {
     super(props);
-    let namespace = this.props.pageName.slice(0, this.props.pageName.lastIndexOf(':'));
-    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace};
+    let namespace = '';
+    let pageName = this.props.pageName;
+    if (pageName.indexOf(':') != -1 ) {
+        namespace = this.props.pageName.slice(0, this.props.pageName.lastIndexOf(':'));
+        pageName = this.props.pageName.slice(this.props.pageName.lastIndexOf(':')+1);
+    }
+    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName};
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]};});
     this.data = DS_instance();
   }
@@ -24,7 +29,7 @@ export default class EditableTextbox extends Component
     if (!this.props.editable) {
       return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {

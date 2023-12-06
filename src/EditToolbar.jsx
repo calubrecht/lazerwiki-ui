@@ -60,7 +60,7 @@ export default class EditToolbar extends Component
          let currentText = this.props.getCurrentText();
          let selectStart = area.selectionStart;
          let selectEnd = area.selectionEnd;
-         let actionReturn = action.script(currentText, selectStart, selectEnd);
+         let actionReturn = action.script(currentText, selectStart, selectEnd, this.props.namespace, this.props.pageName);
          let replacement = currentText;
          if (actionReturn.action === 'insert') {
            if (actionReturn.location === -1) {
