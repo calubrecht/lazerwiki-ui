@@ -25,7 +25,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false};
+    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false, siteTitle: "", pageTitle: this.pageName};
     this.data = DS_instance();
   }
 
@@ -37,7 +37,9 @@ export default class RootFrame extends Component
     if (this.state.user) {
       this.fetchPageData();
     }
-    this.data.getSiteName().then(res => document.title = res);
+    this.data.getSiteName().then(res => {
+      this.setState({siteTitle:res});
+      document.title = res + " - " + this.state.pageTitle;});
   }
 
   componentWillUnmount() {
@@ -47,6 +49,10 @@ export default class RootFrame extends Component
   setPageData(pageData) {
     let stage = (window.location.hash=="#Edit" && pageData.flags.userCanWrite) ? "editing" : "viewing";
     this.setState({pageData: pageData, loaded:true, stage});
+    if (pageData.title) {
+      this.setState({pageTitle:pageData.title});
+      this.data.getSiteName().then(res => document.title = this.state.siteTitle + " - " + pageData.title);
+    }
   }
 
   setUser(user) {
@@ -79,7 +85,7 @@ export default class RootFrame extends Component
     }
       return <div className="RootFrame">
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
-      <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span><DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="shiftRight"/></div>
+      <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="shiftRight"/>}</div>
       </div>;
 
   }
