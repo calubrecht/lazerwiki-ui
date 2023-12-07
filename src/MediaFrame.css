@@ -30,11 +30,13 @@ div.mediaFrame div.close {
 }
 
 div.mediaList  {
-  position: relative;
   width:650px;
-  height:595px;
+  height:470px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+div.mediaBox {
+  position: relative;
 }
 
 div.imageFrame {

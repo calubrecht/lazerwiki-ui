@@ -65,8 +65,9 @@ export default class MediaFrame extends Component
       let counter = 0;
       let nsPrefix = this.state.namespace ? this.state.namespace + ":" : '';
       if (this.props.selectItem) {
-      return <div className="mediaList">
+      return <div className="mediaBox">
         <div className="imageFrame">Image Preview</div>
+          <div className="mediaList">
         {
           this.state.serverImages[this.state.namespace].map( img => {
             counter++;
@@ -76,11 +77,12 @@ export default class MediaFrame extends Component
             </div>;
           })
         }
-        </div>
+        </div></div>
 
       }
-      return <div className="mediaList">
+      return <div className="mediaBox">
         <div className="imageFrame">Image Preview</div>
+          <div className="mediaList">
         {
           this.state.serverImages[this.state.namespace].map( img => {
             counter++;
@@ -90,7 +92,7 @@ export default class MediaFrame extends Component
             </div>;
           })
         }
-      </div>
+      </div></div>
   }
 
   renderFileSize(size) {
