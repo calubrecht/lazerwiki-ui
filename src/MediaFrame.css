@@ -35,6 +35,11 @@ div.mediaList  {
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+div.editToolbar div.mediaList {
+  height:250px;
+}
+
 div.mediaBox {
   position: relative;
 }
