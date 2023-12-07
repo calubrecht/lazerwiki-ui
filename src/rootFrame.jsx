@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
 import PageSearchFrame from './PageSearchFrame';
+import PreviewFrame from './PreviewFrame';
 import EditableTextbox from './EditableTextbox';
 import {instance as US_instance} from './svc/UserService';
 import HTMLReactParser from 'html-react-parser';
@@ -24,7 +25,7 @@ export default class RootFrame extends Component
     }
 
     this.pageName = p.length > 2 ? p[2] : "";
-    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:''};
+    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false};
     this.data = DS_instance();
   }
 
@@ -78,7 +79,7 @@ export default class RootFrame extends Component
     }
       return <div className="RootFrame">
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
-      <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span></div>
+      <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span><DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="shiftRight"/></div>
       </div>;
 
   }
@@ -123,7 +124,13 @@ export default class RootFrame extends Component
   cancelEdit(ev) {
     ev && ev.preventDefault();
     window.location.hash='';
-    this.setState({"stage": "viewing"});
+    this.setState({"stage": "viewing", displayPreview: false});
+  }
+  
+  cancelPreview(ev) {
+    ev && ev.preventDefault();
+    window.location.hash='';
+    this.setState({displayPreview: false});
   }
   
   savePage(ev) {
@@ -132,6 +139,11 @@ export default class RootFrame extends Component
     this.data.savePage(this.pageName, this.getText()).then((pageData) => {
       this.setPageData(pageData);
       this.cancelEdit(); }).catch(e => this.handleError(e));
+  }
+
+  showPreview() {
+    this.data.previewPage(this.pageName, this.getText()).then((pageData) => {
+      this.setState({displayPreview: true, previewData: pageData})});
   }
 
  

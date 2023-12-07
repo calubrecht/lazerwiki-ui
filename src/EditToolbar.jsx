@@ -60,25 +60,32 @@ export default class EditToolbar extends Component
          let currentText = this.props.getCurrentText();
          let selectStart = area.selectionStart;
          let selectEnd = area.selectionEnd;
+         let newStart = selectStart;
+         let newEnd = selectEnd;
          let actionReturn = action.script(currentText, selectStart, selectEnd, this.props.namespace, this.props.pageName);
          let replacement = currentText;
          if (actionReturn.action === 'insert') {
            if (actionReturn.location === -1) {
              replacement = currentText + actionReturn.value;
+             newStart = newEnd = replacement.length -1;
            }
            else {
              replacement = currentText.slice(0, actionReturn.location) + actionReturn.value + currentText.slice(actionReturn.location);
+             newStart = newEnd = actionReturn.location + actionReturn.value;
            }
          }
          if (actionReturn.action === 'replace') {
              replacement = currentText.slice(0, actionReturn.location) + actionReturn.value + currentText.slice(actionReturn.locationEnd);
+             newStart = newEnd = actionReturn.locationEnd + actionReturn.value;
          }
          if (actionReturn.action === 'replaceAll') {
              replacement = actionReturn.value;
+             newStart = newEnd = actionReturn.value.length-1;
          }
          if (actionReturn.action === 'none') {
            return;
          }
+         this.refreshFocus(area, newStart, newEnd);
          this.props.setText(replacement);
         }};
       this.buttons.push(btn);
@@ -112,14 +119,20 @@ export default class EditToolbar extends Component
        let currentText = this.props.getCurrentText();
        let selectStart = area.selectionStart;
        let selectEnd = area.selectionEnd;
+       let newEnd = selectEnd;
+       let newStart = selectStart;
        if (selectStart == selectEnd) {
          // No selection, add header at this point
          currentText = currentText.slice(0, selectStart) + startToken + defaultInside +  endToken + currentText.slice(selectStart);
+         newStart = selectStart + startToken.length;
+         newEnd = selectStart + startToken.length + defaultInside.length;
        }
        else {
-         // No selection, add header at this point
          currentText = currentText.slice(0, selectStart) + startToken + currentText.slice(selectStart, selectEnd) + endToken + currentText.slice(selectEnd);
+         newStart = newEnd=selectEnd + startToken.length + endToken.length;
        }
+       area.value=currentText;
+       this.refreshFocus(area, newStart, newEnd);
        this.props.setText(currentText);
   }
   
@@ -129,7 +142,17 @@ export default class EditToolbar extends Component
        let selectStart = area.selectionStart;
        let selectEnd = area.selectionEnd;
        currentText = currentText.slice(0, selectStart) + replacement + currentText.slice(selectEnd);
+       let newEnd = selectStart + replacement.length;
+       area.value = currentText;
+       this.refreshFocus(area, newEnd, newEnd);
        this.props.setText(currentText);
+  }
+
+  refreshFocus(area, selectStart, selectEnd){
+       area.setSelectionRange(selectEnd, selectEnd);
+       area.blur();
+       area.focus();
+       area.setSelectionRange(selectStart, selectEnd);
   }
 
   addPageLink(p) {

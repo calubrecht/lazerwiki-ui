@@ -1,6 +1,6 @@
 body {
   background: lightgray;
-  background-image: url("/_resurces/Back.png");
+  background-image: url("/_resources/Back.png");
 }
 
 div#bannerHeader {
@@ -87,6 +87,9 @@ div.RootMenu span {
   border-width: 0px 2px 2px 3px;
   border-style: solid;
   margin: 0px 6px 0px 0px;
+}
+div.RootMenu div.shiftRight div.drawerPull {
+  margin-left: 25px;
 }
 
 div.tagList {

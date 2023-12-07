@@ -13,8 +13,8 @@ div.toolbar div.mediaFrame {
 div.editToolbar div.mediaFrame {
   position:absolute;
   width:900px;
-  height:800px;
-  left: 152px;
+  height:600px;
+  left: 60px;
   top: 50px;
   background:white;
   border-style:solid;

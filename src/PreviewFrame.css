@@ -1,0 +1,30 @@
+div#root div.previewFrame {
+  position:absolute;
+  width:1000px;
+  height:800px;
+  right: 60px;
+  bottom: -20px;
+  background:white;
+  border-style:solid;
+  padding:8px;
+  z-index: 1;
+}
+
+div.previewFrame div.close {
+  float:right;
+  margin:1px 3px;
+  color: red;
+  font-weight: bold;
+}
+
+div.previewFrame div.previewFrameContent {
+  position:absolute;
+  margin:25px;
+  overflow-y: auto;
+  top:50px;
+  bottom:0px;
+  left:0px;
+  right:0px;
+  background: #dddddd;
+  padding:10px;
+}

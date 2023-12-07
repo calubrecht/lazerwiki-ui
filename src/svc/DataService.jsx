@@ -134,6 +134,16 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
+  
+  previewPage(pageName, pageData)
+  {
+    return fetch(
+      this.baseRequest + 'page/previewPage/' + pageName,
+       {method: 'post', body: JSON.stringify({pageName: pageName, text: pageData.text, tags:pageData.tags}), credentials: 'include',
+         headers: this.getPostHeaders() })
+         .then(this.handleErrors)
+         .then(res => res.json());
+  }
 
   saveMedia(files, namespace)
   {

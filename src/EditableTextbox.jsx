@@ -27,9 +27,9 @@ export default class EditableTextbox extends Component
   render()
   {
     if (!this.props.editable) {
-      return <div><textarea rows="25" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
+      return <div><textarea rows="50" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea autoFocus rows="25" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {
@@ -127,7 +127,8 @@ export default class EditableTextbox extends Component
       el.value = newVal;
       el.selectionStart = start + newlineIndent.length;
       el.selectionEnd = start + newlineIndent.length;
-
+      el.blur();
+      el.focus();
       this.setState({text: newVal, error:""});
     }
   }
