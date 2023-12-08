@@ -17,19 +17,21 @@ export default class EditableTextbox extends Component
     this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName};
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]};});
     this.data = DS_instance();
+    this.textAreaRef = React.createRef();
   }
   
   componentDidMount()
   {
     this.data.fetchTagList().then((tags) => this.setState({activeTags:new Set(tags)}));
+    this.textAreaRef.current.focus()
   }
 
   render()
   {
     if (!this.props.editable) {
-      return <div><textarea rows="50" cols="80" name="pageSource" className="pageSource" value={this.state.text}  disabled></textarea></div>;
+      return <div onKeyDown={ev => this.onKeydown(ev)}><textarea ref={this.textAreaRef} autofocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea ref={this.textAreaRef} autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {

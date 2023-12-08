@@ -3,6 +3,11 @@ textarea.pageSource {
   width: 98%;
   max-width:98%;
 }
+textarea.pageSource.disabled {
+  color: #545454;
+  width: 98%;
+  max-width:98%;
+}
 
 div.editableTagList {
   text-align: right;
