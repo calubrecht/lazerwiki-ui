@@ -104,6 +104,7 @@ div.mediaSelector {
   display:inline-block;
   vertical-align: top;
   width:800px;
+  padding-right: .5em;
 }
 
 span.label {

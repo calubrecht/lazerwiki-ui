@@ -127,21 +127,24 @@ export default class RootFrame extends Component
     this.setState({"stage": "viewingSource"});
   }
 
+  clearHash() {
+    history.replaceState("", "", `${location.pathname}${location.search}`);
+  }
+
   cancelEdit(ev) {
     ev && ev.preventDefault();
-    window.location.hash='';
+    this.clearHash();
     this.setState({"stage": "viewing", displayPreview: false});
   }
   
   cancelPreview(ev) {
     ev && ev.preventDefault();
-    window.location.hash='';
     this.setState({displayPreview: false});
   }
   
   savePage(ev) {
     ev.preventDefault();
-    window.location.hash='';
+    this.clearHash();
     this.data.savePage(this.pageName, this.getText()).then((pageData) => {
       this.setPageData(pageData);
       this.cancelEdit(); }).catch(e => this.handleError(e));

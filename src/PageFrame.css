@@ -45,6 +45,7 @@ div.pageSelector {
   display:inline-block;
   vertical-align: top;
   width:300px;
+  padding-right: .5em;
 }
 
 div.pageList  {
