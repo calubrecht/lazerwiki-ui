@@ -88,6 +88,13 @@ div.RootMenu span {
   border-style: solid;
   margin: 0px 6px 0px 0px;
 }
+
+div.RootMenu div.previewFrame span {
+  background: transparent;
+  padding: 0;
+  border-width: 0;
+  margin: 0;
+}
 div.RootMenu div.shiftRight div.drawerPull {
   margin-left: 25px;
 }
