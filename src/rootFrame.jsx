@@ -27,6 +27,7 @@ export default class RootFrame extends Component
     this.pageName = p.length > 2 ? p[2] : "";
     this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false, siteTitle: "", pageTitle: this.pageName};
     this.data = DS_instance();
+    this.modalDlgRef = React.createRef();
   }
 
   componentDidMount()
@@ -44,6 +45,12 @@ export default class RootFrame extends Component
 
   componentWillUnmount() {
     this.userService.removeListener(this);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot){
+    if (!this.state.showImgDlg) {
+      this.updateLinkImages();
+    }
   }
 
   setPageData(pageData) {
@@ -76,6 +83,7 @@ export default class RootFrame extends Component
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
         {this.state.displayDeleteDlg && this.renderDeleteDialog() }
+        {this.renderImgDialog() }
         <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
         { this.renderTags() }
         </div>
@@ -168,11 +176,20 @@ export default class RootFrame extends Component
     </dialog>);
   }
   
+  renderImgDialog() {
+    let filename = this.state.showImgDlg ? this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1) :"";
+    return (<dialog className="showImageDialog" ref = {this.modalDlgRef}>
+    <div class="imgTitle">{filename}</div>
+    <div><img src={this.state.showImgDlg} ></img></div>
+    <div><button onClick={() => this.closeShowImgDialog()}>Close</button></div>
+    </dialog>);
+  }
+  
   doDelete() {
     this.setState({displayDeleteDlg: true});
   }
 
- closeDeleteDialog(msg) {
+  closeDeleteDialog(msg) {
    if (msg) {
         this.setState({displayDeleteDlg: false, message: msg, errorMessage:false});
         this.fetchPageData();
@@ -181,8 +198,29 @@ export default class RootFrame extends Component
    this.setState({displayDeleteDlg: false});
  }
 
+ closeShowImgDialog() {
+   this.setState({showImgDlg: null});
+   this.modalDlgRef.current?.close();
+ }
+
+ openShowImgDialog(src) {
+   this.setState({showImgDlg: src});
+   this.modalDlgRef.current?.showModal();
+ }
+
  requestDelete() {
    return this.data.deletePage(this.pageName);
+ }
+
+ updateLinkImages() {
+   let body = document.getElementsByClassName("RootBody")[0];
+   let fullLinkImages = document.getElementsByClassName("fullLink");
+   for (let img of fullLinkImages) {
+     let src = img.src.split("?")[0];
+     img.onclick = () => {
+       this.openShowImgDialog(src);
+     };
+   }
  }
 
 }

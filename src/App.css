@@ -200,6 +200,21 @@ dialog.deletePageDialog {
   background: grey;
 }
 
+dialog.showImageDialog {
+  z-index:10;
+  background: grey;
+}
+
+dialog.showImageDialog::backdrop {
+  z-index:10;
+  background: rgba(0,0,0,0.7);
+}
+
+dialog.showImageDialog div.imgTitle {
+  font-weight:bold;
+  margin:.5em;
+}
+
 table.lazerTable, table.lazerTable td, table.lazerTable th {
   border: 1px solid;
 }
