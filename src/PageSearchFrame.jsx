@@ -27,7 +27,7 @@ export default class PageSearchFrame extends Component
 
 
   fetchPageList() {
-    this.dataService.doPageSearch(this.state.searchTerm).then( (data) => this.setState({pageList:(data)}));
+    this.dataService.doPageSearch(this.state.searchTerm).then( (data) => this.setState({pageList:(data.tag)}));
   }
 
   render()
@@ -43,13 +43,13 @@ export default class PageSearchFrame extends Component
   }
 
   renderLinkURL(p) {
-    let name = p.namespace === '' ? p.pagename : p.namespace + ":" + p.pagename;
+    let name = p.namespace === '' ? p.pageName : p.namespace + ":" + p.pageName;
     return name === '' ? '/' : '/page/' + name;
   }
 
   renderLinkName(p) {
-    let name = p.pagename === '' ? '<ROOT>' : p.pagename;
-    name = p.namespace ? p.namespace + ":" + p.pagename : p.pagename;
+    let name = p.pageName === '' ? '<ROOT>' : p.pageName;
+    name = p.namespace ? p.namespace + ":" + p.pageName : p.pageName;
     let title = p.title ? ' - ' + p.title : '';
     return name + title;
   }
@@ -61,7 +61,7 @@ export default class PageSearchFrame extends Component
     }
     if (this.asLinks() ) {
       return (<div className="pageList">
-        {pages.map( p => <div key={p.pagename}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a></div>)}
+        {pages.map( p => <div key={p.pageName}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a></div>)}
 
       </div>);
     }
