@@ -6,7 +6,9 @@ import LoginFrame from './LoginFrame';
 
 
 function logout() {
-    DS_instance().logout().then(() => US_instance().setUser(null));
+    DS_instance().logout().then(() => US_instance().setUser(null)).catch((e) => {
+      US_instance().setUser(null);
+      console.error(e);});
 }
 
 function UserWidget() {
