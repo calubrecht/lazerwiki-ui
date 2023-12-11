@@ -156,6 +156,12 @@ div.toolbar a {
   text-decoration: none;
   color: black;
 }
+
+div.toolbar a, div.toolbar a.wikiLink, div.toolbar a.wikiLinkMissing, div.toolbar a.wikiLinkExternal {
+  text-decoration: none;
+  color: black;
+}
+
 div.toolbar a:visited {
   color: black;
 }
