@@ -126,7 +126,7 @@ export default class PageSearchFrame extends Component
        <select name="searchType" value={this.state.searchTypeInput} onChange={evt =>this.setState({searchTypeInput:evt.target.value})}>
         <option value="text">Text Search</option>
         <option value="tag">Tag Search</option>
-      </select> <input name="searchTermInput" id="searchTermInput" value={this.state.searchTermInput} onChange={evt => this.setState({searchTermInput:evt.target.value})} placeholder="Search Term" onKeyDown={(ev) => this.handleKeyDown(ev)}/> <button name="Search" onClick={() => this.doSearch()}>Search</button></div>
+      </select> <input name="searchTermInput" id="searchTermInput" value={this.state.searchTermInput} onChange={evt => this.setState({searchTermInput:evt.target.value})} placeholder="Search Term" onKeyDown={(ev) => this.handleKeyDown(ev)} autoFocus /> <button name="Search" onClick={() => this.doSearch()}>Search</button></div>
   }
   
   setUser(user) {
