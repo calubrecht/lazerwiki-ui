@@ -12,13 +12,14 @@ export default class PageSearchFrame extends Component
     this.dataService = DS_instance();
     this.userService = US_instance();
     let searchTerm= props.searchTag ? "tag:" + this.props.searchTag  : "";
-    this.state = { pageList: [], searchTerm: searchTerm };
+    let searchTypeInput= props.searchTag ? "tag" : "text";
+    this.state = { pageList: [], textPageList: [],  searchTerm: searchTerm, searchTermInput: "", searchTypeInput , message:"" , showSearchInput: !!searchTerm};
   }
 
   componentDidMount()
   {
     this.userService.addListener(this);
-    this.fetchPageList();
+    this.initialFetchPageList();
   }
   
   componentWillUnmount() {
@@ -26,8 +27,12 @@ export default class PageSearchFrame extends Component
   }
 
 
-  fetchPageList() {
-    this.dataService.doPageSearch(this.state.searchTerm).then( (data) => this.setState({pageList:(data.tag)}));
+  initialFetchPageList() {
+    this.state.searchTerm && this.fetchPageList(this.state.searchTerm);
+  }
+  
+  fetchPageList(searchTerm) {
+    this.dataService.doPageSearch(searchTerm).then( (data) => this.setPageList(data));
   }
 
   render()
@@ -36,7 +41,9 @@ export default class PageSearchFrame extends Component
     return <div className="pageSearchFrame">
       <div onClick={() => this.props.doClose()} className="close">X</div>
       <h2 className="title">Page Search - {this.state.searchTerm}</h2>
+        {this.renderSearchInput()}
         <div className="pageSearchFrameContent">
+          <div className="message">{this.state.message}</div>
           {this.renderList()}
         </div>
     </div>;
@@ -55,26 +62,98 @@ export default class PageSearchFrame extends Component
   }
 
   renderList() {
+    if (this.state.searchTypeInput == "tag") {
+      return this.renderTagList();
+    }
+    return this.renderTextList();
+  }
+     
+  renderTagList() {
     let pages = this.state.pageList;
-    if (!pages) {
+    if (pages.length == 0) {
       return <div></div>;
     }
-    if (this.asLinks() ) {
-      return (<div className="pageList">
+    return (<div className="pageSearchList">
         {pages.map( p => <div key={p.pageName}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a></div>)}
-
       </div>);
-    }
+  }
 
-    return <div></div>;
+  renderTextList() {
+    if (this.state.pageList.length == 0 && this.state.textPageList.length ==0) {
+      return "";
+    }
+    return (<div className="pageSearchList">
+      <h3>Title Matches</h3>
+      {this.renderTitleMatches()}
+      <h3>Text Matches</h3>
+      {this.renderTextMatches()}
+      </div>);
+  }
+
+  renderTitleMatches() {
+    let pages = this.state.pageList;
+    if (pages.length == 0) {
+      return "No Matches";
+    }
+    return (<div >
+        {pages.map( p => <div key={p.pageName}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a></div>)}
+      </div>);
+  }
+
+  renderTextMatches() {
+    let pages = this.state.textPageList;
+    let searchTerm = this.state.searchTerm.substring(this.state.searchTerm.indexOf(':')+1)
+    if (pages.length == 0) {
+      return "No Matches";
+    }
+    return (<div >
+        {pages.map( p => <div key={p.pageName}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a><br/> {this.highlightMatch(p.resultLine, searchTerm)}</div>)}
+      </div>);
+  }
+
+  highlightMatch(line, searchTerm) {
+    let searches = searchTerm.toLowerCase().split(" ");
+    let words = line.split(/( )/g);
+    return words.map(w =>
+      searches.includes(w.toLowerCase()) ? <span className="match">{w}</span> : <span>{w}</span>);
+  }
+
+  renderSearchInput() {
+    return this.state.showSearchInput || <div className="searchInput">
+       <select name="searchType" value={this.state.searchTypeInput} onChange={evt =>this.setState({searchTypeInput:evt.target.value})}>
+        <option value="text">Text Search</option>
+        <option value="tag">Tag Search</option>
+      </select> <input name="searchTermInput" id="searchTermInput" value={this.state.searchTermInput} onChange={evt => this.setState({searchTermInput:evt.target.value})} placeholder="Search Term" onKeyDown={(ev) => this.handleKeyDown(ev)}/> <button name="Search" onClick={() => this.doSearch()}>Search</button></div>
   }
   
   setUser(user) {
     this.setState({user: user});
-    this.fetchPageList();
+    this.initialFetchPageList();
   }
   
-  asLinks() {
-    return !this.props.editorWidget;
+  setPageList(data) {
+    if (this.state.searchTypeInput === 'tag' || this.props.searchTag) {
+      this.setState({pageList: data.tag});
+      return;
+    }
+    let message = (data.title.length == 0 && data.text.length ==0) ? "No matches found." : "";
+    this.setState({pageList: data.title, textPageList: data.text, message});
+  }
+
+  doSearch() {
+    let searchTerm = this.state.searchTypeInput + ":" + this.state.searchTermInput;
+    this.setState({searchTerm: searchTerm, message: "Searching", pageList:[], textPageList: []});
+    this.fetchPageList(searchTerm);
+  }
+  
+
+  handleKeyDown(ev)
+  {
+      if (ev.key === "Enter")
+      {
+        ev.stopPropagation();
+        ev.preventDefault();
+        this.doSearch();
+      }
   }
 }

@@ -1,3 +1,15 @@
+div.toolbar div.pageSearchFrame {
+  position:absolute;
+  width:600px;
+  height:500px;
+  left: 152px;
+  top: 10px;
+  background:white;
+  border-style:solid;
+  padding:5px;
+  z-index: 1;
+}
+
 div#root div.pageSearchFrame {
   position:absolute;
   width:400px;
@@ -35,13 +47,36 @@ div.pageSelector {
   width:300px;
 }
 
-div.pageList div  {
+div.pageSearchList div  {
   margin-bottom: .25em;
 }
 
-div.pageList a, div.pageList a:visited {
+div.pageSearchList a, div.pageSearchList a:visited {
   color: blue;
   text-decoration: none;
+}
+
+div.pageSearchList  {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height:350px;
+  width: 275px;
+  margin-left: 1em;
+  padding-left: 1em;
+  text-indent: -1em;
+}
+
+div.toolbar div.pageSearchFrame div.pageSearchList {
+  width: 600px;
+  border-color:grey;
+  border-width:1px;
+  border-style:solid;
+  padding: .5em .5em .5em 1.5em;
+  margin-top:.5em
+}
+
+div.pageSearchList span.match {
+  background-color: #ffe0a0;
 }
 
 ul.nsTree {

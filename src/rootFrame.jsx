@@ -179,7 +179,7 @@ export default class RootFrame extends Component
   renderImgDialog() {
     let filename = this.state.showImgDlg ? this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1) :"";
     return (<dialog className="showImageDialog" ref = {this.modalDlgRef}>
-    <div class="imgTitle">{filename}</div>
+    <div className="imgTitle">{filename}</div>
     <div><img src={this.state.showImgDlg} ></img></div>
     <div><button onClick={() => this.closeShowImgDialog()}>Close</button></div>
     </dialog>);
