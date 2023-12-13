@@ -113,6 +113,9 @@ export default class PageSearchFrame extends Component
 
   highlightMatch(line, searchTerm) {
     let searches = searchTerm.toLowerCase().split(" ");
+    if (! line ) {
+      return <span></span>;
+    }
     let words = line.split(/( )/g);
     return words.map(w =>
       searches.includes(w.toLowerCase()) ? <span className="match">{w}</span> : <span>{w}</span>);
