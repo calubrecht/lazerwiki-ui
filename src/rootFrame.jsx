@@ -106,7 +106,7 @@ export default class RootFrame extends Component
         if (! this.loggedIn() || !this.state.pageData.flags.userCanWrite ){
           return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName}/></div>;
         }
-        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&  <span onClick={() => this.doDelete()}>Delete Page</span>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/></div>;
+        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&  <span onClick={() => this.doDelete()}>Delete Page</span>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName}/></div>;
   }
 
   renderTags() {

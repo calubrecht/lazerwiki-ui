@@ -48,10 +48,29 @@ export default class DataService
       this.baseRequest + 'page/get/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
   
+  fetchHistoricalPage(pageDescriptor, revision)
+  {
+    if (pageDescriptor != '') {
+      pageDescriptor = pageDescriptor + '/';
+    }
+    return fetch(
+      this.baseRequest + 'page/getHistorical/' + pageDescriptor + revision).then(this.handleErrors).then(response => response.json());
+  }
+  
   fetchPageHistory(pageDescriptor)
   {
     return fetch(
       this.baseRequest + 'page/history/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
+  }
+  
+  fetchPageDiff(pageDescriptor, rev1, rev2)
+  {
+    
+    if (pageDescriptor != '') {
+      pageDescriptor = pageDescriptor + '/';
+    }
+    return fetch(
+      this.baseRequest + 'page/diff/' + pageDescriptor + rev1 + "/" + rev2).then(this.handleErrors).then(response => response.json());
   }
 
   fetchImageList() {

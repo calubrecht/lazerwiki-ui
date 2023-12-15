@@ -10,7 +10,19 @@ div.RootMenu div.historyFrame {
   z-index: 1;
 }
 
-div.historyFrame div.close {
+div.RootMenu div.historyFramePreview {
+  position:absolute;
+  width:1000px;
+  height:600px;
+  left: 180px;
+  bottom: 60px;
+  background:white;
+  border-style:solid;
+  padding:5px;
+  z-index: 1;
+}
+
+div.historyFrame div.close, div.historyFramePreview div.close {
   float:right;
   margin:1px 3px;
   color: red;
@@ -40,4 +52,32 @@ div.historyList span.diffSelections {
 div.historyList span.diffSelections img {
   vertical-align:middle;
    
+}
+
+div.historyList div.diffLine div {
+  display: inline-block;
+}
+
+div.historyList div.diffLine div.lineNumber {
+  display: inline-block;
+  width: 65px;
+}
+
+div.historyList div.diffLine span {
+  all: initial
+}
+
+div.historyList div.diffLine span.editNewInline {
+  background: lightgreen;
+  font-style: bold;
+}
+div.historyList div.diffLine span.editOldInline {
+  background: #ff5555;
+  text-decoration: line-through;
+}
+
+div.historyFrame div.historicalPage {
+  overflow-y: auto;
+  height:380px;
+  border: 1px grey solid;
 }

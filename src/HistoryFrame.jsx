@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
 import UserService, {instance as US_instance} from './svc/UserService';
+import HTMLReactParser from 'html-react-parser';
 
 import './HistoryFrame.css';
 
@@ -9,7 +10,8 @@ export default class HistoryFrame extends Component
   constructor(props) {
     super(props);
     this.pageName = this.props.initData;
-    this.state = {historyList: [], loading:true};
+    this.pageDisplayName = this.pageName == '' ? 'ROOT' : this.pageName;
+    this.state = {historyList: [], loading:true, mode:'history'};
     this.userService = US_instance();
     this.data = DS_instance();
   }
@@ -40,20 +42,43 @@ export default class HistoryFrame extends Component
 
   render()
   {
-    let counter = 0;
-    return <div className="historyFrame">
+    if (this.state.mode == 'diff') {
+      let counter = 0;
+      return <div className="historyFrame">
+        <div onClick={() => this.props.doClose()} className="close">X</div>
+        <h2 className="title">Diff - {this.pageDisplayName} - {this.state.startSelect} -&gt; {this.state.endSelect}</h2>
+        <div className= "historyList">
+        {this.state.diffInfo.map(a =>
+        <div className="diffLine" key={"diff" + counter++}> <div className="lineNumber">{a.first == -1 ? " " : "Line: " + a.first}</div> - <span>{HTMLReactParser(a.second)} </span></div>)} 
+      </div>
+        <div><button onClick={() => this.setState({mode:'history'})} >Back</button></div>
+      </div>
+    }
+    if (this.state.mode == 'historicalView') {
+      return <div className="historyFramePreview">
+        <div onClick={() => this.props.doClose()} className="close">X</div>
+        <h2 className="title">{this.pageDisplayName} - {this.state.displayRevision}</h2>
+        <div className="historicalPage">{HTMLReactParser(this.state.historicalPageData.rendered)}</div>
+        <div><button onClick={() => this.setState({mode:'history'})} >Back</button></div>
+      </div>
+    }
+     return <div className="historyFrame">
       <div onClick={() => this.props.doClose()} className="close">X</div>
-        <h2 className="title">History - {this.pageName}</h2>
+        <h2 className="title">History - {this.pageDisplayName}</h2>
         {this.renderList()}
         <div><button onClick={() => this.doDiff()} disabled={!this.state.startSelect || !this.state.endSelect} >View Diff</button></div>
     </div>;
   }
 
   renderLinkName(p, first) {
+    let changeType = p.deleted ? "Deleted" : "Modified";
     if (first) {
-      return  "Current - Modified " + p.modified + " - by " + p.modifiedBy;
+      return  "Current - " + changeType + " " + p.modified + " - by " + p.modifiedBy;
     }
-    return  'Revision ' + p.revision + " - Modified " + p.modified + " - by " + p.modifiedBy;
+    if (p.deleted) {
+    return  'Revision ' + p.revision + " - " + changeType + " " + p.modified + " - by " + p.modifiedBy;
+    }
+    return  <a onClick={() => this.showHistoricalPage(p.revision)}>{'Revision ' + p.revision + " - " + changeType + " " + p.modified + " - by " + p.modifiedBy}</a>;
   }
 
   renderDiffSelections(revision) {
@@ -64,6 +89,9 @@ export default class HistoryFrame extends Component
   renderList() {
     let pages = this.state.historyList;
     if (!pages || pages.length == 0) {
+      if (this.state.loading) {
+        return <div>Loading</div>;
+      }
       return <div>Could not find history for this page</div>;
     }
     let first = true;
@@ -100,6 +128,13 @@ export default class HistoryFrame extends Component
     this.setState({endSelect:revision});
   }
 
+  showHistoricalPage(revision) {
+    this.data.fetchHistoricalPage(this.pageName, revision).then((pageData) => this.setState({historicalPageData: pageData, displayRevision: revision, mode:'historicalView'}));
+  }
+
   doDiff() {
+    this.data.fetchPageDiff(this.pageName, this.state.startSelect, this.state.endSelect).then(
+      (e) => {
+        this.setState({diffInfo: e, mode:'diff'})}); 
   }
 }
