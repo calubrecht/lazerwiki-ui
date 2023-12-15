@@ -26,10 +26,18 @@ div.historyFrameContent {
 div.historyList  {
   overflow-y: auto;
   overflow-x: hidden;
-  height:400px;
+  height:380px;
   width:550px;
   margin-left: 1.5em;
   border: 1px solid black;
   padding:.5em;
 }
 
+div.historyList span.diffSelections {
+  all: initial;
+}
+
+div.historyList span.diffSelections img {
+  vertical-align:middle;
+   
+}
