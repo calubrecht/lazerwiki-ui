@@ -47,6 +47,12 @@ export default class DataService
     return fetch(
       this.baseRequest + 'page/get/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
+  
+  fetchPageHistory(pageDescriptor)
+  {
+    return fetch(
+      this.baseRequest + 'page/history/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
+  }
 
   fetchImageList() {
     return fetch(
