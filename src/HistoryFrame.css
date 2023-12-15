@@ -22,6 +22,15 @@ div.RootMenu div.historyFramePreview {
   z-index: 1;
 }
 
+div.historyFrame span, div.historyFramePreview span {
+  background: initial;
+  padding: initial;
+  border-width: initial;
+  border-style: initial;
+  margin: initial;
+}
+
+
 div.historyFrame div.close, div.historyFramePreview div.close {
   float:right;
   margin:1px 3px;
@@ -45,9 +54,14 @@ div.historyList  {
   padding:.5em;
 }
 
-div.historyList span.diffSelections {
-  all: initial;
+div.historicalPage  {
+  overflow-y: auto;
+  height:490px;
+  margin-left: 1.5em;
+  border: 1px solid black;
+  padding:.5em;
 }
+
 
 div.historyList span.diffSelections img {
   vertical-align:middle;
