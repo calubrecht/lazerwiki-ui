@@ -28,3 +28,7 @@ div.previewFrame div.previewFrameContent {
   background: #dddddd;
   padding:10px;
 }
+
+div.previewFrame div {
+  margin-bottom: .5em
+}

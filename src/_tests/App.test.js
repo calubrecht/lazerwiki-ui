@@ -1,6 +1,6 @@
 import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
-import App from './App';
-import {setInstance as set_DS_instance} from './svc/DataService';
+import App from '../App';
+import {setInstance as set_DS_instance} from '../svc/DataService';
 
 
 /**
@@ -14,12 +14,11 @@ var ds = {
 
 //set_DS_instance(ds);
 
-jest.mock("./rootFrame", () => () => {
+jest.mock("../rootFrame", () => () => {
   return <div className="RootFrame">Mocked Root</div>;
 });
 
 test('renders ', async () => {
-    //render(<App />);
     await waitFor( () => {
       render(<App />);
     });

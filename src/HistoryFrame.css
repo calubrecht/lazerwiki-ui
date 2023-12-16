@@ -30,6 +30,10 @@ div.historyFrame span, div.historyFramePreview span {
   margin: initial;
 }
 
+div.historyFrame span, div.historyFramePreview span {
+  margin-bottom: 0.5em;
+}
+
 
 div.historyFrame div.close, div.historyFramePreview div.close {
   float:right;
