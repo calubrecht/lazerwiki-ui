@@ -76,17 +76,21 @@ div.RootBody div {
 }
 
 div.RootMenu {
-  position:relative;
+  position:fixed;
   text-align: left;
-  margin-left: 40px
+  right:10px;
+  margin-top: 20px;
+  float:right;
+  z-index:1;
 }
 
-div.RootMenu span {
+div.RootMenu .rootMenuButton {
   background: white;
   padding: 3px 3px 5px 3px;
-  border-width: 0px 2px 2px 3px;
+  border-width: 2px 2px 2px 2px;
   border-style: solid;
-  margin: 0px 6px 0px 0px;
+  margin-bottom: .25em;
+  box-shadow: 5px 2px;
 }
 
 div.RootMenu div.previewFrame span {
@@ -184,18 +188,6 @@ pre.code {
   font-family: monospace;
   background-color: #f0f0f0;
   clear:both;
-}
-
-div.RootMenu div.drawer, div.RootMenu div.drawerPull  {
-  display: inline-block;
-}
-
-div.RootMenu div.drawerPull  {
-  background: white;
-  padding: 3px 3px 5px 3px;
-  border-width: 0px 2px 2px 3px;
-  border-style: solid;
-  margin: -3px 6px 0px 0px;
 }
 
 dialog.deletePageDialog {

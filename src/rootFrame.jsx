@@ -85,16 +85,16 @@ export default class RootFrame extends Component
       return <div className="RootFrame">
         {this.state.displayDeleteDlg && this.renderDeleteDialog() }
         {this.renderImgDialog() }
+        { this.renderMenu(createAction) }
         <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
         { this.renderTags() }
         </div>
-        { this.renderMenu(createAction) }
         { this.renderTagSearch() }
         </div>;
     }
-      return <div className="RootFrame">
+      return <div className="RootFrame">      
+      <div className="RootMenu">{this.state.stage === 'editing' && <div className="rootMenuButton" onClick={ev => this.savePage(ev)}>Save Page</div>}<div className="rootMenuButton" onClick={ev => this.cancelEdit(ev)}>Cancel</div>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton shiftRight"/>}</div>
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
-      <div className="RootMenu">{this.state.stage === 'editing' && <span onClick={ev => this.savePage(ev)}>Save Page</span>}<span onClick={ev => this.cancelEdit(ev)}>Cancel</span>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="shiftRight"/>}</div>
       </div>;
 
   }
@@ -104,9 +104,9 @@ export default class RootFrame extends Component
           return <div className="RootMenu"></div>;
         }
         if (! this.loggedIn() || !this.state.pageData.flags.userCanWrite ){
-          return <div className="RootMenu"><span onClick={() => this.viewSource()}>View Source</span><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName}/></div>;
+          return <div className="RootMenu"><div className="rootMenuButton" onClick={() => this.viewSource()}>View Source</div><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
         }
-        return <div className="RootMenu"><span onClick={() => this.editPage()}>{createAction}</span>   {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&  <span onClick={() => this.doDelete()}>Delete Page</span>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks}/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName}/></div>;
+        return <div className="RootMenu"><div className="rootMenuButton" onClick={() => this.editPage()}>{createAction}</div>   {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&  <div className="rootMenuButton"onClick={() => this.doDelete()}>Delete Page</div>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
   }
 
   renderTags() {

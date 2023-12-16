@@ -2,8 +2,8 @@ div#root div.previewFrame {
   position:absolute;
   width:1000px;
   height:800px;
-  right: 60px;
-  bottom: -20px;
+  right: 140px;
+  top: -180px;
   background:white;
   border-style:solid;
   padding:8px;

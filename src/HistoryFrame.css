@@ -2,8 +2,8 @@ div.RootMenu div.historyFrame {
   position:absolute;
   width:600px;
   height:500px;
-  left: 180px;
-  bottom: 60px;
+  right: 100px;
+  top: 0px;
   background:white;
   border-style:solid;
   padding:5px;
@@ -14,8 +14,8 @@ div.RootMenu div.historyFramePreview {
   position:absolute;
   width:1000px;
   height:600px;
-  left: 180px;
-  bottom: 60px;
+  right: 100px;
+  top: 0px;
   background:white;
   border-style:solid;
   padding:5px;
