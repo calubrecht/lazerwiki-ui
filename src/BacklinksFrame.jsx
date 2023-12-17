@@ -16,7 +16,7 @@ export default class BacklinksFrame extends Component
   {
     let counter = 0;
     return <div className="backlinksFrame">
-      <div onClick={() => this.props.doClose()} className="close">X</div>
+      <button onClick={() => this.props.doClose()} className="close button-unstyled">X</button>
         <h2 className="title">Backlinks</h2>
         {this.renderList()}
     </div>;
@@ -36,7 +36,7 @@ export default class BacklinksFrame extends Component
       return <div>No links to this page</div>;
     }
     return (<div className="backlinkspageList">
-        {pages.map( p => <div key={p.pagename}><a href={this.renderLinkURL(p)}>{this.renderLinkName(p)}</a></div>)}
+        {pages.map( p => <div key={p}><a href={this.renderLinkURL(p)}>{this.renderLinkName(p)}</a></div>)}
 
       </div>);
   }

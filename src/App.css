@@ -3,6 +3,14 @@ body {
   background-image: url("/_resources/Back.png");
 }
 
+
+.button-unstyled {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
 div#bannerHeader {
   max-width:1200px;
   display: flex;
@@ -18,6 +26,9 @@ div#banner {
   display: inline-block;
 }
 
+div#topWidgets {
+  display: inline-block;  
+}
 
 div#userWidget {
   display: inline-block;
@@ -30,6 +41,23 @@ div#userWidget {
 div.UserWidget {
   background: lightgray;
   padding:10px;
+}
+
+div#adminWidget {
+  display: inline-block;
+  text-align: right;
+  height:90px;
+  vertical-align:top;
+  margin-top:1em;
+}
+
+div.AdminWidget {
+  background: lightgray;
+  padding:10px;
+}
+
+div.AdminWidget.hidden {
+  display:none;
 }
 
 

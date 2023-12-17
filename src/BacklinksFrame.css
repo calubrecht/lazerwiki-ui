@@ -10,7 +10,7 @@ div.RootMenu div.backlinksFrame {
   z-index: 1;
 }
 
-div.backlinksFrame div.close {
+div.backlinksFrame button.close {
   float:right;
   margin:1px 3px;
   color: red;
