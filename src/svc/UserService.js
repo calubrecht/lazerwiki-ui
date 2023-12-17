@@ -13,7 +13,7 @@ export default class UserService{
   }
 
   removeListener(listener) {
-    const index = this.listeners.indexOf(5);
+    const index = this.listeners.indexOf(listener);
     if (index > -1) {
       this.listeners.splice(index, 1);
     }

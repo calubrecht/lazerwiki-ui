@@ -116,7 +116,7 @@ export default class PageSearchFrame extends Component
     if (! line ) {
       return <span></span>;
     }
-    let words = line.split(/( )/g);
+    let words = line.split(/([ .,+?"\-])/g);
     return words.map(w =>
       searches.includes(w.toLowerCase()) ? <span className="match">{w}</span> : <span>{w}</span>);
   }
