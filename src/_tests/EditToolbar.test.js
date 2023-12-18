@@ -159,3 +159,74 @@ test('lists', async () => {
   expect(text).toBe(" -List Item\n\n");
 
 });
+
+let callSelectItem = null;
+let doFrameClose = null;
+
+jest.mock("../PageFrame", () => (props) => {
+  callSelectItem = (item) => props.selectItem(item);
+  doFrameClose = props.doClose;
+  return "PageFrame";}
+);
+
+test('pageFrame', async () => {
+  let currentText = "";
+  let getCurrentText = () => currentText;
+  let text = "";
+  let setText = t => text=t;
+
+  render (<div><EditToolbar getCurrentText = {getCurrentText} setText={setText}/><textarea id="pageSource"></textarea></div>);
+  let ta = screen.getByRole("textbox");
+  ta.value = currentText;
+  let max = currentText.length;
+
+  let btn = screen.getByRole("button", {name:"Page Link"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  expect(screen.getByText("PageFrame")).toBeInTheDocument();
+
+  await act( () => callSelectItem("newPage"));
+  expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
+
+  
+  expect(text).toBe("[[newPage|]]");
+
+  await userEvent.click(btn);
+  await act(() => doFrameClose());
+  expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
+
+});
+
+jest.mock("../MediaFrame", () => (props) => {
+  callSelectItem = (item) => props.selectItem(item);
+  doFrameClose = props.doClose;
+  return "MediaFrame";}
+);
+
+test('mediaFrame', async () => {
+  let currentText = "";
+  let getCurrentText = () => currentText;
+  let text = "";
+  let setText = t => text=t;
+
+  render (<div><EditToolbar getCurrentText = {getCurrentText} setText={setText}/><textarea id="pageSource"></textarea></div>);
+  let ta = screen.getByRole("textbox");
+  ta.value = currentText;
+  let max = currentText.length;
+
+  let btn = screen.getByRole("button", {name:"Image"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  expect(screen.getByText("MediaFrame")).toBeInTheDocument();
+
+  await act( () => callSelectItem("newImage"));
+  expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
+
+  
+  expect(text).toBe("{{newImage|}}");
+
+  await userEvent.click(btn);
+  await act(() => doFrameClose());
+  expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
+
+});
