@@ -29,14 +29,19 @@ export default class EditableTextbox extends Component
   render()
   {
     if (!this.props.editable) {
-      return <div onKeyDown={ev => this.onKeydown(ev)}><textarea ref={this.textAreaRef} autofocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>;
+      return <div onKeyDown={ev => this.onKeydown(ev)}><textarea ref={this.textAreaRef} autoFocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>;
     }
     return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea ref={this.textAreaRef} autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
   }
 
   renderTagList() {
     let allTags = [...new Set([...this.state.tags,...this.state.activeTags])].sort();
-    return <div className="editableTagList"><span className="tagHeader">TAGS</span>{allTags.map((t) => <span key={t}> <input type="checkbox"  name={t} checked={this.state.tags.has(t)} onChange={ev => this.onTagClick(ev)}/><label htmlFor={t} onClick={ev => this.onTagClick(ev)}>{t}</label></span>)} <span>+<input type="text" value={this.state.newTag} onChange={ev => this.newTagBox(ev)} onKeyDown={ev =>this.newTagEnter(ev)}/></span></div>;
+    return <div className="editableTagList">
+      <span className="tagHeader">TAGS</span>{allTags.map((t) => <span key={t}> <input type="checkbox"  name={t} checked={this.state.tags.has(t)}
+      onChange={ev => this.onTagClick(ev)}/><label htmlFor={t} onClick={ev => this.onTagClick(ev)}>{t}</label></span>)}
+      <span>+<input type="text" name="tagEntry" value={this.state.newTag}
+        onChange={ev => this.newTagBox(ev)}
+        onKeyDown={ev =>this.newTagEnter(ev)}/></span></div>;
   }
 
   renderErrorMsg() {
@@ -102,19 +107,6 @@ export default class EditableTextbox extends Component
     }
     currTags.delete(tagName);
     this.setState( {tags: currTags, error:""});
-  }
-
-  submit(ev)
-  {
-    ev.preventDefault();
-    this.props.doSubmit(this.state.text);
-  }
-  
-  cancel(ev)
-  {
-    ev.preventDefault();
-    this.setState({text:null, error:""});
-    this.props.doCancel()
   }
 
   handleAutoIndent(ev) {

@@ -13,12 +13,6 @@ div.editableTagList {
   text-align: right;
 }
 
-div.editableTagList span {
-}
-
-div.editableTagList span input {
-}
-
 div.error {
   color: red;
 }
