@@ -191,7 +191,7 @@ test('pageFrame', async () => {
   
   expect(text).toBe("[[newPage|]]");
 
-  await userEvent.click(btn);
+  userEvent.click(btn);
   await act(() => doFrameClose());
   expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
 
@@ -229,4 +229,72 @@ test('mediaFrame', async () => {
   await act(() => doFrameClose());
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 
+});
+
+test('pluginActions', async () => { 
+    LAZERWIKI_PLUGINS = [
+    {
+        name: "Insert1",
+        icon: "plugin.png",
+        script: (text, start, end, ns, name) => {return {action:'insert', location:-1, value:"new at end"}}
+    },
+    {
+        name: "Insert2",
+        icon: "plugin.png",
+        script: (text, start, end, ns, name) => {return {action:'insert', location:4, value:"new at middle"}}
+    },
+    {
+        name: "Replace",
+        icon: "plugin.png",
+        script: (text, start, end, ns, name) => {return {action:'replace', location:4, locationEnd:10, value:"Replacement"}}
+    },
+    {
+        name: "ReplaceAll",
+        icon: "plugin.png",
+        script: (text, start, end, ns, name) => {return {action:'replaceAll', value:"Replacement"}}
+    },
+    {
+        name: "None",
+        icon: "plugin.png",
+        script: (text, start, end, ns, name) => {return {action:'none'}}
+    }];
+  let currentText = "Abcdefg1234lmnop";
+  let getCurrentText = () => currentText;
+  let text = "";
+  let setText = t => text=t;
+
+  render (<div><EditToolbar getCurrentText = {getCurrentText} setText={setText}/><textarea id="pageSource"></textarea></div>);
+  let ta = screen.getByRole("textbox");
+  ta.value = currentText;
+  let max = currentText.length;
+
+  let btn = screen.getByRole("button", {name:"Insert1"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  
+  expect(text).toBe(currentText + "new at end"); 
+  btn = screen.getByRole("button", {name:"Insert2"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  
+  expect(text).toBe("Abcdnew at middleefg1234lmnop"); 
+  
+  btn = screen.getByRole("button", {name:"Replace"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  
+  expect(text).toBe("AbcdReplacement4lmnop"); 
+  
+  btn = screen.getByRole("button", {name:"ReplaceAll"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  
+  expect(text).toBe("Replacement"); 
+ 
+  text = "This was here";
+  btn = screen.getByRole("button", {name:"None"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  
+  expect(text).toBe("This was here"); 
 });

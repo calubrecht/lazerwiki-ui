@@ -136,18 +136,6 @@ export default class EditToolbar extends Component
        this.props.setText(currentText);
   }
   
-  replaceWholeSelectionText(replacement) {
-       let area = this.getTextArea();
-       let currentText = this.props.getCurrentText();
-       let selectStart = area.selectionStart;
-       let selectEnd = area.selectionEnd;
-       currentText = currentText.slice(0, selectStart) + replacement + currentText.slice(selectEnd);
-       let newEnd = selectStart + replacement.length;
-       area.value = currentText;
-       this.refreshFocus(area, newEnd, newEnd);
-       this.props.setText(currentText);
-  }
-
   refreshFocus(area, selectStart, selectEnd){
        area.setSelectionRange(selectEnd, selectEnd);
        area.blur();
