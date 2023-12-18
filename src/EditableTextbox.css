@@ -17,13 +17,13 @@ div.error {
   color: red;
 }
 
-div.editToolbar span.button {
+div.editToolbar button.toolbar-button {
   border-style: outset;
   border-width: 2px;
   border-color: black;
   margin-right: 1px ;
   display: inline-block;
 }
-div.editToolbar span.button:active {
+div.editToolbar button.toolbar-button:active {
   border-style: inset;
 }

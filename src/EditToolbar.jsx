@@ -98,8 +98,8 @@ export default class EditToolbar extends Component
   }
 
   renderButtons() {
-    return this.buttons.map( (def) => <span className="button" onClick={def.click} title={def.name} key={def.name}>
-      <img src={"/_resources/" + def.icon} alt={def.name}/></span>);
+    return this.buttons.map( (def) => <button className="toolbar-button button-unstyled" onClick={def.click} title={def.name} key={def.name}>
+      <img src={"/_resources/" + def.icon} alt={def.name}/></button>);
 
   }
 
