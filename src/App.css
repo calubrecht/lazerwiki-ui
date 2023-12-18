@@ -10,6 +10,7 @@ body {
   background: none;
   box-shadow: none;
   font-size: inherit;
+  font-family: inherit;
 }
 
 div#bannerHeader {

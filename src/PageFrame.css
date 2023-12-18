@@ -72,17 +72,17 @@ ul.nsTree {
   padding-left: 20px;
 }
 
-ul.nsTree li.terminal > span.dot:before{
+ul.nsTree li.terminal > button.dot:before{
   content: url("/_resources/dot.png");
 
 }
 
-ul.nsTree li.open > span.dot:before{
+ul.nsTree li.open > button.dot:before{
   content: url("/_resources/minus.png");
 
 }
 
-ul.nsTree li.closed > span.dot:before{
+ul.nsTree li.closed > button.dot:before{
   content: url("/_resources/plus.png");
 
 }

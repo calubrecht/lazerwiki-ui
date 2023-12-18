@@ -14,10 +14,10 @@ export default class NsTree extends Component
   renderNSSubtree(tree, level) {
     let name = tree.namespace ? tree.namespace : "<ROOT>";
     if (!tree.children || tree.children.length == 0) {
-      return <li className="terminal" key={tree.fullNamespace}><span className="dot" onClick={evt => evt.stopPropagation()}> </span><span onClick={(evt => this.selectNS(evt, tree.fullNamespace))}>{name}</span></li>;
+      return <li className="terminal" key={tree.fullNamespace}><button className="dot button-unstyled" onClick={evt => evt.stopPropagation()} aria-label={"expand-" + tree.fullNamespace}> </button><button className="button-unstyled" onClick={(evt => this.selectNS(evt, tree.fullNamespace))}>{name}</button></li>;
     }
     let subTreeClass = level <= 1 ? "open" : "closed";
-    return <li className={subTreeClass} key={tree.fullNamespace} onClick= {(evt => this.toggleTreeClass(evt))}><span className="dot"> </span><span onClick={(evt => this.selectNS(evt, tree.fullNamespace))}>{name}</span><ul className="nsTree">{
+    return <li className={subTreeClass} key={tree.fullNamespace} onClick= {(evt => this.toggleTreeClass(evt))}><button className="dot button-unstyled" aria-label={"expand-" + tree.fullNamespace}> </button><button className="button-unstyled" onClick={(evt => this.selectNS(evt, tree.fullNamespace))}>{name}</button><ul className="nsTree">{
       tree.children.map( c => this.renderNSSubtree(c))
     }</ul></li>;
   }
