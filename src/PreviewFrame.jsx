@@ -15,7 +15,7 @@ export default class PreviewFrame extends Component
   {
     let counter = 0;
     return <div className="previewFrame">
-      <div onClick={() => this.props.doClose()} className="close">X</div>
+      <button className="button-unstyled close" onClick={() => this.props.doClose()}>X</button>
       <h2 className="title">Preview - {this.props.initData.pageName}</h2>
         <div>{this.renderPage()}</div>
     </div>;

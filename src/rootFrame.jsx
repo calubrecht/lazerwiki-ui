@@ -93,7 +93,7 @@ export default class RootFrame extends Component
         </div>;
     }
       return <div className="RootFrame">      
-      <div className="RootMenu">{this.state.stage === 'editing' && <div className="rootMenuButton" onClick={ev => this.savePage(ev)}>Save Page</div>}<div className="rootMenuButton" onClick={ev => this.cancelEdit(ev)}>Cancel</div>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton shiftRight"/>}</div>
+      <div className="RootMenu">{this.state.stage === 'editing' && <div className="rootMenuButton" onClick={ev => this.savePage(ev)}>Save Page</div>}<div className="rootMenuButton" onClick={ev => this.cancelEdit(ev)}>Cancel</div>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
       </div>;
 

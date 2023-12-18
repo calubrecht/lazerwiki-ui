@@ -10,7 +10,7 @@ div#root div.previewFrame {
   z-index: 1;
 }
 
-div.previewFrame div.close {
+div.previewFrame button.close {
   float:right;
   margin:1px 3px;
   color: red;

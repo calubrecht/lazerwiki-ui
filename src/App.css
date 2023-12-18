@@ -9,6 +9,7 @@ body {
   border: 0;
   background: none;
   box-shadow: none;
+  font-size: inherit;
 }
 
 div#bannerHeader {
@@ -127,7 +128,7 @@ div.RootMenu div.previewFrame span {
   border-width: 0;
   margin: 0;
 }
-div.RootMenu div.shiftRight div.drawerPull {
+div.RootMenu div.shiftRight button.drawerPull {
   margin-left: 25px;
 }
 
