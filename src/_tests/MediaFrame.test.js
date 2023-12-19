@@ -1,0 +1,134 @@
+import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import { within } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
+import UserService, {instance as US_instance} from '../svc/UserService';
+import MediaFrame from '../MediaFrame';
+
+var TAG_PROMISE = new Promise(() => {});
+var DELETE_PROMISE = () =>Promise.resolve("Success");
+let mockDS = {fetchImageList: () => TAG_PROMISE, deleteFile: jest.fn(() => DELETE_PROMISE())};
+
+jest.mock("../svc/DataService", () => {
+    return {instance: () => mockDS};
+
+});
+
+jest.mock("../NsTree", ()  => (props) => "NsTree");
+
+beforeEach(() => {
+    TAG_PROMISE = new Promise(() => {});
+    DELETE_PROMISE = () =>Promise.resolve("Success");
+    US_instance().setUser(null);
+  
+  });
+
+
+function getByStartText(text) {
+    return screen.getAllByText((content, node) => {
+        return node.textContent.startsWith(text);
+      }
+      )[0];
+}
+
+// props = namespace (optional), doClose, selectItem(optional)
+test('render', async () => {
+  let doClose = jest.fn(() => {});
+  TAG_PROMISE = Promise.resolve({media: {"": [
+    {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", },
+    {fileName:"bigFile.png", fileSize:1000000, width:120, height:100, uploadedBy:"Bob", },
+    {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
+]}, namespaces: { namespace:"", children:[]}});
+
+  render(<MediaFrame doClose={doClose}/>);
+  await waitFor(() => {});
+
+  expect(screen.getByText("NsTree")).toBeInTheDocument();
+  expect(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).toBeInTheDocument();
+  expect(getByStartText('bigFile.png - 976.56 kb -  120x100 - uploaded by Bob')).toBeInTheDocument();
+  expect(getByStartText('bigestFile.png - 953.67 mb -  520x500 - uploaded by Bob')).toBeInTheDocument();
+});
+
+test('renderWithSelect', async () => {
+    let doClose = jest.fn(() => {});
+    let doSelect = jest.fn(() => {});
+    TAG_PROMISE = Promise.resolve({media: {"": [
+      {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", },
+      {fileName:"bigFile.png", fileSize:1000000, width:120, height:100, uploadedBy:"Bob", },
+      {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
+  ]}, namespaces: { namespace:"", children:[]}});
+  
+    render(<MediaFrame doClose={doClose} selectItem={doSelect}/>);
+    await waitFor(() => {});
+  
+    expect(screen.getByText("NsTree")).toBeInTheDocument();
+    expect(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).toBeInTheDocument();
+    expect(getByStartText('bigFile.png - 976.56 kb -  120x100 - uploaded by Bob')).toBeInTheDocument();
+    expect(getByStartText('bigestFile.png - 953.67 mb -  520x500 - uploaded by Bob')).toBeInTheDocument();
+    expect(screen.getByRole("button", {name: 'file.png'})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name: 'bigFile.png'})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name: 'bigestFile.png'})).toBeInTheDocument();
+  });
+
+test('basicButtons', async () => {
+    US_instance().setUser({userName:"joe"});
+    let doClose = jest.fn(() => {});
+    TAG_PROMISE = Promise.resolve({media: {"": [
+      {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", }
+  ]}, namespaces: { namespace:"", children:[]}});
+  
+    render(<MediaFrame doClose={doClose}/>);
+    await waitFor(() => {});
+  
+    await userEvent.click(screen.getByRole("button", {name: "X"}));
+
+    expect (doClose.mock.calls).toHaveLength(1);
+
+    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+
+    expect (screen.getByRole("dialog")).toBeInTheDocument();
+    // Just close
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Cancel"}));
+    expect (screen.queryByRole("dialog")).not.toBeInTheDocument();
+    // verify delete not called
+    expect(mockDS.deleteFile.mock.calls).toHaveLength(0);
+
+    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Delete"}));
+    expect (screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect (screen.getByText("File Deleted")).toBeInTheDocument();
+    expect(mockDS.deleteFile.mock.calls).toHaveLength(1);
+
+    // Error upload
+    DELETE_PROMISE = () => Promise.reject({message:"Bad"});
+    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Delete"}));
+    expect (screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect (screen.queryByText("File Deleted")).not.toBeInTheDocument();
+    expect (screen.queryByText("Bad")).toBeInTheDocument();
+    expect(mockDS.deleteFile.mock.calls).toHaveLength(2);
+
+});
+
+test('basicButtonsWithSelect', async () => {
+    let doClose = jest.fn(() => {});
+    let doSelect = jest.fn(() => {});
+    TAG_PROMISE = Promise.resolve({media: {"ns": [
+      {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", }
+  ]}, namespaces: { namespace:"", children:[{namespace:"ns"}]}});
+  
+    render(<MediaFrame doClose={doClose} selectItem={doSelect} namespace="ns"/>);
+    await waitFor(() => {});
+    await waitFor(() => US_instance().setUser({userName:"joe"}));
+
+    await userEvent.click(screen.getByRole("button", {name: 'file.png'}));
+
+    expect(doSelect.mock.calls[0][0]).toBe('ns:file.png');
+
+    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+    expect (screen.getByRole("dialog")).toBeInTheDocument();
+});
+
+// Additional test
+// test errror on fetchImageList
+// Test select NSTree select other namespace, should change namespace
+// Test Uploading

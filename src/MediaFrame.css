@@ -22,7 +22,7 @@ div.editToolbar div.mediaFrame {
   z-index: 1;
 }
 
-div.mediaFrame div.close {
+div.mediaFrame button.close {
   float:right;
   margin:1px 3px;
   color: red;

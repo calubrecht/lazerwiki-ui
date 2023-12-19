@@ -37,7 +37,7 @@ export default class MediaFrame extends Component
     let messageClass = this.state.errorMessage ? "error" : "message";
     let enableUpload = this.enableUpload();
     return <div className="mediaFrame">
-      <div onClick={() => this.props.doClose()} className="close">X</div>
+      <button onClick={() => this.props.doClose()} className="close button-unstyled">X</button>
       <h2 className="title">Media Viewer</h2>
       <div className="mediaFrameContent">
       <div className="nsTreeSelector">
@@ -72,7 +72,7 @@ export default class MediaFrame extends Component
           this.state.serverImages[this.state.namespace].map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
-              <div><a onClick={(ev) => this.doAction(ev, nsPrefix + img.fileName)}>{img.fileName}</a> - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</span>}</div>
+              <div><button className="button-unstyled" onClick={(ev) => this.doAction(ev, nsPrefix + img.fileName)}>{img.fileName}</button> - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <button className="delete button-unstyled" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}</div>
               <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
             </div>;
           })
@@ -87,7 +87,7 @@ export default class MediaFrame extends Component
           this.state.serverImages[this.state.namespace].map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
-              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <span className="delete" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</span>}</div>
+              <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <button className="delete button-unstyled" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}</div>
               <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
             </div>;
           })
@@ -132,12 +132,7 @@ export default class MediaFrame extends Component
   }
 
   handleError(e) {
-    if (e.message) {
-      this.setState({"message": e.message, "errorMessage": true, enabled:true})
-    }
-    else {
-      e.promise.then(msg => this.setState({"message": msg, "errorMessage": true, enabled:true})  )
-    }
+    this.setState({"message": e.message, "errorMessage": true, enabled:true})
   }
 
   uploadFile(ev) {
@@ -162,7 +157,7 @@ export default class MediaFrame extends Component
     <div>Are you sure you want to delete {this.state.deleteImage.displayName}?</div>
     <div>The file will be removed from the server</div>
     <div><button onClick={  ()=> this.requestDelete(this.state.deleteImage.fileName).then(() => this.closeDeleteDialog("File Deleted")).
-  catch(e => {this.handleError(e); this.closeDeleteDialog()})}>Delete</button><button onClick={() => this.closeDeleteDialog()}>Cancel</button></div>
+  catch(e => {this.handleError(e); this.closeDeleteDialog();})}>Delete</button><button onClick={() => this.closeDeleteDialog()}>Cancel</button></div>
     </dialog>);
   }
 
