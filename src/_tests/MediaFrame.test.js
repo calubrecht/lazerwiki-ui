@@ -1,22 +1,26 @@
-import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import { render, screen, act, waitFor, queryByAttribute, fireEvent } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import UserService, {instance as US_instance} from '../svc/UserService';
 import MediaFrame from '../MediaFrame';
 
-var TAG_PROMISE = new Promise(() => {});
+var IMG_PROMISE = new Promise(() => {});
 var DELETE_PROMISE = () =>Promise.resolve("Success");
-let mockDS = {fetchImageList: () => TAG_PROMISE, deleteFile: jest.fn(() => DELETE_PROMISE())};
+let mockDS = {fetchImageList: () => IMG_PROMISE, deleteFile: jest.fn(() => DELETE_PROMISE())};
 
 jest.mock("../svc/DataService", () => {
     return {instance: () => mockDS};
 
 });
 
-jest.mock("../NsTree", ()  => (props) => "NsTree");
+let NsTreeSelectNS=null;
+
+jest.mock("../NsTree", ()  => (props) => {
+    NsTreeSelectNS=props.selectNS;
+    return "NsTree"});
 
 beforeEach(() => {
-    TAG_PROMISE = new Promise(() => {});
+    IMG_PROMISE = new Promise(() => {});
     DELETE_PROMISE = () =>Promise.resolve("Success");
     US_instance().setUser(null);
   
@@ -33,7 +37,7 @@ function getByStartText(text) {
 // props = namespace (optional), doClose, selectItem(optional)
 test('render', async () => {
   let doClose = jest.fn(() => {});
-  TAG_PROMISE = Promise.resolve({media: {"": [
+  IMG_PROMISE = Promise.resolve({media: {"": [
     {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", },
     {fileName:"bigFile.png", fileSize:1000000, width:120, height:100, uploadedBy:"Bob", },
     {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
@@ -51,7 +55,7 @@ test('render', async () => {
 test('renderWithSelect', async () => {
     let doClose = jest.fn(() => {});
     let doSelect = jest.fn(() => {});
-    TAG_PROMISE = Promise.resolve({media: {"": [
+    IMG_PROMISE = Promise.resolve({media: {"": [
       {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", },
       {fileName:"bigFile.png", fileSize:1000000, width:120, height:100, uploadedBy:"Bob", },
       {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
@@ -72,7 +76,7 @@ test('renderWithSelect', async () => {
 test('basicButtons', async () => {
     US_instance().setUser({userName:"joe"});
     let doClose = jest.fn(() => {});
-    TAG_PROMISE = Promise.resolve({media: {"": [
+    IMG_PROMISE = Promise.resolve({media: {"": [
       {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", }
   ]}, namespaces: { namespace:"", children:[]}});
   
@@ -112,9 +116,9 @@ test('basicButtons', async () => {
 test('basicButtonsWithSelect', async () => {
     let doClose = jest.fn(() => {});
     let doSelect = jest.fn(() => {});
-    TAG_PROMISE = Promise.resolve({media: {"ns": [
+    IMG_PROMISE = Promise.resolve({media: {"ns": [
       {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", }
-  ]}, namespaces: { namespace:"", children:[{namespace:"ns"}]}});
+  ]}, namespaces: { namespace:"", children:[{namespace:"os", children:[]}, {namespace:"ns", children:[]}]}});
   
     render(<MediaFrame doClose={doClose} selectItem={doSelect} namespace="ns"/>);
     await waitFor(() => {});
@@ -128,7 +132,69 @@ test('basicButtonsWithSelect', async () => {
     expect (screen.getByRole("dialog")).toBeInTheDocument();
 });
 
-// Additional test
-// test errror on fetchImageList
-// Test select NSTree select other namespace, should change namespace
-// Test Uploading
+
+test('errorFetch', async () => {
+    let doClose = jest.fn(() => {});
+    let doSelect = jest.fn(() => {});
+    let rejectHook = null;
+    IMG_PROMISE = new Promise((resolve, reject) => rejectHook=reject);
+        
+  
+    render(<MediaFrame doClose={doClose} selectItem={doSelect} namespace="ns"/>);
+    await rejectHook({message: "NO IMAGES"});
+    await waitFor(() => {});
+    expect (screen.getByText("NO IMAGES")).toBeInTheDocument();
+});
+
+test('NsTree', async() => {
+    IMG_PROMISE = Promise.resolve({media: {"": [
+        {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", }
+    ], 
+"ns": [{fileName:"file2.png", fileSize:1000, width:10, height:10, uploadedBy:"Bobby", }]}, namespaces: { namespace:"", children:[{namespace:"ns"}]}});
+
+    render(<MediaFrame/>);
+    await waitFor(() => {});
+    expect(screen.getByText("Media - []")).toBeInTheDocument();
+    expect(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).toBeInTheDocument();
+
+    await waitFor(() => NsTreeSelectNS("ns"));
+    expect(screen.getByText("Media - [ns]")).toBeInTheDocument();
+    expect(getByStartText('file2.png - 1000 bytes -  10x10 - uploaded by Bobby')).toBeInTheDocument();
+});
+
+
+test('upload', async() => {
+    US_instance().setUser({userName:"joe"});
+    let doClose = jest.fn(() => {});
+    IMG_PROMISE = Promise.resolve({media: {"": [
+      {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", }
+  ]}, namespaces: { namespace:"", writable:true, children:[]}});
+
+    let uploadPromiseResolveHook = null;
+    let uploadPromiseRejectHook = null;
+    mockDS.saveMedia = jest.fn((files, ns) => new Promise((resolve, reject) => {uploadPromiseResolveHook= resolve; uploadPromiseRejectHook = reject;}));
+  
+    let component = render(<MediaFrame doClose={doClose}/>);
+    await waitFor(() => {});
+
+    await fireEvent.change(queryByAttribute("id", component.container, "mediaFileUpload"), { target: {files: 'f'}});
+    await screen.getByLabelText("NS").focus();
+    await userEvent.keyboard("newNS");
+    await userEvent.click(screen.getByRole("button", {name:"Upload"}));
+
+    expect(mockDS.saveMedia.mock.calls[0][0]).toBe('f');
+    expect(mockDS.saveMedia.mock.calls[0][1]).toBe('newNS');
+    expect(screen.getByText("Uploading")).toBeInTheDocument();
+
+    await waitFor( () => uploadPromiseResolveHook({}));
+    expect(screen.getByText("Upload Complete")).toBeInTheDocument();
+    expect(queryByAttribute("id", component.container, "mediaFileUpload").value).toBe("");
+
+
+    await fireEvent.change(queryByAttribute("id", component.container, "mediaFileUpload"), { target: {files: 'f'}});
+    await userEvent.click(screen.getByRole("button", {name:"Upload"}));
+    await waitFor( () => uploadPromiseRejectHook({message: "Uplaod failed"}));
+    await waitFor(() => {});
+    expect(screen.getByText("Uplaod failed")).toBeInTheDocument();
+    
+});

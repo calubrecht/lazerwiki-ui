@@ -28,7 +28,7 @@ export default class MediaFrame extends Component
   fetchImageList() {
     this.dataService.fetchImageList().then(
       (imgs) => this.setState({serverImages: imgs.media, nsTree: imgs.namespaces, enabled:true})).catch(
-      e => this.setState({"message": e, "errorMessage": false, enabled:true}));
+      e => this.setState({message: e.message, errorMessage: true, enabled:true}));
   }
 
 
@@ -48,7 +48,7 @@ export default class MediaFrame extends Component
           <h3>Media - [{this.state.namespace}]</h3>
       {this.state.user && <form className="uploadBox">
         <div><input id="mediaFileUpload" type="file" disabled={!enableUpload}/>
-        <span className="label">NS</span><input id="mediaFileUploadNS" disabled={!enableUpload} onChange={evt => this.setState({uploadNS: evt.target.value})} value={this.state.uploadNS}></input><button onClick={(ev) => this.uploadFile(ev)} disabled={!enableUpload}>Upload</button></div>
+        <label htmlFor="mediaFileUploadNS" className="label">NS</label><input id="mediaFileUploadNS" disabled={!enableUpload} onChange={evt => this.setState({uploadNS: evt.target.value})} value={this.state.uploadNS}></input><button onClick={(ev) => this.uploadFile(ev)} disabled={!enableUpload}>Upload</button></div>
       </form>}
       <div id="message" className={messageClass}>{this.state.message}</div>
       {this.state.displayDeleteDlg && this.renderDeleteDialog() }
@@ -66,7 +66,7 @@ export default class MediaFrame extends Component
       let nsPrefix = this.state.namespace ? this.state.namespace + ":" : '';
       if (this.props.selectItem) {
       return <div className="mediaBox">
-        <div className="imageFrame">Image Preview</div>
+        <div className="imageFrame" title="Hover over filename to preview">Image Preview</div>
           <div className="mediaList">
         {
           this.state.serverImages[this.state.namespace].map( img => {
