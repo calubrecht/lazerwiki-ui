@@ -121,6 +121,12 @@ div.RootMenu .rootMenuButton {
   border-style: solid;
   margin-bottom: .25em;
   box-shadow: 5px 2px;
+  display: block;
+  text-align: left;
+}
+
+div.RootMenu button.rootMenuButton {
+  width:100%
 }
 
 div.RootMenu div.previewFrame span {
