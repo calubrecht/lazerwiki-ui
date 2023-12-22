@@ -81,7 +81,7 @@ export default class MediaFrame extends Component
 
       }
       return <div className="mediaBox">
-        <div className="imageFrame">Image Preview</div>
+        <div className="imageFrame" title="Hover over filename to preview">Image Preview</div>
           <div className="mediaList">
         {
           this.state.serverImages[this.state.namespace].map( img => {
