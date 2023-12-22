@@ -17,15 +17,18 @@ export default class RootFrame extends Component
     let url =  window.location.pathname;
     if (url != '/' && !url.startsWith("/page/")) {
       window.location.pathname = '/';
-      return;
+      this.pageName = '';
     }
-    let p = url.split('/');
-    if (p.length > 3) {
-      window.location.pathname = '/';
-      return;
+    else 
+    {
+      let p = url.split('/');
+      if (p.length > 3) {
+        window.location.pathname = '/';
+      }
+      else {
+        this.pageName = p.length > 2 ? p[2] : "";
+      }
     }
-
-    this.pageName = p.length > 2 ? p[2] : "";
     this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false, siteTitle: "", pageTitle: this.pageName};
     this.data = DS_instance();
     this.modalDlgRef = React.createRef();
@@ -59,7 +62,10 @@ export default class RootFrame extends Component
     this.setState({pageData: pageData, loaded:true, stage});
     if (pageData.title) {
       this.setState({pageTitle:pageData.title});
-      this.data.getSiteName().then(res => document.title = this.state.siteTitle + " - " + pageData.title);
+      document.title = this.state.siteTitle + " - " + pageData.title;
+    }
+    else {
+      document.title = this.state.siteTitle;
     }
   }
 
