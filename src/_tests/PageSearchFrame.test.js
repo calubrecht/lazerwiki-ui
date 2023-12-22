@@ -63,7 +63,6 @@ test('closeButton', () => {
 test('doSearch', async () => {
     let resolveHook = null;
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
-//    mockDS.doPageSearch = jest.fn(() => PAGE_SEARCH_PROMISE);
 
     render(<PageSearchFrame /> );
     await waitFor( () => {});
@@ -74,11 +73,15 @@ test('doSearch', async () => {
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
     await waitFor( () => {});
     expect(screen.getByText('Searching')).toBeInTheDocument();
-    resolveHook({title: [{pageName: "Big Page"}, {pageName:"Other Page"}], text: [{pageName: "Page With Text Match", resultLine: "There is some text searched here"}]});
+    resolveHook({title: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}], text: [{pageName: "Page With Text Match", namespace:"", resultLine: "There is some text searched here"}]});
 
     await waitFor( () => {});
-    expect(screen.getByText('Big Page')).toBeInTheDocument();
-    expect(screen.getByText('Other Page')).toBeInTheDocument();
+    expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+    expect(screen.getByText('ns:Other Page')).toBeInTheDocument();
+    let link = screen.getByRole("link", {name:"ns:Other Page"});
+    expect(screen.getByRole("link", {name:"ns:Other Page"})).toHaveAttribute("href", "/page/ns:Other Page");
+    expect(screen.getByText("<ROOT>")).toBeInTheDocument();
+    expect(screen.getByRole("link", {name:"<ROOT>"})).toHaveAttribute("href", "/");
     expect(screen.getByText('Page With Text Match')).toBeInTheDocument();
     let  textMatchLine = screen.getByTestId("textMatch-Page With Text Match");
     expect(textMatchLine).toHaveTextContent("Page With Text Match There is some text searched here");
@@ -87,13 +90,88 @@ test('doSearch', async () => {
     
 });
 
-//  Needed, check render Links with namespaces.
-//  Check render tag search with results
-// Test render no title matches
-//  Test render no text matches
-// Test neither title nor text
-// Test render missing resultLine, nothing to highlight
-// Test change searchType
-// Test search button
-// Tset setUser (and unmount )
-// Test tagSearch from dropdown
+test('doTagSearch', async () => {
+    let resolveHook = null;
+    PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
+
+    render(<PageSearchFrame /> );
+    await waitFor( () => {});
+    userEvent.selectOptions(screen.queryByRole('combobox'), 'tag');
+    screen.getByRole('textbox').focus();
+    await userEvent.keyboard("aTag");
+    await userEvent.click(screen.queryByRole('button', {name: "Search"}));
+
+    expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
+    await waitFor( () => {});
+    expect(screen.getByText('Searching')).toBeInTheDocument();
+    resolveHook({tag: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}]});
+
+    await waitFor( () => {});
+    expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+    expect(screen.getByText('ns:Other Page')).toBeInTheDocument();
+    let link = screen.getByRole("link", {name:"ns:Other Page"});
+    expect(screen.getByRole("link", {name:"ns:Other Page"})).toHaveAttribute("href", "/page/ns:Other Page");
+});
+
+test('doSearch empty lists', async () => {
+    let resolveHook = null;
+    PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
+
+    render(<PageSearchFrame /> );
+    await waitFor( () => {});
+    screen.getByRole('textbox').focus();
+    await userEvent.keyboard("search text");
+    await userEvent.keyboard("[Enter]");
+
+    expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
+    await waitFor( () => {});
+    expect(screen.getByText('Searching')).toBeInTheDocument();
+    resolveHook({title: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}], text: []});
+
+    await waitFor( () => {});
+    expect(screen.getByText('No Matches')).toBeInTheDocument();
+    expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+    
+    PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
+    await userEvent.keyboard("[Enter]");
+    await waitFor( () => {});
+    resolveHook({title: [], text: [{pageName:"", namespace:""}]});
+
+    await waitFor( () => {});
+    expect(screen.getByText('No Matches')).toBeInTheDocument();
+    expect(screen.getByText('<ROOT>')).toBeInTheDocument();
+    expect(screen.getByTestId("emptyMatch")).toBeInTheDocument();
+
+
+    PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
+    await userEvent.keyboard("[Enter]");
+    await waitFor( () => {});
+    resolveHook({title: [], text: []});
+
+    await waitFor( () => {});
+    expect(screen.getByText('No matches found.')).toBeInTheDocument();
+    
+});
+
+test('setUser triggers additional search', async () => {
+    let resolveHook = null;
+    PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
+
+    render(<PageSearchFrame /> );
+    await waitFor( () => {});
+    screen.getByRole('textbox').focus();
+    await userEvent.keyboard("search text");
+    await userEvent.keyboard("[Enter]");
+
+    expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
+    await waitFor( () => {});
+    expect(screen.getByText('Searching')).toBeInTheDocument();
+    resolveHook({title: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}], text: []});
+
+    await waitFor( () => {});
+
+    US_instance().setUser({userName:"user"});
+    await waitFor( () => {});
+    expect(mockDS.doPageSearch.mock.calls).toHaveLength(2);
+    
+});

@@ -56,7 +56,7 @@ export default class PageSearchFrame extends Component
 
   renderLinkName(p) {
     let name = p.pageName === '' ? '<ROOT>' : p.pageName;
-    name = p.namespace ? p.namespace + ":" + p.pageName : p.pageName;
+    name = p.namespace ? p.namespace + ":" + name : name;
     let title = p.title ? ' - ' + p.title : '';
     return name + title;
   }
@@ -114,7 +114,7 @@ export default class PageSearchFrame extends Component
   highlightMatch(line, searchTerm) {
     let searches = searchTerm.toLowerCase().split(" ");
     if (! line ) {
-      return <span key="empty"></span>;
+      return <span key="empty" data-testid={"emptyMatch"}></span>;
     }
     let counter =0 ;
     let words = line.split(/([ .,+?"\-])/g);
