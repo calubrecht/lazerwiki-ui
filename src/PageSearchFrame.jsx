@@ -39,7 +39,7 @@ export default class PageSearchFrame extends Component
   {
     let counter = 0;
     return <div className="pageSearchFrame">
-      <div onClick={() => this.props.doClose()} className="close">X</div>
+      <button onClick={() => this.props.doClose()} className="close button-unstyled">X</button>
       <h2 className="title">Page Search - {this.state.searchTerm}</h2>
         {this.renderSearchInput()}
         <div className="pageSearchFrameContent">
@@ -107,18 +107,19 @@ export default class PageSearchFrame extends Component
       return "No Matches";
     }
     return (<div >
-        {pages.map( p => <div key={p.pageName}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a><br/> {this.highlightMatch(p.resultLine, searchTerm)}</div>)}
+        {pages.map( p => <div key={p.pageName} data-testid={"textMatch-"+p.pageName}><a href={this.renderLinkURL(p)} key="link">{this.renderLinkName(p)}</a><br key="break"/> {this.highlightMatch(p.resultLine, searchTerm)}</div>)}
       </div>);
   }
 
   highlightMatch(line, searchTerm) {
     let searches = searchTerm.toLowerCase().split(" ");
     if (! line ) {
-      return <span></span>;
+      return <span key="empty"></span>;
     }
+    let counter =0 ;
     let words = line.split(/([ .,+?"\-])/g);
     return words.map(w =>
-        searches.filter(search => w.toLowerCase().startsWith(search)).length  ? <span className="match">{w}</span> : <span>{w}</span>);
+        searches.filter(search =>w.toLowerCase().startsWith(search)).length  ? <span className="match" key={"term-"+ w+"-"+ counter++}>{w}</span> : <span key={"term-"+ w+"-"+ counter++}>{w}</span>);
   }
 
   renderSearchInput() {
