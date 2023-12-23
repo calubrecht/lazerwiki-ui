@@ -253,6 +253,12 @@ test('render tags', async () => {
     expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
     await waitFor(() => pageSearchClose());
     expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
+    // Clicking a tag button while the tag search window is open will close it.
+    await userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
 });
 
 test('render view source', async () => {
