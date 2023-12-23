@@ -31,7 +31,6 @@ export default class RootFrame extends Component
     }
     this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false, siteTitle: "", pageTitle: this.pageName};
     this.data = DS_instance();
-    this.modalDlgRef = React.createRef();
   }
 
   componentDidMount()
@@ -184,8 +183,11 @@ export default class RootFrame extends Component
   }
   
   renderImgDialog() {
-    let filename = this.state.showImgDlg ? this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1) :"";
-    return (<dialog className="showImageDialog" ref = {this.modalDlgRef}>
+    if  (!this.state.showImgDlg) {
+      return
+    }
+    let filename = this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1);
+    return (<dialog className="showImageDialog" open>
     <div className="imgTitle">{filename}</div>
     <div><img src={this.state.showImgDlg} ></img></div>
     <div><button onClick={() => this.closeShowImgDialog()}>Close</button></div>
@@ -207,12 +209,10 @@ export default class RootFrame extends Component
 
  closeShowImgDialog() {
    this.setState({showImgDlg: null});
-   this.modalDlgRef.current?.close();
  }
 
  openShowImgDialog(src) {
    this.setState({showImgDlg: src});
-   this.modalDlgRef.current?.showModal();
  }
 
  requestDelete() {

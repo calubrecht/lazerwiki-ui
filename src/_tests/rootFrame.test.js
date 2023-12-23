@@ -206,6 +206,31 @@ test('PageTitle', async () => {
     expect(document.title).toBe("Test Site - PageTitle");
 });
 
+test('image dialog', async () => {
+    let resolveHook = null
+    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
+    render(<RootFrame/>);
+    await waitFor( () => {});
+    expect(screen.getByText('Loading')).toBeInTheDocument();
+    // fetchPage not called until user is set
+    expect(mockDS.fetchPage.mock.calls).toHaveLength(0);
+
+    await waitFor( () => {US_instance().setUser(null)});
+    expect(mockDS.fetchPage.mock.calls).toHaveLength(1);
+
+    resolveHook({flags: {exists:true}, rendered: '<img className="fullLink" src="/text.png?100" title="img1"></img> <img  src="/otherimge.png" title="img2"></img>', tags:[]});
+    await waitFor( () => {});
+    
+    await userEvent.click(screen.getByTitle("img2"));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // First opens dialog
+    await userEvent.click(screen.getByTitle("img1"));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", {name: "Close"}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+}, 300000);
 // Test imgDialog
 // Test view source
 // Test renderTags, and displaytag search
