@@ -176,7 +176,7 @@ export default class RootFrame extends Component
       return
     }
     let filename = this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1);
-    return (<dialog className="showImageDialog" open>
+    return (<dialog className="showImageDialog" open >
     <div className="imgTitle">{filename}</div>
     <div><img src={this.state.showImgDlg} ></img></div>
     <div><button onClick={() => this.closeShowImgDialog()}>Close</button></div>

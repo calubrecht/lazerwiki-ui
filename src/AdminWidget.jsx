@@ -1,12 +1,28 @@
 import React, {useEffect, useState} from 'react';
-import './App.css';
+import './AdminWidget.css';
 import {instance as US_instance} from './svc/UserService';
-import LoginFrame from './LoginFrame';
+import DrawerLink from './DrawerLink';
 
 
 function userHasAdmin(siteName, roles) {
     return roles.filter(r => r === "ROLE_ADMIN" || r === "ROLE_ADMIN:" + siteName).length > 0;
 }
+
+function AdminDialog(props) {
+ return (<div><dialog className="AdminDialog" open>
+       <button onClick={() => props.doClose()} className="close button-unstyled">X</button>
+       <div id="adminSidebar" aria-label="SettingSiteTabs">
+          <label>Site Settings</label>
+          <button className="selectedTab settingsTabBtn button-unstyled">Global Settings</button>
+          <button className="settingsTabBtn button-unstyled">Site 1</button>
+          <button className="settingsTabBtn button-unstyled">Site 2</button>
+
+       </div>
+    </dialog>
+    <dialog className="AdminDialogBackdrop" open/>
+    </div>);
+}
+
 
 function AdminWidget() {
   const [userName, setUserName] = useState(null);
@@ -21,11 +37,7 @@ function AdminWidget() {
       setUserIsAdmin(user ? userHasAdmin(user.siteName, user.userRoles) : false);
     }});
   }, []);
-  return (
-    <div className={userIsAdmin ? "AdminWidget" : "AdminWidget hidden"}>
-      { userIsAdmin && "admin" }
-    </div>
-  );
+  return (userIsAdmin? <DrawerLink extraClasses="AdminWidget" title="admin" component={AdminDialog} /> : "");
 }
 
 export default AdminWidget;

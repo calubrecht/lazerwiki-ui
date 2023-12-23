@@ -1,0 +1,50 @@
+div#adminWidget  {
+  display: inline-block;
+  text-align: right;
+  height:90px;
+  vertical-align:top;
+  margin-top:1em;
+}
+
+div#adminWidget div.AdminWidget > button.drawerPull {
+  background: lightgray;
+  padding:10px;
+}
+  
+  
+
+  dialog.AdminDialog {
+    z-index:10;
+    background: grey;
+    top:100px;
+    width:800px;
+    height:800px;
+
+  }
+
+  div#adminSidebar {
+    float:left;
+  }
+
+  div#adminSidebar label {
+    font-size:2em;
+  }
+
+  button.settingsTabBtn {
+    display:block;
+  }
+  
+  dialog.AdminDialogBackdrop {
+    z-index:8;
+    background: rgba(0,0,0,0.7);
+    height:100%;
+    width:100%;
+    top:0px;
+  }
+
+  dialog.AdminDialog button.close {
+    float:right;
+    margin:1px 3px;
+    color: red;
+    font-weight: bold;
+  }

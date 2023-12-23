@@ -1,4 +1,6 @@
 import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import { within } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
 import {instance as US_instance} from '../svc/UserService';
 import AdminWidget from '../AdminWidget';
 
@@ -39,4 +41,28 @@ test('render userChangesafter render', async () => {
     expect(screen.queryByText('admin')).not.toBeInTheDocument();
     await waitFor( () => US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN:test"]}));
     expect(screen.queryByText('admin')).toBeInTheDocument();
+});
+
+let mockDS = {fetchSites: () => Promise.resolve(["Site 1", "Site 2"])};
+
+jest.mock("../svc/DataService", () => {
+    return {instance: () => mockDS};
+
+});
+
+test('render sidebar', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
+    let component = render(<AdminWidget/>);
+
+    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+
+    let sidebar = screen.getByLabelText("SettingSiteTabs");
+    expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toHaveClass("selectedTab");
+
+    await userEvent.click(screen.getByRole("button", {name: "X"}));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });

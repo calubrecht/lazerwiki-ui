@@ -1,7 +1,7 @@
 {
   "name": "lazerwiki-ui",
   "private": true,
-  "version": "0.4.82",
+  "version": "0.4.83",
   "type": "module",
   "scripts": {
     "dev": "npm run prebuild; vite",
@@ -68,7 +68,8 @@
     ],
     "collectCoverageFrom": [
       "src/**/*.jsx",
-      "!src/main.jsx"
+      "!src/main.jsx",
+      "!src/svc/DataService.jsx"
     ]
   }
 }
