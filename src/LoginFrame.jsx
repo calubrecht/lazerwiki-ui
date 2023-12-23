@@ -17,8 +17,8 @@ export default class LoginFrame extends Component
       <div className="loginComponent" onKeyDown={this.handleKeyDown}>
       <div className="loginHeader">Please Log in</div>
       <div className="loginForm">
-        <div><span className="inputLabel">Username:</span><input type="text" placeholder="Username" name="Username" onChange={evt => this.onChangeField(evt, "username")} disabled= {this.state.disabled} ></input></div>
-        <div><span className="inputLabel">Password:</span><input type="password" placeholder="Password" name="Password" onChange={evt => this.onChangeField(evt, "password")} disabled= {this.state.disabled} ></input></div>
+        <div><label htmlFor="Username" className="inputLabel">Username:</label><input type="text" placeholder="Username" name="Username" id="Username" onChange={evt => this.onChangeField(evt, "username")} disabled= {this.state.disabled} autoFocus  ></input></div>
+        <div><label htmlFor="Password" className="inputLabel">Password:</label><input type="password" placeholder="Password" name="Password" id="Password"  onChange={evt => this.onChangeField(evt, "password")} disabled= {this.state.disabled} ></input></div>
         <div className='errorText'>{this.state.error}</div>
       </div>
       </div>)
