@@ -66,3 +66,16 @@ test('render sidebar', async () => {
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
+
+test('selectTab', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
+    let component = render(<AdminWidget/>);
+
+    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+
+    expect(screen.getByText("Settings for - Global Settings")).toBeInTheDocument();
+
+    let sidebar = screen.getByLabelText("SettingSiteTabs");
+    await userEvent.click(within(sidebar).getByRole("button", {name: "Site 1"}));
+    expect(screen.getByText("Settings for - Site 1")).toBeInTheDocument();
+});

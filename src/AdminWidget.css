@@ -13,25 +13,46 @@ div#adminWidget div.AdminWidget > button.drawerPull {
   
   
 
-  dialog.AdminDialog {
+dialog.AdminDialog {
     z-index:10;
-    background: grey;
     top:100px;
     width:800px;
     height:800px;
+    padding:0px;
+    background: #b0b0b0;
 
   }
 
-  div#adminSidebar {
+div#adminSidebar {
     float:left;
-  }
+    background: grey;
+    border-right: 5px double black;
+    padding:1em;
+    height: 100%;
+    
+}
 
-  div#adminSidebar label {
-    font-size:2em;
-  }
+div#adminSidebar label {
+  font-size:3em;
+}
 
   button.settingsTabBtn {
     display:block;
+    font-size:2em;
+    margin-top:1em;
+    text-align:right;
+    margin-right: calc(-.5em + -5px);
+    padding:.1em;
+    padding-right: .5em;
+    margin-left: auto;
+  }
+  
+  button.settingsTabBtn.selectedTab  {
+    background: #b0b0b0;
+    border-width: 2px 0px 2px 2px;
+    border-radius: 10px 0 0 10px;
+    border-color:black;
+    border-style:  solid;
   }
   
   dialog.AdminDialogBackdrop {
