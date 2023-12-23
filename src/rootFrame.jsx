@@ -29,7 +29,7 @@ export default class RootFrame extends Component
         this.pageName = p.length > 2 ? p[2] : "";
       }
     }
-    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', displayPreview:false, siteTitle: "", pageTitle: this.pageName};
+    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', siteTitle: "", pageTitle: this.pageName};
     this.data = DS_instance();
   }
 
@@ -116,7 +116,7 @@ export default class RootFrame extends Component
 
   renderTags() {
     return <div className="tagList"> {
-      this.state.pageData.tags.map((t) => <span key={t} onClick={ev => this.toggleSearchTag(t)}>{t}</span> )
+      this.state.pageData.tags.map((t) => <button key={t} className="button-unstyled" onClick={ev => this.toggleSearchTag(t)}>{t}</button> )
     }
       </div>
   }
@@ -148,12 +148,7 @@ export default class RootFrame extends Component
   cancelEdit(ev) {
     ev && ev.preventDefault();
     this.clearHash();
-    this.setState({"stage": "viewing", displayPreview: false});
-  }
-  
-  cancelPreview(ev) {
-    ev && ev.preventDefault();
-    this.setState({displayPreview: false});
+    this.setState({"stage": "viewing"});
   }
   
   savePage(ev) {
@@ -163,12 +158,6 @@ export default class RootFrame extends Component
       this.setPageData(pageData);
       this.cancelEdit(); }).catch(e => this.handleError(e));
   }
-
-  showPreview() {
-    this.data.previewPage(this.pageName, this.getText()).then((pageData) => {
-      this.setState({displayPreview: true, previewData: pageData})});
-  }
-
  
   setGetEditCB(cb) {
     this.getText = cb;

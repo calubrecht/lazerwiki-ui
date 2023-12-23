@@ -230,9 +230,69 @@ test('image dialog', async () => {
 
     await userEvent.click(screen.getByRole("button", {name: "Close"}));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-}, 300000);
-// Test imgDialog
-// Test view source
-// Test renderTags, and displaytag search
-// Test errros
-// Test show/cancel preview pane
+});
+
+let pageSearchClose = null;
+jest.mock("../PageSearchFrame", () => (props) => {
+  pageSearchClose = props.doClose;
+  return `PageSearchFrame:${props.searchTag}`;
+});
+
+test('render tags', async () => {
+    let resolveHook = null;
+    US_instance().setUser({userName:"Bob"});
+    FETCH_PAGE_PROMISE = Promise.resolve({flags: {exists:true}, rendered: "Page with Tags", tags:["blue", "green"]});
+    render(<RootFrame/>);
+    await waitFor( () => {});
+ 
+
+    expect(screen.getByRole('button', {name: 'blue'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'green'})).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
+    await waitFor(() => pageSearchClose());
+    expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
+});
+
+test('render view source', async () => {
+    US_instance().setUser({userName:"Bob"});
+    let resolveHook = null
+    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
+    let comp = render(<RootFrame/>);
+    resolveHook({flags: {exists:true, userCanWrite: false}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
+    await waitFor( () => {});
+ 
+    await userEvent.click(screen.getByRole('button', {name:"View Source"}));
+    expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name:"Cancel"}));
+    expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
+    expect(screen.getByText('Rendered Text for Bob')).toBeInTheDocument();
+
+
+});
+
+test('test errors',  async () => {
+    US_instance().setUser({userName:"Bob"});
+    FETCH_PAGE_PROMISE = Promise.reject("Not for you");
+    let comp = render(<RootFrame/>);
+    await waitFor( () => {});
+    expect(console.log.mock.calls[2][0]).toBe("Not for you");
+    comp.unmount();
+
+    let rejectHook = null
+    let savePagePromise = new Promise((resolve, reject) => {rejectHook=reject;});
+    FETCH_PAGE_PROMISE = Promise.resolve({flags: {exists:true, userCanWrite:true}, rendered: "Rendered", source:"source", tags:[]});
+    render(<RootFrame/>);
+    await waitFor( () => {});
+
+    console.log.mockClear();
+    mockDS.savePage = () => Promise.reject("Cannot Save");
+    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
+    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    await waitFor( () => {});
+
+    let calls = console.log.mock.calls;
+    expect(console.log.mock.calls[0][0]).toBe("Cannot Save");
+});
