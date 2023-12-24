@@ -129,6 +129,13 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
+  
+  getUsers() {
+    return fetch(
+      this.baseRequest + 'admin/getUsers')
+         .then(this.handleErrors)
+         .then(res => res.json());
+  }
 
   login(username, password)
   {

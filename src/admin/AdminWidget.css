@@ -20,6 +20,7 @@ dialog.AdminDialog {
     height:800px;
     padding:0px;
     background: #b0b0b0;
+    text-align: left;
 
   }
 
@@ -29,6 +30,7 @@ div#adminSidebar {
     border-right: 5px double black;
     padding:1em;
     height: 100%;
+    margin-right:1em;
     
 }
 
@@ -69,3 +71,6 @@ div#adminSidebar label {
     color: red;
     font-weight: bold;
   }
+
+dialog.AdminDialog div.settingsBody {
+}

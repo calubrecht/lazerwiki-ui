@@ -1,0 +1,12 @@
+div.siteSetup select {
+  width:10em;
+}
+div.siteSetup div.siteButtons {
+  display:inline-block;
+  margin:.5em;
+  vertical-align: top;
+}
+div.siteSetup div.siteButtons button {
+  display:block;
+  margin:.25em;
+}

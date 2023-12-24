@@ -1,0 +1,12 @@
+div.userSetup select {
+  width:10em;
+}
+div.userSetup div.userButtons {
+  display:inline-block;
+  margin:.5em;
+  vertical-align: top;
+}
+div.userSetup div.userButtons button {
+  display:block;
+  margin:.25em;
+}

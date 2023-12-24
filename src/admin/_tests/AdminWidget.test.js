@@ -1,7 +1,7 @@
 import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import {instance as US_instance} from '../svc/UserService';
+import {instance as US_instance} from '../../svc/UserService';
 import AdminWidget from '../AdminWidget';
 
 let dUser = {userName: 'joe', userRoles:[]};
@@ -45,11 +45,18 @@ test('render userChangesafter render', async () => {
 
 let mockDS = {fetchSites: () => Promise.resolve(["Site 1", "Site 2"])};
 
-jest.mock("../svc/DataService", () => {
+jest.mock("../../svc/DataService", () => {
     return {instance: () => mockDS};
 
 });
 
+jest.mock("../SiteSetup", () => (props) => {
+    return <div>SiteSetup-Sites={props.activeSites.join(",")}</div>;
+});
+jest.mock("../UserSetup", () => (props) => {
+    return <div>UserSetup</div>;
+});
+  
 test('render sidebar', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
     let component = render(<AdminWidget/>);
@@ -73,7 +80,10 @@ test('selectTab', async () => {
 
     await userEvent.click(screen.getByRole("button", {name: "admin"}));
 
-    expect(screen.getByText("Settings for - Global Settings")).toBeInTheDocument();
+    let settingBody = screen.getByLabelText("SettingSiteBody");
+    expect(within(settingBody).getByText("Global Settings")).toBeInTheDocument();
+    expect(within(settingBody).getByText("SiteSetup-Sites=Site1,Site2")).toBeInTheDocument();
+    expect(within(settingBody).getByText("UserSetup")).toBeInTheDocument();
 
     let sidebar = screen.getByLabelText("SettingSiteTabs");
     await userEvent.click(within(sidebar).getByRole("button", {name: "Site 1"}));
