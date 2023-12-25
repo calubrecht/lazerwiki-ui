@@ -208,6 +208,12 @@ pre.code {
   clear:both;
 }
 
+div.RootBody blockquote,div.previewFrameContent blockquote {
+  border-left: #606060 solid 3px;
+  padding-left: .5em;
+  margin-left: 1em;
+}
+
 dialog.deletePageDialog {
   position: absolute;
   z-index:10;
