@@ -1,12 +1,20 @@
 div.userSetup select {
   width:10em;
 }
-div.userSetup div.userButtons {
+div.userSetup div.userButtons, div.userSetup div.roleButtons {
   display:inline-block;
   margin:.5em;
   vertical-align: top;
 }
-div.userSetup div.userButtons button {
+div.userSetup div.userButtons button, div.userSetup div.roleButtons button {
   display:block;
   margin:.25em;
+}
+
+div.userSetup div.selectWidget {
+  float:left;
+}
+
+select#roleList {
+  width:250px;
 }

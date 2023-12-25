@@ -16,7 +16,7 @@ div#adminWidget div.AdminWidget > button.drawerPull {
 dialog.AdminDialog {
     z-index:10;
     top:100px;
-    width:800px;
+    width:1000px;
     height:800px;
     padding:0px;
     background: #b0b0b0;
