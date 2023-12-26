@@ -24,6 +24,11 @@ dialog.AdminDialog {
 
   }
 
+  dialog.AdminDialog::backdrop {
+    z-index:10;
+    background: rgba(0,0,0,0.7);
+  }  
+
 div#adminSidebar {
     float:left;
     background: grey;
@@ -55,14 +60,6 @@ div#adminSidebar label {
     border-radius: 10px 0 0 10px;
     border-color:black;
     border-style:  solid;
-  }
-  
-  dialog.AdminDialogBackdrop {
-    z-index:8;
-    background: rgba(0,0,0,0.7);
-    height:100%;
-    width:100%;
-    top:0px;
   }
 
   dialog.AdminDialog button.close {

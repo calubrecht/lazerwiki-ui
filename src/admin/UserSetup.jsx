@@ -2,6 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {instance as DS_instance} from '../svc/DataService';
 import './UserSetup.css';
 
+function loadUsers(setActiveUsers, setUserMap) {
+  
+}
+
 function UserSetup() {
   const [activeUsers, setActiveUsers] = useState([]);
   const [userMap, setUserMap] = useState({});

@@ -217,8 +217,7 @@ div.RootBody blockquote,div.previewFrameContent blockquote {
 dialog.deletePageDialog {
   position: absolute;
   z-index:10;
-  bottom:60px;
-  left: -200px;
+  top:60px;
   background: grey;
 }
 

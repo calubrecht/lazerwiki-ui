@@ -9,6 +9,7 @@ let dUser = {userName: 'joe', userRoles:[]};
 test('firstRender', () => {
     US_instance().setUser(null);
     render(<AdminWidget/>);
+    document
 
     expect(screen.queryByText('admin')).not.toBeInTheDocument();
 });
@@ -62,6 +63,8 @@ test('render sidebar', async () => {
     let component = render(<AdminWidget/>);
 
     await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    let d = document.getElementsByClassName("AdminDialog")[0];
+    document.getElementsByClassName("AdminDialog")[0].open = true;
 
     let sidebar = screen.getByLabelText("SettingSiteTabs");
     expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toBeInTheDocument();
@@ -79,6 +82,7 @@ test('selectTab', async () => {
     let component = render(<AdminWidget/>);
 
     await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    document.getElementsByClassName("AdminDialog")[0].open = true;
 
     let settingBody = screen.getByLabelText("SettingSiteBody");
     expect(within(settingBody).getByText("Global Settings")).toBeInTheDocument();

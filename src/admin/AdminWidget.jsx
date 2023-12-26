@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import './AdminWidget.css';
 import {instance as US_instance} from '../svc/UserService';
 import DrawerLink from '../DrawerLink';
@@ -27,7 +27,12 @@ function renderDlgBody(tab) {
 function AdminDialog(props) {
  const [selectedTab, setSelectedTab] = useState(props.initData.selectedTab);
  let tabList = ["Global Settings", "Site 1", "Site 2"];
- return (<div><dialog className="AdminDialog" open>
+ const dlgRef = useRef();
+ useEffect(() => {
+  console.log(dlgRef.current.showModal);
+  dlgRef.current?.showModal?.();
+ }, [])
+ return (<div><dialog className="AdminDialog" ref={dlgRef}>
        <button onClick={() => props.doClose()} className="close button-unstyled">X</button>
        <div id="adminSidebar" aria-label="SettingSiteTabs">
           <label>Site Settings</label>
@@ -39,7 +44,6 @@ function AdminDialog(props) {
        </div>
        {renderDlgBody(selectedTab)}
     </dialog>
-    <dialog className="AdminDialogBackdrop" open/>
     </div>);
 }
 
@@ -47,6 +51,7 @@ function AdminDialog(props) {
 function AdminWidget() {
   const [userName, setUserName] = useState(null);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
+
   useEffect( () => {
     let u = US_instance().getUser();
     setUserName(u ? u.userName : null);
