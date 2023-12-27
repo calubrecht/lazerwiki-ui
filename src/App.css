@@ -221,6 +221,24 @@ dialog.deletePageDialog {
   background: grey;
 }
 
+dialog.deletePageDialog div.deleteDialogButtons {
+  display: inline-flex;
+}
+
+dialog.deletePageDialog div.deleteDialogButtons button.cancel {
+  order: 2;
+}
+
+dialog.deletePageDialog div.deleteDialogButtons button.delete {
+  order: 1;
+}
+
+
+dialog.deletePageDialog::backdrop {
+  z-index:10;
+  background: rgba(0,0,0,0.7);
+}
+
 dialog.showImageDialog {
   z-index:10;
   background: grey;

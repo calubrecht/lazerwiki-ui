@@ -157,17 +157,22 @@ test('do delete', async () => {
 
     await userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
     expect(screen.getByText('Are you sure you want to delete this page?')).toBeInTheDocument();
+    let dlg= document.getElementsByClassName("deletePageDialog")[0];
+    dlg.open = true;
     
 
     await userEvent.click(screen.getByRole('button', {name:"Cancel"}));
     expect(mockDS.deletePage.mock.calls).toHaveLength(0);
-    expect(screen.queryByText('Are you sure you want to delete this page?')).not.toBeInTheDocument();
+    dlg.open = false;
+    expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
     
     await userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
+    dlg.open = true;
     await userEvent.click(screen.getByRole('button', {name:"Delete"}));
     expect(mockDS.deletePage.mock.calls).toHaveLength(1);
     expect(mockDS.deletePage.mock.calls[0][0]).toBe("page1"); // pageName
-    expect(screen.queryByText('Are you sure you want to delete this page?')).not.toBeInTheDocument();
+    dlg.open = false;
+    expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
 });
 
 test('bad start url', async () => {
@@ -218,18 +223,21 @@ test('image dialog', async () => {
     await waitFor( () => {US_instance().setUser(null)});
     expect(mockDS.fetchPage.mock.calls).toHaveLength(1);
 
-    resolveHook({flags: {exists:true}, rendered: '<img className="fullLink" src="/text.png?100" title="img1"></img> <img  src="/otherimge.png" title="img2"></img>', tags:[]});
+    resolveHook({flags: {exists:true}, rendered: '<img className="fullLink" src="/test.png?100" title="img1"></img> <img  src="/otherimge.png" title="img2"></img>', tags:[]});
     await waitFor( () => {});
     
-    await userEvent.click(screen.getByTitle("img2"));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
     // First opens dialog
     await userEvent.click(screen.getByTitle("img1"));
+    let dlg= document.getElementsByClassName("showImageDialog")[0];
+    let img= dlg.getElementsByTagName("img")[0];
+    dlg.open = true;
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(img).toHaveAttribute("src", "http://localhost/test.png");
 
     await userEvent.click(screen.getByRole("button", {name: "Close"}));
+    document.getElementsByClassName("showImageDialog")[0].open = false;
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(img).not.toHaveAttribute("src", "http://localhost/test.png");
 });
 
 let pageSearchClose = null;

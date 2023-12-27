@@ -29,8 +29,10 @@ export default class RootFrame extends Component
         this.pageName = p.length > 2 ? p[2] : "";
       }
     }
-    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, displayDeleteDlg:false, message:'', errorMessage:'', siteTitle: "", pageTitle: this.pageName};
+    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, message:'', errorMessage:'', siteTitle: "", pageTitle: this.pageName};
     this.data = DS_instance();
+    this.imgDlgRef = React.createRef();
+    this.delDlgRef = React.createRef();
   }
 
   componentDidMount()
@@ -88,7 +90,7 @@ export default class RootFrame extends Component
     let createAction = this.state.pageData.flags.exists ? "Edit Page" : "Create Page";
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
-        {this.state.displayDeleteDlg && this.renderDeleteDialog() }
+        {this.renderDeleteDialog() }
         {this.renderImgDialog() }
         { this.renderMenu(createAction) }
         <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
@@ -164,19 +166,19 @@ export default class RootFrame extends Component
   }
   
   renderDeleteDialog() {
-    return (<dialog className="deletePageDialog" open>
+    return (<dialog className="deletePageDialog" ref={this.delDlgRef} >
     <div>Are you sure you want to delete this page?</div>
-    <div><button onClick={  ()=> this.requestDelete().then(() => this.closeDeleteDialog("Page Deleted")).
-  catch(e => {this.handleError(e); this.closeDeleteDialog()})}>Delete</button><button onClick={() => this.closeDeleteDialog()}>Cancel</button></div>
+    <div className="deleteDialogButtons">
+      <button className="cancel" onClick={() => this.closeDeleteDialog()} autoFocus >Cancel</button>
+      <button className="delete" onClick={  ()=> this.requestDelete().then(() => this.closeDeleteDialog("Page Deleted")).
+  catch(e => {this.handleError(e); this.closeDeleteDialog()})}>Delete</button>
+      </div>
     </dialog>);
   }
   
   renderImgDialog() {
-    if  (!this.state.showImgDlg) {
-      return
-    }
-    let filename = this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1);
-    return (<dialog className="showImageDialog" open >
+    let filename = this.state.showImgDlg ? this.state.showImgDlg.substring(this.state.showImgDlg.lastIndexOf("/")+1) : "";
+    return (<dialog className="showImageDialog" ref={this.imgDlgRef}>
     <div className="imgTitle">{filename}</div>
     <div><img src={this.state.showImgDlg} ></img></div>
     <div><button onClick={() => this.closeShowImgDialog()}>Close</button></div>
@@ -184,24 +186,27 @@ export default class RootFrame extends Component
   }
   
   doDelete() {
-    this.setState({displayDeleteDlg: true});
+    this.delDlgRef.current?.showModal?.();
   }
 
   closeDeleteDialog(msg) {
    if (msg) {
-        this.setState({displayDeleteDlg: false, message: msg, errorMessage:false});
+        this.setState({message: msg, errorMessage:false});
+        this.delDlgRef.current?.close?.();
         this.fetchPageData();
         return;
    }
-   this.setState({displayDeleteDlg: false});
+   this.delDlgRef.current?.close?.();
  }
 
  closeShowImgDialog() {
    this.setState({showImgDlg: null});
+   this.imgDlgRef.current?.close?.();
  }
 
  openShowImgDialog(src) {
    this.setState({showImgDlg: src});
+   this.imgDlgRef.current?.showModal?.();
  }
 
  requestDelete() {
