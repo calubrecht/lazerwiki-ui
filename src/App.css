@@ -127,7 +127,7 @@ div.tagList {
   right:0px;
 }
 
-div.tagList span {
+div.tagList .tagButton {
   padding-right: 5px;
   color: #AA0010;
   font-weight: bold;

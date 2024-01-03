@@ -27,7 +27,7 @@ function UserSetup() {
       <div>
         <select name="userList" id="userList" data-testid="userList" size="5" onChange={(ev) => {
           setSelectedUser(ev.target.value);
-          setSelectedRole(undefined);}}
+          setSelectedRole("~~NON_EXISTANT_ROLE~~");}}
           value={selectedUser}>
           {activeUsers.map( user => <option value={user} key={user}>{user}</option>)}
         </select>

@@ -118,7 +118,7 @@ export default class RootFrame extends Component
 
   renderTags() {
     return <div className="tagList"> {
-      this.state.pageData.tags.map((t) => <button key={t} className="button-unstyled" onClick={ev => this.toggleSearchTag(t)}>{t}</button> )
+      this.state.pageData.tags.map((t) => <button key={t} className="button-unstyled tagButton" onClick={ev => this.toggleSearchTag(t)}>{t}</button> )
     }
       </div>
   }
