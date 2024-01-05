@@ -212,6 +212,16 @@ export default class DataService
            .then(res => res.text());
   }
 
+  deleteRole(userName, userRole) {
+    return fetch(
+      this.baseRequest + "admin/role/" + userName + "/" + userRole,
+       {method: 'delete', credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.text());
+
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

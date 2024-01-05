@@ -45,7 +45,7 @@ function UserSetup() {
         </select>
         <div className="roleButtons">
           <button>Add Role</button>
-          <button>Remove Role</button>
+          <button onClick={(ev) => DS_instance().deleteRole(selectedUser, selectedRole)}>Remove Role</button>
         </div>
       </div>
       </div>)}

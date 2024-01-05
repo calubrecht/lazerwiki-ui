@@ -29,7 +29,6 @@ function AdminDialog(props) {
  let tabList = ["Global Settings", "Site 1", "Site 2"];
  const dlgRef = useRef();
  useEffect(() => {
-  console.log(dlgRef.current.showModal);
   dlgRef.current?.showModal?.();
  }, [])
  return (<div><dialog className="AdminDialog" ref={dlgRef}>
