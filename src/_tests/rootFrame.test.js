@@ -35,6 +35,7 @@ let realConsoleLog = console.log
 beforeEach(() => {
     FETCH_PAGE_PROMISE = new Promise(() => {});
     mockDS.fetchPage.mockClear();
+    mockDS.deletePage = jest.fn(() => Promise.resolve());
     US_instance().setUser(null);
     console.log = jest.fn(() => {});
 
@@ -173,6 +174,13 @@ test('do delete', async () => {
     expect(mockDS.deletePage.mock.calls[0][0]).toBe("page1"); // pageName
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
+    dlg.open = true;
+    console.log.mockClear();
+    mockDS.deletePage = jest.fn(() => Promise.reject("Failure"));
+    await userEvent.click(screen.getByRole('button', {name:"Delete"}));
+    expect(console.log.mock.calls[0][0]).toBe("Failure");
 });
 
 test('bad start url', async () => {
