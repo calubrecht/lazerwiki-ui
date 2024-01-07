@@ -232,6 +232,36 @@ export default class DataService
 
   }
 
+  addUser(userName, password) {
+    return fetch(
+      this.baseRequest + "admin/user/" + userName + "/" + password,
+       {method: 'put', credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.json());
+
+  }
+
+  setUserPassword(userName, password) {
+    return fetch(
+      this.baseRequest + "admin/passwordReset/" + userName + "/" + password,
+       {method: 'post', credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.json());
+
+  }
+
+  deleteUser(userName) {
+    return fetch(
+      this.baseRequest + "admin/user/" + userName,
+       {method: 'delete', credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.json());
+
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

@@ -39,3 +39,40 @@ dialog.addRoleDialog div.addRoleButtons button {
 dialog.addRoleDialog label {
   margin-right: .5em;
 }
+
+dialog.addUserDialog label {
+  margin-right: .5em;
+}
+
+div.AddUserError {
+  color:red;
+  width: 400px;
+  height: 22px;
+
+}
+
+dialog.addUserDialog div.addUserButtons button {
+  margin: .5em;
+  margin-top: 1.5em;
+}
+
+dialog.addUserDialog .title {
+  margin-top:0;
+}
+
+dialog.confirmDeleteDialog div.confirmDeleteButtons {
+  display: inline-flex;
+}
+
+dialog.confirmDeleteDialog div.confirmDeleteButtons button.cancel {
+  order: 2;
+}
+
+dialog.confirmDeleteDialog div.confirmDeleteButtons button.delete {
+  order: 1;
+}
+
+dialog.confirmDeleteDialog div.confirmDeleteButtons button {
+  margin: .5em;
+  margin-top: 1.5em;
+}

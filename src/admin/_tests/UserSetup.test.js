@@ -4,7 +4,12 @@ import UserSetup from '../UserSetup';
 
 
 let mockDS = {getUsers: () => Promise.resolve([{userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, {userName:"User 2"}]), deleteRole:
-  jest.fn(() => Promise.resolve({userName:"User 1", userRoles:["ROLE_USER"]})), addRole: jest.fn(() => Promise.resolve({userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER", "ROLE_NEW"]}))};
+  jest.fn(() => Promise.resolve({userName:"User 1", userRoles:["ROLE_USER"]})), addRole: jest.fn(() => Promise.resolve({userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER", "ROLE_NEW"]})),
+  addUser: jest.fn(() => Promise.resolve({userName:"USER1", userRoles:[]})),
+  setUserPassword: jest.fn(() => Promise.resolve({userName:"USER1", userRoles:[]})),
+  deleteUser: jest.fn(() => Promise.resolve({userName:"USER1", userRoles:[]})),
+
+};
 
 jest.mock("../../svc/DataService", () => {
     return {instance: () => mockDS};
@@ -99,6 +104,41 @@ test('add Role', async () => {
   expect(roleInput.value).toBe("ROLE_");
 
 });
+
+
+test('add User', async () => {
+  render(<UserSetup />);
+
+  await waitFor(() => {});
+
+  await userEvent.click(screen.getByRole("button", {name: "Create User"}));
+  let dlg= document.getElementsByClassName("addUserDialog")[0];
+  dlg.open = true;
+
+  expect(screen.getByText("Add New User")).toBeInTheDocument();
+  let userInput = screen.getByLabelText("New User:");
+  await(userInput.focus());
+  await userEvent.keyboard("USER1[TAB]PASS[TAB]PAS[ENTER]");
+  expect(mockDS.addUser.mock.calls).toHaveLength(0);
+
+  expect(screen.getByText("Password confirmation does not match. Please correct")).toBeInTheDocument();
+  await screen.getByLabelText("Confirm Password:").focus();
+  await userEvent.keyboard("S");
+  await userEvent.click(screen.getByRole("button", {name: "Submit New User"}));
+  expect(mockDS.addUser.mock.calls[0][0]).toBe("USER1");
+  expect(mockDS.addUser.mock.calls[0][1]).toBe("PASS");
+  
+  await waitFor(() => {});
+  expect(screen.getByRole("option", {name: "USER1"}));
+
+
+  expect(userInput.value).toBe("");
+  await(userInput.focus());
+  await userEvent.keyboard("USER2");
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
+  expect(userInput.value).toBe("");
+
+}, 300000);
 
 test('net Fail', async () => {
   mockDS.deleteRole = jest.fn(() => Promise.reject("Failed"));
