@@ -52,15 +52,13 @@ function submitResetPassword(data, dlgRef) {
   }
   data.setErrMsg('');
   data.setDisabled(true);
-  DS_instance().setUserPassword(data.userName, data.password).then((newUser) => {
+  DS_instance().setUserPassword(data.userName, data.password).then(() => {
     data.setDisabled(false);
     data.setNewUserName('');
     data.setPassword('');
     data.setConfirmPassword('');
-    data.userMap[newUser.userName] = newUser;
-    data.setUserMap(data.userMap);
     dlgRef?.current?.close?.();
-  }).catch((ev) => {console.log(ev); data.setDisabled(false); data.setErrMsg('Add User Failed');});
+  }).catch((ev) => {console.log(ev); data.setDisabled(false); data.setErrMsg('Set Password Failed');});
 }
 
 function renderAddRole(selectedUser, userMap, setUserMap, dlgRef) {
@@ -88,17 +86,19 @@ function renderAddRole(selectedUser, userMap, setUserMap, dlgRef) {
     const [errMsg, setErrMsg] = useState('');
     const submitFnc = isResetPassword ? submitResetPassword : submitAddUser;
     const title = isResetPassword ? "Reset Password for " + currentUser : "Add New User";
+    const submitBtnText = isResetPassword ? "Set Password" : "Submit New User";
     let userName = isResetPassword ? currentUser : newUserName;
     const submitData = {userName, password, confirmPassword, userMap, activeUsers, setUserMap, setDisabled, setNewUserName, setPassword, setConfirmPassword, setErrMsg, setActiveUsers};
     return (<dialog className="addUserDialog" ref={dlgRef} >
       <h3 className="title">{title}</h3>
-      {isResetPassword || <div><label htmlFor="username" >New User:</label><input type="text" placeholder="Username" id="username" name="username" value={newUserName}  onChange={evt => setNewUserName(evt.target.value)} disabled= {disabled} autoFocus autoComplete="false"></input></div>}
-      <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)} disabled= {disabled}  ></input></div>
-      <div><label htmlFor="confirmPassword" >Confirm Password:</label><input type="password" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" value={confirmPassword}  onChange={evt => setConfirmPassword(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitFnc, submitData, dlgRef)} disabled= {disabled} ></input></div>
+      {isResetPassword || <div><label htmlFor="username" >New User:</label><input type="text" placeholder="Username" id="username" name="username" value={newUserName}  onChange={evt => setNewUserName(evt.target.value)} disabled= {disabled} autoFocus autoComplete="new-password" ></input></div>}
+      {isResetPassword || <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)}  autoComplete="new-password" disabled= {disabled}  ></input></div>}
+      {isResetPassword && <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)}  autoComplete="new-password" autoFocus disabled= {disabled}  ></input></div>}
+      <div><label htmlFor="confirmPassword" >Confirm Password:</label><input type="password" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" value={confirmPassword}  onChange={evt => setConfirmPassword(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitFnc, submitData, dlgRef)} autoComplete="new-password" disabled= {disabled} ></input></div>
     <div className="addUserButtons">
     <button className="add" onClick={() => {
         submitFnc(submitData, dlgRef);
-      }} disabled={disabled} >Submit New User</button>
+      }} disabled={disabled} >{submitBtnText}</button>
       <button className="cancel"  onClick={() => {
         dlgRef?.current?.close?.();
         setNewUserName('');
@@ -125,11 +125,6 @@ function renderDeleteConfirm(userName, activeUsers, setActiveUsers, dlgRef) {
   setDisabled(true);
   DS_instance().deleteUser(userName).then((newUser) => {
    setDisabled(false);
-   data.setNewUserName('');
-   data.setPassword('');
-   data.setConfirmPassword('');
-   data.userMap[newUser.userName] = newUser;
-   data.setUserMap(userMap);
    dlgRef?.current?.close?.();
   })}} disabled={disabled} >Delete</button>
   </div>

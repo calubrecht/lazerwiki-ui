@@ -7,7 +7,7 @@ let mockDS = {getUsers: () => Promise.resolve([{userName:"User 1", userRoles:["R
   jest.fn(() => Promise.resolve({userName:"User 1", userRoles:["ROLE_USER"]})), addRole: jest.fn(() => Promise.resolve({userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER", "ROLE_NEW"]})),
   addUser: jest.fn(() => Promise.resolve({userName:"USER1", userRoles:[]})),
   setUserPassword: jest.fn(() => Promise.resolve({userName:"USER1", userRoles:[]})),
-  deleteUser: jest.fn(() => Promise.resolve({userName:"USER1", userRoles:[]})),
+  deleteUser: jest.fn(() => Promise.resolve({})),
 
 };
 
@@ -138,11 +138,56 @@ test('add User', async () => {
   await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
   expect(userInput.value).toBe("");
 
-}, 300000);
+});
+
+test('reset Password', async () => {
+  render(<UserSetup />);
+
+  await waitFor(() => {});
+
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.click(screen.getByRole("button", {name: "Reset User Password"}));
+  let dlg= document.getElementsByClassName("addUserDialog")[0];
+  dlg.open = true;
+
+  expect(screen.getByText("Reset Password for User 1")).toBeInTheDocument();
+  expect(screen.queryByLabelText("New User:")).not.toBeInTheDocument();
+  let passwordInput = screen.getByLabelText("Password:");
+  await(passwordInput.focus());
+  await userEvent.keyboard("PASS[TAB]PAS[ENTER]");
+  expect(mockDS.setUserPassword.mock.calls).toHaveLength(0);
+
+  expect(screen.getByText("Password confirmation does not match. Please correct")).toBeInTheDocument();
+  await screen.getByLabelText("Confirm Password:").focus();
+  await userEvent.keyboard("S");
+  await userEvent.click(screen.getByRole("button", {name: "Set Password"}));
+  expect(mockDS.setUserPassword.mock.calls[0][0]).toBe("User 1");
+  expect(mockDS.setUserPassword.mock.calls[0][1]).toBe("PASS");
+
+});
+
+test('delete User', async () => {
+  render(<UserSetup />);
+
+  await waitFor(() => {});
+
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.click(screen.getByRole("button", {name: "Delete User"}));
+  let dlg= document.getElementsByClassName("confirmDeleteDialog")[0];
+  dlg.open = true;
+
+  await screen.getByRole("button", {name: "Cancel"}).click();
+  expect(mockDS.deleteUser.mock.calls).toHaveLength(0);
+
+  await userEvent.click(screen.getByRole("button", {name: "Delete"}));
+  expect(mockDS.deleteUser.mock.calls[0][0]).toBe("User 1");
+});
 
 test('net Fail', async () => {
   mockDS.deleteRole = jest.fn(() => Promise.reject("Failed"));
   mockDS.addRole = jest.fn(() => Promise.reject("Add Failed"));
+  mockDS.addUser = jest.fn(() => Promise.reject("addUser Failed"));
+  mockDS.setUserPassword = jest.fn(() => Promise.reject("setUserPassword Failed"));
   console.log = jest.fn(() => {});
 
   render(<UserSetup />);
@@ -165,9 +210,27 @@ test('net Fail', async () => {
   dlg.open = true;
 
   let roleInput = screen.getByLabelText("New Role:");
-  await(roleInput.focus());
+  roleInput.focus();
   expect(roleInput.value).toBe("ROLE_");
   await userEvent.keyboard("ONE[ENTER]");
     expect(console.log.mock.calls[1][0]).toBe("Add Failed");
+  dlg.open = false;
+
+  dlg= document.getElementsByClassName("addUserDialog")[0];
+  await userEvent.click(screen.getByRole("button", {name: "Create User"}));
+  dlg.open = true;
+  let userInput = screen.getByLabelText("New User:");
+  userInput.focus();
+  await userEvent.keyboard("USER1[TAB]PASS[TAB]PASS[ENTER]");
+  expect(console.log.mock.calls[2][0]).toBe("addUser Failed");
+  expect(screen.getByText("Add User Failed"));
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
+
+  await userEvent.click(screen.getByRole("button", {name: "Reset User Password"}));
+  let passwordInput = screen.getByLabelText("Password:");
+  passwordInput.focus();
+  await userEvent.keyboard("PASS2[TAB]PASS2[ENTER]");
+  expect(console.log.mock.calls[3][0]).toBe("setUserPassword Failed");
+  expect(screen.getByText("Set Password Failed"));
 
 });
