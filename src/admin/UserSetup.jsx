@@ -28,15 +28,15 @@ function renderAddRole(selectedUser, userMap, setUserMap, dlgRef) {
     const [newRole, setNewRole] = useState(DEF_ROLE);
     const [disabled, setDisabled] = useState(false);
     return (<dialog className="addRoleDialog" ref={dlgRef} >
-      <div><label htmlFor="roleName" >New Role:</label><input type="text" placeholder="New Role" name="roleName" value={newRole}  onChange={evt => setNewRole(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitAddRole, selectedUser, newRole, userMap, setUserMap, setDisabled, setNewRole, dlgRef)} disabled= {disabled}  ></input></div>
+      <div><label htmlFor="roleName" >New Role:</label><input type="text" placeholder="New Role" id="roleName" name="roleName" value={newRole}  onChange={evt => setNewRole(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitAddRole, selectedUser, newRole, userMap, setUserMap, setDisabled, setNewRole, dlgRef)} disabled= {disabled} autoFocus ></input></div>
     <div className="addRoleButtons">
-      <button className="cancel"  autoFocus onClick={() => {
+      <button className="cancel"  onClick={() => {
         dlgRef?.current?.close?.();
         setNewRole(DEF_ROLE);
       }} disabled={disabled} >Cancel</button>
       <button className="add" onClick={() => {
         submitAddRole(selectedUser, newRole, userMap, setUserMap, setDisabled, setNewRole, dlgRef);
-      }} disabled={disabled} > Add Role</button>
+      }} disabled={disabled} >Submit New Role</button>
       </div>
     </dialog>);
   }

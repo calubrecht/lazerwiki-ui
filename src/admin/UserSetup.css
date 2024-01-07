@@ -30,3 +30,12 @@ dialog.addRoleDialog div.addRoleButtons button.cancel {
 dialog.addRoleDialog div.addRoleButtons button.add {
   order: 1;
 }
+
+dialog.addRoleDialog div.addRoleButtons button {
+  margin: .5em;
+  margin-top: 1.5em;
+}
+
+dialog.addRoleDialog label {
+  margin-right: .5em;
+}
