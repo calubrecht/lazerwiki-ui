@@ -34,7 +34,7 @@ div#adminSidebar {
     background: grey;
     border-right: 5px double black;
     padding:1em;
-    height: 100%;
+    height: calc(100% - 2em);
     margin-right:1em;
     
 }

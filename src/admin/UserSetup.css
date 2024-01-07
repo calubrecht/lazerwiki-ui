@@ -18,3 +18,15 @@ div.userSetup div.selectWidget {
 select#roleList {
   width:250px;
 }
+
+dialog.addRoleDialog div.addRoleButtons {
+  display: inline-flex;
+}
+
+dialog.addRoleDialog div.addRoleButtons button.cancel {
+  order: 2;
+}
+
+dialog.addRoleDialog div.addRoleButtons button.add {
+  order: 1;
+}

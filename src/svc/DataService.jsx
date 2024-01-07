@@ -218,7 +218,17 @@ export default class DataService
        {method: 'delete', credentials: 'include',
          headers: {'x-xsrf-token': this.getTokenCookie() }})
          .then(this.handleErrors)
-         .then(res => res.text());
+         .then(res => res.json());
+
+  }
+  
+  addRole(userName, userRole) {
+    return fetch(
+      this.baseRequest + "admin/role/" + userName + "/" + userRole,
+       {method: 'put', credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.json());
 
   }
 
