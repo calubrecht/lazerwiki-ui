@@ -256,8 +256,7 @@ export default class DataService
       this.baseRequest + "admin/user/" + userName,
        {method: 'delete', credentials: 'include',
          headers: {'x-xsrf-token': this.getTokenCookie() }})
-         .then(this.handleErrors)
-         .then(res => res.json());
+         .then(this.handleErrors);
 
   }
 

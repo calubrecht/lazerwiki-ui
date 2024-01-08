@@ -123,8 +123,11 @@ function renderDeleteConfirm(userName, activeUsers, setActiveUsers, dlgRef) {
   }} disabled={disabled} >Cancel</button>
 <button className="delete" onClick={() => {
   setDisabled(true);
-  DS_instance().deleteUser(userName).then((newUser) => {
+  DS_instance().deleteUser(userName).then(() => {
    setDisabled(false);
+   const index = activeUsers.indexOf(userName);
+   activeUsers.splice(index, 1);
+   setActiveUsers(activeUsers);
    dlgRef?.current?.close?.();
   })}} disabled={disabled} >Delete</button>
   </div>
