@@ -259,6 +259,14 @@ export default class DataService
          .then(this.handleErrors);
 
   }
+  
+  getSites(userName, password) {
+    return fetch(
+      this.baseRequest + 'admin/sites')
+         .then(this.handleErrors)
+         .then(res => res.json());
+  }
+
 
   getTokenCookie()
   {

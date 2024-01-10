@@ -105,7 +105,6 @@ test('add Role', async () => {
 
 });
 
-
 test('add User', async () => {
   render(<UserSetup />);
 
@@ -176,7 +175,7 @@ test('delete User', async () => {
   let dlg= document.getElementsByClassName("confirmDeleteDialog")[0];
   dlg.open = true;
 
-  await screen.getByRole("button", {name: "Cancel"}).click();
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
   expect(mockDS.deleteUser.mock.calls).toHaveLength(0);
 
   await userEvent.click(screen.getByRole("button", {name: "Delete"}));

@@ -6,6 +6,13 @@ import AdminWidget from '../AdminWidget';
 
 let dUser = {userName: 'joe', userRoles:[]};
 
+let mockDS = {getSites: () => Promise.resolve(["Site 1", "Site 2", "Site 3"])};
+
+jest.mock("../../svc/DataService", () => {
+    return {instance: () => mockDS};
+
+});
+
 test('firstRender', () => {
     US_instance().setUser(null);
     render(<AdminWidget/>);
@@ -44,13 +51,6 @@ test('render userChangesafter render', async () => {
     expect(screen.queryByText('admin')).toBeInTheDocument();
 });
 
-let mockDS = {fetchSites: () => Promise.resolve(["Site 1", "Site 2"])};
-
-jest.mock("../../svc/DataService", () => {
-    return {instance: () => mockDS};
-
-});
-
 jest.mock("../SiteSetup", () => (props) => {
     return <div>SiteSetup-Sites={props.activeSites.join(",")}</div>;
 });
@@ -86,7 +86,7 @@ test('selectTab', async () => {
 
     let settingBody = screen.getByLabelText("SettingSiteBody");
     expect(within(settingBody).getByText("Global Settings")).toBeInTheDocument();
-    expect(within(settingBody).getByText("SiteSetup-Sites=Site1,Site2")).toBeInTheDocument();
+    expect(within(settingBody).getByText("SiteSetup-Sites=Site 1,Site 2,Site 3")).toBeInTheDocument();
     expect(within(settingBody).getByText("UserSetup")).toBeInTheDocument();
 
     let sidebar = screen.getByLabelText("SettingSiteTabs");

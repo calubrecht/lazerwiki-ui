@@ -31,7 +31,7 @@ function UserWidget() {
         setUserName(null);
         return;
       }
-      console.log("Other user error " + e);
+      console.log("Other user error: " + e.message);
 
       });
   }, []);
@@ -40,7 +40,7 @@ function UserWidget() {
       {
         initted ? (
           userName ? (
-             <div><span>Hi, {userName}</span> <span className="logout" onClick={logout}>LogOut</span></div>
+             <div><span>Hi, {userName}</span> <button className="logout button-unstyled" onClick={logout}>LogOut</button></div>
           ) :
              <div>
                <div><span>Hi, Guest</span></div>

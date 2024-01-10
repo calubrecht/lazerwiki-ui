@@ -32,6 +32,11 @@ export default class UserService{
     this.listeners.forEach((l) => l.setUser(this.user));
   }
 
+  /*
+   * For after tests*/
+  cleanup() {
+    this.listeners = [];
+  }
 }
 
 export function instance() {
