@@ -51,7 +51,11 @@ test('render userChangesafter render', async () => {
     expect(screen.queryByText('admin')).toBeInTheDocument();
 });
 
+
+let siteSetupSetSitesCallback = null;
+
 jest.mock("../SiteSetup", () => (props) => {
+    siteSetupSetSitesCallback = props.setSites;
     return <div>SiteSetup-Sites={props.activeSites.join(",")}</div>;
 });
 jest.mock("../UserSetup", () => (props) => {
@@ -92,4 +96,25 @@ test('selectTab', async () => {
     let sidebar = screen.getByLabelText("SettingSiteTabs");
     await userEvent.click(within(sidebar).getByRole("button", {name: "Site 1"}));
     expect(screen.getByText("Settings for - Site 1")).toBeInTheDocument();
+});
+
+test('update Sitelist', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
+    let component = render(<AdminWidget/>);
+
+    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    let d = document.getElementsByClassName("AdminDialog")[0];
+    document.getElementsByClassName("AdminDialog")[0].open = true;
+
+    let sidebar = screen.getByLabelText("SettingSiteTabs");
+    expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
+
+    await waitFor( () => siteSetupSetSitesCallback(["Site 1", "Site 3", "Site 5"]));
+    expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 3"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 5"})).toBeInTheDocument();
+    expect(within(sidebar).queryByRole("button", {name: "Site 2"})).not.toBeInTheDocument();
 });

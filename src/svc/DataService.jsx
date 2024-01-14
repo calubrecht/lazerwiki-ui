@@ -266,6 +266,17 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
+  
+  addSite(name, siteName, hostName) {
+    return fetch(
+      this.baseRequest + "admin/site/" + siteName,
+       {method: 'put', credentials: 'include',
+         body: JSON.stringify({name: name, siteName: siteName, hostName: hostName}),
+         headers: this.getPostHeaders()})
+         .then(this.handleErrors)
+         .then(res => res.json());
+
+  }
 
 
   getTokenCookie()

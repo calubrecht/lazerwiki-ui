@@ -10,3 +10,45 @@ div.siteSetup div.siteButtons button {
   display:block;
   margin:.25em;
 }
+
+dialog.addSiteDialog div.addSiteButtons {
+  display: inline-flex;
+}
+
+dialog.addSiteDialog div.addSiteButtons button.cancel {
+  order: 2;
+}
+
+dialog.addSiteDialog div.addSiteButtons button.add {
+  order: 1;
+}
+
+dialog.addSiteDialog div.addSiteButtons button {
+  margin: .5em;
+  margin-top: 1.5em;
+}
+
+dialog.addSiteDialog label {
+  margin-right: .5em;
+}
+
+dialog.deleteSiteDialog div.deleteSiteButtons {
+  display: inline-flex;
+}
+
+dialog.deleteSiteDialog div.deleteSiteButtons button.cancel {
+  order: 2;
+}
+
+dialog.deleteSiteDialog div.deleteSiteButtons button.delete {
+  order: 1;
+}
+
+dialog.deleteSiteDialog div.deleteSiteButtons button {
+  margin: .5em;
+  margin-top: 1.5em;
+}
+
+dialog.deleteSiteDialog label {
+  margin-right: .5em;
+}

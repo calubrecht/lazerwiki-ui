@@ -13,7 +13,7 @@ function userHasAdmin(siteName, roles) {
 
 function renderGlobalSettings(sites, setSites) {
   return <div className="settingsBody" aria-label="SettingSiteBody" ><h1>Global Settings</h1>
-      <SiteSetup activeSites={sites} />
+      <SiteSetup activeSites={sites} setSites={setSites}/>
       <UserSetup />
     </div>;
 }
