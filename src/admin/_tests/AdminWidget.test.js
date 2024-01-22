@@ -81,6 +81,25 @@ test('render sidebar', async () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
+test('render sidebar as site Admin', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN:test"]});
+    let component = render(<AdminWidget/>);
+
+    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    let d = document.getElementsByClassName("AdminDialog")[0];
+    document.getElementsByClassName("AdminDialog")[0].open = true;
+
+    let sidebar = screen.getByLabelText("SettingSiteTabs");
+    expect(within(sidebar).queryByRole("button", {name: "Global Settings"})).not.toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Site 1"})).toHaveClass("selectedTab");
+
+    await userEvent.click(screen.getByRole("button", {name: "X"}));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+}, 300000);
+
 test('selectTab', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
     let component = render(<AdminWidget/>);

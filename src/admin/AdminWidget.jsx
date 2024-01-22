@@ -11,6 +11,10 @@ function userHasAdmin(siteName, roles) {
     return roles.filter(r => r === "ROLE_ADMIN" || r === "ROLE_ADMIN:" + siteName).length > 0;
 }
 
+function userHasGlobalAdmin(roles) {
+  return roles.filter(r => r === "ROLE_ADMIN").length > 0;
+}
+
 function renderGlobalSettings(sites, setSites) {
   return <div className="settingsBody" aria-label="SettingSiteBody" ><h1>Global Settings</h1>
       <SiteSetup activeSites={sites} setSites={setSites}/>
@@ -27,8 +31,12 @@ function renderDlgBody(tab, sites, setSites) {
 
 function AdminDialog(props) {
  const [selectedTab, setSelectedTab] = useState(props.initData.selectedTab);
+ let showSelectedTab = selectedTab;
  const [sites, setSites] = useState([]);
- let tabList = ["Global Settings", ...sites];
+ let tabList =  userHasGlobalAdmin(props.initData.roles) ? ["Global Settings", ...sites] : sites;
+ if (! tabList.includes(selectedTab) && tabList.length > 0) {
+  showSelectedTab = tabList[0];
+ }
  useEffect( () => {
     DS_instance().getSites().then(sites => {
       setSites(sites);
@@ -44,11 +52,11 @@ function AdminDialog(props) {
           <label>Site Settings</label>
           {tabList.map(tab => {
             let className = "settingsTabBtn button-unstyled";
-            className = tab == selectedTab ? className + " selectedTab" : className;
+            className = tab == showSelectedTab ? className + " selectedTab" : className;
             return <button key={tab} className={className} onClick={() => setSelectedTab(tab)}>{tab}</button>
           })}
        </div>
-         {renderDlgBody(selectedTab, sites, setSites)}
+         {renderDlgBody(showSelectedTab, sites, setSites)}
     </dialog>
     </div>);
 }
@@ -57,9 +65,9 @@ function AdminDialog(props) {
 function AdminWidget() {
   const [userName, setUserName] = useState(null);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
+  let u = US_instance().getUser();
 
   useEffect( () => {
-    let u = US_instance().getUser();
     setUserName(u ? u.userName : null);
     setUserIsAdmin(u ? userHasAdmin(u.siteName, u.userRoles) : false);
     setUserName(US_instance().getUser());
@@ -68,7 +76,7 @@ function AdminWidget() {
       setUserIsAdmin(user ? userHasAdmin(user.siteName, user.userRoles) : false);
     }});
   }, []);
-  return (userIsAdmin? <DrawerLink extraClasses="AdminWidget" title="admin" component={AdminDialog} initData={{selectedTab:"Global Settings"}}/> : "");
+  return (userIsAdmin? <DrawerLink extraClasses="AdminWidget" title="admin" component={AdminDialog} initData={{selectedTab:"Global Settings", roles: u.userRoles}}/> : "");
 }
 
 export default AdminWidget;
