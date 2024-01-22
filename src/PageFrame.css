@@ -22,7 +22,7 @@ div.editToolbar div.pageFrame {
   z-index: 1;
 }
 
-div.pageFrame div.close {
+div.pageFrame .close {
   float:right;
   margin:1px 3px;
   color: red;

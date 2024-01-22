@@ -34,46 +34,11 @@ export default class PageFrame extends Component
     this.setState({nsTree: pageData.namespaces, pageData: pageData.pages})
   }
 
-  parseTree(tree, pageData, fullName, displayName) {
-    tree.fullName = fullName;
-    tree.displayName = displayName;
-    tree.children = [];
-    for (let idx in pageData.children) {
-      let node = pageData.children[idx];
-      if (node.namespace) {
-        let subtree = {};
-        this.parseTree(subtree, node, displayName === '' ? node.namespace : displayName + ":" + node.namespace, node.namespace);
-        tree.children.push(subtree);
-      }
-    }
-  }
-
-  parsePages(nsPages, pageData) {
-    for (let idx in pageData.children) {
-      let node = pageData.children[idx];
-      if (node.namespace) {
-        let subtree = {};
-        this.parsePages(nsPages, node);
-      }
-      if (node.page) {
-        let ns = node.page.namespace;
-        if (!(ns in nsPages)) {
-          nsPages[ns] = []
-        }
-        nsPages[ns].push(node.page);
-      }
-    }
-
-  }
-
-
-
-
   render()
   {
     let counter = 0;
     return <div className="pageFrame">
-      <div onClick={() => this.props.doClose()} className="close">X</div>
+      <button onClick={() => this.props.doClose()} className="close button-unstyled">X</button>
       <h2 className="title">Page List</h2>
         <div className="pageFrameContent">
         <div className="nsTreeSelector">

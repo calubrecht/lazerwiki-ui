@@ -1,4 +1,5 @@
 import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import PageFrame from '../PageFrame';
 
 let mockNamespaces =  {data:"NSTREE"};
@@ -17,7 +18,8 @@ jest.mock("../NsTree", () => (props) => { selectNS = props.selectNS; return prop
 
 
 test('render empty Pages', async () => {
-    render(<PageFrame /> );
+    let doClose = jest.fn(() => {});
+    render(<PageFrame doClose={doClose} /> );
     await waitFor( () => {});
 
     expect(screen.getByText('NSTREE')).toBeInTheDocument();
@@ -26,4 +28,16 @@ test('render empty Pages', async () => {
     selectNS("Green");
     await waitFor( () => {});
     expect(screen.getByText("Pages - [Green]")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", {"name": "X"}));
+
+    expect(doClose.mock.calls).toHaveLength(1);
+});
+
+test('render with inital NS', async () => {
+    render(<PageFrame namespace="ns1"/> );
+    await waitFor( () => {});
+
+    expect(screen.getByText('NSTREE')).toBeInTheDocument();
+    expect(screen.getByText("Pages - [ns1]")).toBeInTheDocument();
 });
