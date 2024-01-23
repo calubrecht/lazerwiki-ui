@@ -137,12 +137,20 @@ export default class DataService
          .then(res => res.json());
   }
 
-  login(username, password)
-  {
+  fetchLogin(username, password) {
     return fetch(
       this.baseRequest + 'sessions/login',
        {method: 'post', body: JSON.stringify({username: username, password:password}), credentials: 'include',
-         headers: this.getPostHeaders() })
+         headers: this.getPostHeaders() });
+  }
+
+  login(username, password)
+  {
+    return this.fetchLogin(username, password)
+         .then(response => {
+           if (!response.ok && response.status === 403) {
+             return this.fetchLogin(username, password); }
+           return response;})
          .then(this.handleErrors)
          .then(res => res.json());
   }
