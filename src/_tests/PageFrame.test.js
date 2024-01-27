@@ -4,9 +4,10 @@ import userEvent from '@testing-library/user-event';
 import PageFrame from '../PageFrame';
 
 let mockNamespaces =  {data:"NSTREE"};
-let mockPages = [];
+let mockRes = (mockPages) => {return {namespaces: mockNamespaces, pages: mockPages}};
+let resolvePageListHook = null
 
-let mockDS = {fetchPageList: jest.fn(() => Promise.resolve({namespaces: mockNamespaces, pages: mockPages}))};
+let mockDS = {};
 
 jest.mock("../svc/DataService", () => {
     return {instance: () => mockDS};
@@ -18,7 +19,7 @@ let selectNS = null;
 jest.mock("../NsTree", () => (props) => { selectNS = props.selectNS; return props.nsTree.data; })
 
 beforeEach(() => {
-    mockPages = [];
+    mockDS.fetchPageList = jest.fn( ()=>new Promise((resolve, reject) => {resolvePageListHook=resolve;}));
 });
 
 
@@ -26,11 +27,13 @@ test('render empty Pages', async () => {
     let doClose = jest.fn(() => {});
     render(<PageFrame doClose={doClose} /> );
     await waitFor( () => {});
+    act( ()=>resolvePageListHook(mockRes([])));
+    await waitFor( () => {});    
 
     expect(screen.getByText('NSTREE')).toBeInTheDocument();
     expect(screen.getByText("Pages - []")).toBeInTheDocument();
 
-    selectNS("Green");
+    act( () => selectNS("Green"));
     await waitFor( () => {});
     expect(screen.getByText("Pages - [Green]")).toBeInTheDocument();
 
@@ -43,15 +46,21 @@ test('render with inital NS', async () => {
     render(<PageFrame namespace="ns1"/> );
     await waitFor( () => {});
 
+    act( ()=>resolvePageListHook(mockRes([])));
+    await waitFor( () => {});      
+
     expect(screen.getByText('NSTREE')).toBeInTheDocument();
     expect(screen.getByText("Pages - [ns1]")).toBeInTheDocument();
 });
 
 
 test('render links', async () => {
-    mockPages = {"": [{pagename:"page1", namespace:"", title: "Page 1"}, {pagename:"page2", namespace:"ns"}, {pagename:'', namespace:'', title:"ROOT"}]};
+    let mockPages = {"": [{pagename:"page1", namespace:"", title: "Page 1"}, {pagename:"page2", namespace:"ns"}, {pagename:'', namespace:'', title:"ROOT"}]};
     render(<PageFrame /> );
     await waitFor( () => {});
+
+    act( ()=>resolvePageListHook(mockRes(mockPages)));
+    await waitFor( () => {});    
 
     expect(screen.getByText('NSTREE')).toBeInTheDocument();
     expect(screen.getByText("Pages - []")).toBeInTheDocument();
@@ -61,10 +70,13 @@ test('render links', async () => {
 });
 
 test('render action', async () => {
-    mockPages = {"": [{pagename:"page1", namespace:"", title: "Page 1"}, {pagename:"page2", namespace:"ns"}]};
+    let mockPages = {"": [{pagename:"page1", namespace:"", title: "Page 1"}, {pagename:"page2", namespace:"ns"}]};
     let selectItem = jest.fn(()=>{});
     render(<PageFrame selectItem={selectItem}/> );
     await waitFor( () => {});
+
+    act( ()=>resolvePageListHook(mockRes(mockPages)));
+    await waitFor( () => {});    
 
     expect(screen.getByText('NSTREE')).toBeInTheDocument();
     expect(screen.getByText("Pages - []")).toBeInTheDocument();
@@ -83,9 +95,10 @@ test('setUser', async () => {
     jest.clearAllMocks();
     render(<PageFrame  /> );
     await waitFor( () => {});
+ 
 
     expect(mockDS.fetchPageList.mock.calls).toHaveLength(1);
-
-    US_instance().setUser({user: "Bob"});
+    act( () => US_instance().setUser({user: "Bob"}));
+    await waitFor( () => {});
     expect(mockDS.fetchPageList.mock.calls).toHaveLength(2);
 });

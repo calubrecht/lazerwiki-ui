@@ -35,7 +35,7 @@ div.historyFrame span, div.historyFramePreview span {
 }
 
 
-div.historyFrame div.close, div.historyFramePreview div.close {
+div.historyFrame button.close, div.historyFramePreview button.close {
   float:right;
   margin:1px 3px;
   color: red;
@@ -67,7 +67,7 @@ div.historicalPage  {
 }
 
 
-div.historyList span.diffSelections img {
+div.historyList button.diffSelections img {
   vertical-align:middle;
    
 }

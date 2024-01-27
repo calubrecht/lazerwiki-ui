@@ -45,29 +45,34 @@ export default class HistoryFrame extends Component
     if (this.state.mode == 'diff') {
       let counter = 0;
       return <div className="historyFrame">
-        <div onClick={() => this.props.doClose()} className="close">X</div>
+        {this.renderClose()}
         <h2 className="title">Diff - {this.pageDisplayName} - {this.state.startSelect} -&gt; {this.state.endSelect}</h2>
         <div className= "historyList">
         {this.state.diffInfo.map(a =>
-        <div className="diffLine" key={"diff" + counter++}> <div className="lineNumber">{a.first == -1 ? " " : "Line: " + a.first}</div> - <span>{HTMLReactParser(a.second)} </span></div>)} 
+        <div className="diffLine" key={"diff" + counter++}> <div className="lineNumber">{a.first == -1 ? " " : "Line: " + a.first}</div> - <span>{HTMLReactParser(a.second)}</span></div>)} 
       </div>
         <div><button onClick={() => this.setState({mode:'history'})} >Back</button></div>
       </div>
     }
     if (this.state.mode == 'historicalView') {
       return <div className="historyFramePreview">
-        <div onClick={() => this.props.doClose()} className="close">X</div>
+        {this.renderClose()}
         <h2 className="title">{this.pageDisplayName} - {this.state.displayRevision}</h2>
         <div className="historicalPage">{HTMLReactParser(this.state.historicalPageData.rendered)}</div>
         <div><button onClick={() => this.setState({mode:'history'})} >Back</button></div>
       </div>
     }
      return <div className="historyFrame">
-      <div onClick={() => this.props.doClose()} className="close">X</div>
+      {this.renderClose()}
+
         <h2 className="title">History - {this.pageDisplayName}</h2>
         {this.renderList()}
         <div><button onClick={() => this.doDiff()} disabled={!this.state.startSelect || !this.state.endSelect} >View Diff</button></div>
     </div>;
+  }
+
+  renderClose() {
+    return <button className="close button-unstyled" onClick={() => this.props.doClose()}>X</button>
   }
 
   renderLinkName(p, first) {
@@ -83,7 +88,8 @@ export default class HistoryFrame extends Component
 
   renderDiffSelections(revision) {
     let imgType = this.state.startSelect == revision ? "startSelect.png" : (this.state.endSelect == revision ? "endSelect.png" : "noSelect.png");
-    return <span className="diffSelections"><img src={"/_resources/" + imgType} onClick={() => this.doSelect(revision)} /></span>
+    let name = this.state.startSelect == revision ? "startSelect" : (this.state.endSelect == revision ? "endSelect" : "noSelect");
+    return <button className="diffSelections button-unstyled" aria-label="diffSelect" onClick={() => this.doSelect(revision)} ><img src={"/_resources/" + imgType} alt={name}  /></button>
   }
 
   renderList() {
