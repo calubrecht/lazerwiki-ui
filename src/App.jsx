@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import './printer.css';
 import RootFrame from './rootFrame';
 
 let pluginScript = document.createElement("script");

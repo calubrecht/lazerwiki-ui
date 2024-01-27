@@ -1,0 +1,42 @@
+@media print {
+
+body {
+  background: white;
+}
+
+div#toolbar {
+  display:none;
+}
+
+div#bannerHeader {
+  display:none;
+}
+
+div#root {
+  margin:0;
+}
+
+div.RootMenu {
+  display:none;
+}
+
+div.RootBody {
+  position:revert;
+  border: revert;
+  margin: revert;
+  padding: revert;
+}
+
+@page :footer {
+    display: none
+}
+
+@page :header {
+    display: none
+}
+
+@page {
+  size: auto;
+  margin: 0;
+}
+}
