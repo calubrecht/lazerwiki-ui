@@ -90,3 +90,15 @@ ul.nsTree li.closed > button.dot:before{
 ul.nsTree li.closed ul {
   display:none;
 }
+
+button.pageFrameSelect {
+  text-align: inherit;
+  text-indent: inherit;
+  padding-left: inherit;
+  padding-inline: revert;
+  margin-left: 1em;
+}
+
+button.pageFrameSelect:hover {
+  color:#a67000;
+}

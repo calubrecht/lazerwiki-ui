@@ -76,7 +76,7 @@ export default class PageFrame extends Component
       </div>);
     }
     return (<div className="pageList">
-        {pages.map( p => <div key={p.pagename}><a onClick={ev => this.doAction(ev, p)}>{this.renderLinkName(p)}</a></div>)}
+        {pages.map( p => <div key={p.pagename}><button className="button-unstyled pageFrameSelect" key={p.pagename} onClick={ev => this.doAction(ev, p)}>{this.renderLinkName(p)}</button></div>)}
 
       </div>);
   }
