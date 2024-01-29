@@ -50,7 +50,7 @@ div#appWrapper {
 }
 
 div#toolbar {
-  position: absolute;
+  position: fixed;
   top: 400px;
   background: #dddddd;
   padding: 1em;
@@ -58,6 +58,7 @@ div#toolbar {
   border-style:solid;
   border-width: 2px 2px 2px 0;
   width:120px;
+  z-index:1;
 }
 
 div#root {
