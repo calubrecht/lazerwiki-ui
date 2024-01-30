@@ -27,16 +27,5 @@ div.RootBody {
   padding: revert;
 }
 
-@page :footer {
-    display: none
-}
 
-@page :header {
-    display: none
-}
-
-@page {
-  size: auto;
-  margin: 0;
-}
 }

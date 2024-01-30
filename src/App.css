@@ -11,6 +11,7 @@ body {
   box-shadow: none;
   font-size: inherit;
   font-family: inherit;
+  cursor: pointer;
 }
 
 div#bannerHeader {
