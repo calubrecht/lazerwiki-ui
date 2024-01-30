@@ -88,12 +88,13 @@ export default class RootFrame extends Component
   {
     let user = this.state.user ? this.state.user.userName : "GUEST";
     let createAction = this.state.pageData.flags.exists ? "Edit Page" : "Create Page";
+    let className= "RootBody" + (this.state.pageData.id  ? (" p" + this.state.pageData.id) : "");
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame">
         {this.renderDeleteDialog() }
         {this.renderImgDialog() }
         { this.renderMenu(createAction) }
-        <div className="RootBody"> {HTMLReactParser(this.state.pageData.rendered)}  
+        <div className={className}> {HTMLReactParser(this.state.pageData.rendered)}
         { this.renderTags() }
         </div>
         { this.renderTagSearch() }
