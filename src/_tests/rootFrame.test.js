@@ -318,3 +318,16 @@ test('test errors',  async () => {
     let calls = console.log.mock.calls;
     expect(console.log.mock.calls[0][0]).toBe("Cannot Save");
 });
+
+test('render wID', async () => {
+    let resolveHook = null
+    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
+    render(<RootFrame/>);
+    await waitFor( () => {});
+    await waitFor( () => {US_instance().setUser(null)});
+
+    resolveHook({flags: {exists:true}, rendered: "Rendered Text", tags:[], id:101});
+    await waitFor( () => {});
+    
+    expect(screen.getByRole("group", {name: "RootBody p101"}));
+});

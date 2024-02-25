@@ -5,6 +5,7 @@ import {instance as DS_instance} from '../svc/DataService';
 import DrawerLink from '../DrawerLink';
 import SiteSetup from './SiteSetup';
 import UserSetup from './UserSetup';
+import SiteSettings from './SiteSettings';
 
 
 function userHasAdmin(siteName, roles) {
@@ -15,25 +16,26 @@ function userHasGlobalAdmin(roles) {
   return roles.filter(r => r === "ROLE_ADMIN").length > 0;
 }
 
-function renderGlobalSettings(sites, setSites) {
-  return <div className="settingsBody" aria-label="SettingSiteBody" ><h1>Global Settings</h1>
+function renderGlobalSettings(sites, setSites, visible) {
+  const className = visible ? "settingsBody" : "settingsBody hidden";
+  return <div className={className} aria-label="SettingSiteBody" ><h1>Global Settings</h1>
       <SiteSetup activeSites={sites} setSites={setSites}/>
       <UserSetup />
     </div>;
 }
 
 function renderDlgBody(tab, sites, setSites) {
- if (tab === 'Global Settings') {
-      return renderGlobalSettings(sites, setSites);
-  }
-  return <div className="settingsBody" aria-label="SettingSiteBody">  <h1>Settings for - {tab}</h1></div>;
+ return <div>
+    {renderGlobalSettings(sites, setSites, tab === 'Global Settings')}
+    {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} visible={site.siteName === tab}/>)}</div>
 }
 
 function AdminDialog(props) {
  const [selectedTab, setSelectedTab] = useState(props.initData.selectedTab);
  let showSelectedTab = selectedTab;
  const [sites, setSites] = useState([]);
- let tabList =  userHasGlobalAdmin(props.initData.roles) ? ["Global Settings", ...sites] : sites;
+ const siteNames = sites.map(site => site.siteName);
+ let tabList =  userHasGlobalAdmin(props.initData.roles) ? ["Global Settings", ...siteNames] : siteNames;
  if (! tabList.includes(selectedTab) && tabList.length > 0) {
   showSelectedTab = tabList[0];
  }

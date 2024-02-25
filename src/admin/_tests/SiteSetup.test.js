@@ -17,7 +17,7 @@ afterEach( () => {
 });
 
 test('render', () => {
-  render(<SiteSetup activeSites={["Site 1", "Site 2"]}/>);
+  render(<SiteSetup activeSites={[{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}]}/>);
 
   expect(screen.getByText("Available Sites"));
   expect(screen.getByRole("option", {name: "Site 1"}));
@@ -28,9 +28,10 @@ test('render', () => {
 
 test('addSite', async () => {
   let setSitesCB = jest.fn(() => {});
-  render(<SiteSetup activeSites={["Site 1", "Site 2"]} setSites={setSitesCB}/>);
+  render(<SiteSetup activeSites={[{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}]} setSites={setSitesCB}/>);
   await userEvent.click(screen.getByRole("button", {name: "Add New Site"}));
-  mockDS.addSite = jest.fn(() => Promise.resolve(["Site 1", "New Site"]));
+  let sitesRes = [{siteName:"Site 1", site:"site1"}, {siteName:"New Site", site:"newSite"}];
+  mockDS.addSite = jest.fn(() => Promise.resolve(sitesRes));
   
   expect(screen.getByText("Available Sites"));
   
@@ -56,7 +57,7 @@ test('addSite', async () => {
   expect(mockDS.addSite.mock.calls[0][0]).toBe("NewSite");
   expect(mockDS.addSite.mock.calls[0][1]).toBe("New Site");
   expect(mockDS.addSite.mock.calls[0][2]).toBe("newsite.com");
-  expect(setSitesCB.mock.calls[0][0]).toStrictEqual(["Site 1", "New Site"]);
+  expect(setSitesCB.mock.calls[0][0]).toStrictEqual(sitesRes);
 
   await(siteInput.focus());
   await userEvent.keyboard("NewSite[TAB]New Site[TAB]newsite.com");
@@ -64,7 +65,7 @@ test('addSite', async () => {
   expect(mockDS.addSite.mock.calls[1][0]).toBe("NewSite");
   expect(mockDS.addSite.mock.calls[1][1]).toBe("New Site");
   expect(mockDS.addSite.mock.calls[1][2]).toBe("newsite.com");
-  expect(setSitesCB.mock.calls[1][0]).toStrictEqual(["Site 1", "New Site"]);
+  expect(setSitesCB.mock.calls[1][0]).toStrictEqual(sitesRes);
 
   // test error
   await(siteInput.focus());

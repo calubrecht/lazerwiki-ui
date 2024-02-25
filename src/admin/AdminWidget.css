@@ -71,3 +71,7 @@ div#adminSidebar label {
 
 dialog.AdminDialog div.settingsBody {
 }
+
+dialog.AdminDialog div.settingsBody.hidden {
+  display: none
+}

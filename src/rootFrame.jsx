@@ -94,7 +94,7 @@ export default class RootFrame extends Component
         {this.renderDeleteDialog() }
         {this.renderImgDialog() }
         { this.renderMenu(createAction) }
-        <div className={className}> {HTMLReactParser(this.state.pageData.rendered)}
+        <div className={className} role="group" aria-label={className}> {HTMLReactParser(this.state.pageData.rendered)}
         { this.renderTags() }
         </div>
         { this.renderTagSearch() }

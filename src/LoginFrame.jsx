@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {instance as DS_instance} from './svc/DataService';
 import {instance as US_instance} from './svc/UserService';
 
+import TextField from './TextField';
+
 export default class LoginFrame extends Component
 {
   constructor(props) {
@@ -17,8 +19,8 @@ export default class LoginFrame extends Component
       <div className="loginComponent" onKeyDown={this.handleKeyDown}>
       <div className="loginHeader">Please Log in</div>
       <div className="loginForm">
-        <div><label htmlFor="Username" className="inputLabel">Username:</label><input type="text" placeholder="Username" name="Username" id="Username" onChange={evt => this.onChangeField(evt, "username")} disabled= {this.state.disabled} autoFocus  ></input></div>
-        <div><label htmlFor="Password" className="inputLabel">Password:</label><input type="password" placeholder="Password" name="Password" id="Password"  onChange={evt => this.onChangeField(evt, "password")} disabled= {this.state.disabled} ></input></div>
+        <TextField name="Username" label="Username:" onChange={(v,f) => this.onChangeField(v,f)} disabled={this.state.disabled} varName="username" autofocus={true} value={this.state.username}/>
+        <TextField name="Password" label="Password:" onChange={(v,f) => this.onChangeField(v,f)} disabled={this.state.disabled} varName="password" isPassword={true} value={this.state.password}/>
         <div className='errorText'>{this.state.error}</div>
       </div>
       </div>)
@@ -49,8 +51,7 @@ export default class LoginFrame extends Component
     this.setState({error:'Invalid username or password', disabled: ''});
   }
 
-  onChangeField(evt, field) {
-    const val = evt.target.value;
+  onChangeField(val, field) {
     this.setState({[field]: val});
   }
 }

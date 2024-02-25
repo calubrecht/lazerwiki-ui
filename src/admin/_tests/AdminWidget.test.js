@@ -6,12 +6,14 @@ import AdminWidget from '../AdminWidget';
 
 let dUser = {userName: 'joe', userRoles:[]};
 
-let mockDS = {getSites: () => Promise.resolve(["Site 1", "Site 2", "Site 3"])};
+let mockDS = {getSites: () => Promise.resolve([{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}, {siteName:"Site 3", name:"site3"}])};
 
 jest.mock("../../svc/DataService", () => {
     return {instance: () => mockDS};
 
 });
+
+jest.mock("../SiteSettings", () => (props) => <div>Settings for - {props.siteDisplayName} - {props.visible ? "visible" : "hidden"}</div>);
 
 test('firstRender', () => {
     US_instance().setUser(null);
@@ -56,7 +58,7 @@ let siteSetupSetSitesCallback = null;
 
 jest.mock("../SiteSetup", () => (props) => {
     siteSetupSetSitesCallback = props.setSites;
-    return <div>SiteSetup-Sites={props.activeSites.join(",")}</div>;
+    return <div>SiteSetup-Sites={props.activeSites.map(site => site.siteName).join(",")}</div>;
 });
 jest.mock("../UserSetup", () => (props) => {
     return <div>UserSetup</div>;
@@ -114,7 +116,9 @@ test('selectTab', async () => {
 
     let sidebar = screen.getByLabelText("SettingSiteTabs");
     await userEvent.click(within(sidebar).getByRole("button", {name: "Site 1"}));
-    expect(screen.getByText("Settings for - Site 1")).toBeInTheDocument();
+    expect(screen.getByText("Settings for - Site 1 - visible")).toBeInTheDocument();
+    expect(screen.getByText("Settings for - Site 2 - hidden")).toBeInTheDocument();
+    expect(screen.getByText("Settings for - Site 3 - hidden")).toBeInTheDocument();
 });
 
 test('update Sitelist', async () => {
@@ -130,7 +134,7 @@ test('update Sitelist', async () => {
     expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
 
-    await waitFor( () => siteSetupSetSitesCallback(["Site 1", "Site 3", "Site 5"]));
+    await waitFor( () => siteSetupSetSitesCallback([{siteName:"Site 1", name:"site1"}, {siteName:"Site 3", name:"site3"}, {siteName:"Site 5", name:"site5"}]));
     expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Site 3"})).toBeInTheDocument();

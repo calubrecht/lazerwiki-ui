@@ -53,7 +53,7 @@ function SiteSetup(props) {
       </div>
     </dialog>
     <select name="siteList" id="siteList" size="5">
-      {props.activeSites.map( site => <option value={site} key={site}>{site}</option>)}
+      {props.activeSites.map( site => <option value={site.siteName} key={site.name}>{site.siteName}</option>)}
     </select>
     <div className="siteButtons">
       <button onClick={() => {addSiteRef?.current?.showModal?.() }}>Add New Site</button>
