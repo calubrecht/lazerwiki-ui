@@ -37,11 +37,11 @@ export default class EditableTextbox extends Component
   renderTagList() {
     let allTags = [...new Set([...this.state.tags,...this.state.activeTags])].sort();
     return <div className="editableTagList">
-      <span className="tagHeader">TAGS</span>{allTags.map((t) => <span key={t}> <input type="checkbox"  name={t} checked={this.state.tags.has(t)}
-      onChange={ev => this.onTagClick(ev)}/><label htmlFor={t} onClick={ev => this.onTagClick(ev)}>{t}</label></span>)}
-      <span>+<input type="text" name="tagEntry" value={this.state.newTag}
+      <span className="tagHeader">TAGS</span>{allTags.map((t) => <span><span className="tag" key={t}> <input type="checkbox"  name={t} checked={this.state.tags.has(t)}
+      onChange={ev => this.onTagClick(ev)}/><label htmlFor={t} onClick={ev => this.onTagClick(ev)}>{t}</label></span></span>)}
+      <span><span className="newTagEntry" title="Add New Tag">+<input type="text" name="tagEntry" value={this.state.newTag}
         onChange={ev => this.newTagBox(ev)}
-        onKeyDown={ev =>this.newTagEnter(ev)}/></span></div>;
+        onKeyDown={ev =>this.newTagEnter(ev)}/></span></span></div>;
   }
 
   renderErrorMsg() {

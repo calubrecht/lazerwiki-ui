@@ -13,6 +13,15 @@ div.editableTagList {
   text-align: right;
 }
 
+div.editableTagList span.tag {
+  white-space: nowrap;
+}
+
+div.editableTagList span.newTagEntry {
+  white-space: nowrap;
+  margin-left:4px;
+}
+
 div.error {
   color: red;
 }
