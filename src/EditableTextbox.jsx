@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import {instance as DB_instance} from './svc/DbService';
 import EditToolbar from './EditToolbar';
 
 import './EditableTextbox.css';
@@ -22,6 +23,7 @@ export default class EditableTextbox extends Component
   
   componentDidMount()
   {
+    DB_instance().addValue("Rex", "Manning");
     this.data.fetchTagList().then((tags) => this.setState({activeTags:new Set(tags)}));
     this.textAreaRef.current.focus()
   }
@@ -37,7 +39,7 @@ export default class EditableTextbox extends Component
   renderTagList() {
     let allTags = [...new Set([...this.state.tags,...this.state.activeTags])].sort();
     return <div className="editableTagList">
-      <span className="tagHeader">TAGS</span>{allTags.map((t) => <span><span className="tag" key={t}> <input type="checkbox"  name={t} checked={this.state.tags.has(t)}
+      <span className="tagHeader">TAGS</span>{allTags.map((t) => <span key={t}><span className="tag"> <input type="checkbox"  name={t} checked={this.state.tags.has(t)}
       onChange={ev => this.onTagClick(ev)}/><label htmlFor={t} onClick={ev => this.onTagClick(ev)}>{t}</label></span> </span>)}
       <span><span className="newTagEntry" title="Add New Tag">+<input type="text" name="tagEntry" value={this.state.newTag}
         onChange={ev => this.newTagBox(ev)}
