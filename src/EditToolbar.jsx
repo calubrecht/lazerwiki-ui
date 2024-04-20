@@ -166,10 +166,26 @@ export default class EditToolbar extends Component
         return [text.slice(newlines[1]+1, newlines[0]), newlines[1]];
       }
     }
-    if (newlines.length ==1) {
-      return [text.slice(0, start-1), 0];
-    }
     return [text.slice(0, start), 0];
+  }
+
+  getCurrentLine(text, start) {
+    let lineStart = -1;
+    let lineEnd = text.length-1;
+    for (let lookBack = start; lookBack >= 0; lookBack--) {
+      if (text[lookBack] == '\n') {
+        break;
+      }
+      lineStart = lookBack;
+    }
+    for (let lookFwd = start; lookFwd < text.length; lookFwd++) {
+      if (text[lookFwd] == '\n') {
+        lineEnd = lookFwd - 1;
+        break;
+      }
+      lineEnd = lookFwd;
+    }
+    return [text.slice(lineStart, lineEnd + 1), lineStart];
   }
 
   getHeaderLevel(fullText, selectionStart) {
@@ -186,15 +202,27 @@ export default class EditToolbar extends Component
   }
   
   getListLevel(fullText, selectionStart) {
+    let defaultIndent = " ";
     if (fullText[selectionStart] == '\n') {
       selectionStart = selectionStart -1;
     }
-    let [previousLine, newPosition] = this.getPreviousLine(fullText, selectionStart);
-    const headerRE = /^( *)[-*].*$/;
-    let m = previousLine.match(headerRE);
+    if (selectionStart == 0) {
+      return defaultIndent;
+    }
+    const listRE = /^( *)[-*].*$/;
+    let [currentLine, currentPosition] = this.getCurrentLine(fullText, selectionStart);
+    let m = currentLine.match(listRE);
     if (m) {
       return m[1];
     }
-    return " "
+    // Only examine previous line if at start of a line
+    if (fullText[selectionStart-1] == '\n') {
+      let [previousLine, newPosition] = this.getPreviousLine(fullText, selectionStart);
+      m = previousLine.match(listRE);
+      if (m) {
+        return m[1];
+      }
+    }
+    return defaultIndent;
   }
 }

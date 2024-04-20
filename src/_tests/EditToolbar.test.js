@@ -90,6 +90,21 @@ test('addHeader', async () => {
     ta.setSelectionRange(max, max);
     await userEvent.click(btn);
     expect(text).toBe("===Level 3 Header===\nLine after\nAndAnother\n===Header===\n");
+
+    // Level 2 Header
+    currentText = "==Level 2 Header==\n\n";
+    ta.value = currentText;
+    max = currentText.length;
+    ta.setSelectionRange(max, max);
+    await userEvent.click(btn);
+    expect(text).toBe("==Level 2 Header==\n\n==Header==\n");
+
+    currentText = "Not first line\n==Level 2 Header==\n\n";
+    ta.value = currentText;
+    max = currentText.length;
+    ta.setSelectionRange(max, max);
+    await userEvent.click(btn);
+    expect(text).toBe("Not first line\n==Level 2 Header==\n\n==Header==\n");
 });
 
 test('bold/italic', async () => {
@@ -157,6 +172,46 @@ test('lists', async () => {
   let btn = screen.getByRole("button", {name:"Ordered List"});
   await userEvent.click(btn);
   expect(text).toBe(" -List Item\n\n");
+
+});
+
+test('listsOtherCases', async () => {
+  let currentText = "  -List in middle"
+
+
+  let getCurrentText = () => currentText;
+  let text = "";
+  let setText = t => text=t;
+  let wait = async () => {};
+  let check= async (input, expected, selectionStartOffset, selectionEndOffset) => {
+    currentText = input;
+    ta.value = input;
+    let max = input.length -1;
+    ta.setSelectionRange(max - selectionStartOffset, max - selectionEndOffset);
+    await wait();
+    await userEvent.click(btn);
+    expect(text).toBe(expected);
+  }
+
+  render (<div><EditToolbar getCurrentText = {getCurrentText} setText={setText}/><textarea id="pageSource"></textarea></div>);
+  let btn = screen.getByRole("button", {name:"Ordered List"});
+  let ta = screen.getByRole("textbox");
+
+  let defText = "\n  -List not on firstLine\n";
+  await check(defText,defText + "  -List Item\n\n", 0 ,0);
+
+  // Cursor is in middle of line, just add LI in place.
+  await check(defText + " text\n",defText + " tex\n -List Item\nt\n", 1 ,1);
+
+  // If Cursor at start of line, use previous line indent
+  await check(defText + " text\n",defText + "  -List Item\n text\n", 5 ,5);
+  // If Cursor at start of line of doc, use default ident
+  await check(defText," -List Item\n\n  -List not on firstLine\n", defText.length-1 ,defText.length-1);
+
+  // if selection is marking text
+  await check(defText + "some item\nmoretext",defText + "  -some item\n\nmoretext", 17,8);
+
+  await check(defText + "some item\nmoretext\n",defText + "some item\n -List Item\nmoretext\n",8,8);
 
 });
 
