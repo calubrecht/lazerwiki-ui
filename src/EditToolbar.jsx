@@ -163,7 +163,7 @@ export default class EditToolbar extends Component
         newlines.push(i);
       }
       if (newlines.length == 2) {
-        return [text.slice(newlines[1]+1, newlines[0]-1), newlines[1]];
+        return [text.slice(newlines[1]+1, newlines[0]), newlines[1]];
       }
     }
     if (newlines.length ==1) {
