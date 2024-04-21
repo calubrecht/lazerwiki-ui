@@ -299,6 +299,11 @@ test('pluginActions', async () => {
         script: (text, start, end, ns, name) => {return {action:'insert', location:4, value:"new at middle"}}
     },
     {
+      name: "InsertAtCursor",
+      icon: "plugin.png",
+      script: (text, start, end, ns, name) => {return {action:'insert', atCursor:true, value:"cursor"}}
+    },
+    {
         name: "Replace",
         icon: "plugin.png",
         script: (text, start, end, ns, name) => {return {action:'replace', location:4, locationEnd:10, value:"Replacement"}}
@@ -333,6 +338,13 @@ test('pluginActions', async () => {
   await userEvent.click(btn);
   
   expect(text).toBe("Abcdnew at middleefg1234lmnop"); 
+
+
+  btn = screen.getByRole("button", {name:"InsertAtCursor"});
+  ta.setSelectionRange(5, 5);
+  await userEvent.click(btn);
+
+  expect(text).toBe("Abcdecursorfg1234lmnop"); 
   
   btn = screen.getByRole("button", {name:"Replace"});
   ta.setSelectionRange(max, max);

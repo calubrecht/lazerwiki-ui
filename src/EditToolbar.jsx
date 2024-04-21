@@ -65,7 +65,12 @@ export default class EditToolbar extends Component
          let actionReturn = action.script(currentText, selectStart, selectEnd, this.props.namespace, this.props.pageName);
          let replacement = currentText;
          if (actionReturn.action === 'insert') {
-           if (actionReturn.location === -1) {
+           if (actionReturn.atCursor) {
+            replacement = currentText.slice(0, selectStart) + actionReturn.value + currentText.slice(selectEnd);
+            currentText + actionReturn.value;
+            newEnd = newStart + actionReturn.value.length - (newEnd - newStart);
+           } 
+           else if (actionReturn.location === -1) {
              replacement = currentText + actionReturn.value;
              newStart = newEnd = replacement.length -1;
            }
@@ -85,7 +90,8 @@ export default class EditToolbar extends Component
          if (actionReturn.action === 'none') {
            return;
          }
-         this.refreshFocus(area, newStart, newEnd);
+         area.value = replacement;
+         this.refreshFocus(area, newEnd, newEnd);
          this.props.setText(replacement);
         }};
       this.buttons.push(btn);
