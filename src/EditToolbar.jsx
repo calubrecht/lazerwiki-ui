@@ -65,7 +65,12 @@ export default class EditToolbar extends Component
          let actionReturn = action.script(currentText, selectStart, selectEnd, this.props.namespace, this.props.pageName);
          let replacement = currentText;
          if (actionReturn.action === 'insert') {
-           if (actionReturn.location === -1) {
+           if (actionReturn.atCursor) {
+            replacement = currentText.slice(0, selectStart) + actionReturn.value + currentText.slice(selectEnd);
+            currentText + actionReturn.value;
+            newEnd = newStart + actionReturn.value.length - (newEnd - newStart);
+           } 
+           else if (actionReturn.location === -1) {
              replacement = currentText + actionReturn.value;
              newStart = newEnd = replacement.length -1;
            }
@@ -85,7 +90,8 @@ export default class EditToolbar extends Component
          if (actionReturn.action === 'none') {
            return;
          }
-         this.refreshFocus(area, newStart, newEnd);
+         area.value = replacement;
+         this.refreshFocus(area, newEnd, newEnd);
          this.props.setText(replacement);
         }};
       this.buttons.push(btn);
@@ -163,13 +169,29 @@ export default class EditToolbar extends Component
         newlines.push(i);
       }
       if (newlines.length == 2) {
-        return [text.slice(newlines[1]+1, newlines[0]-1), newlines[1]];
+        return [text.slice(newlines[1]+1, newlines[0]), newlines[1]];
       }
     }
-    if (newlines.length ==1) {
-      return [text.slice(0, start-1), 0];
-    }
     return [text.slice(0, start), 0];
+  }
+
+  getCurrentLine(text, start) {
+    let lineStart = -1;
+    let lineEnd = text.length-1;
+    for (let lookBack = start; lookBack >= 0; lookBack--) {
+      if (text[lookBack] == '\n') {
+        break;
+      }
+      lineStart = lookBack;
+    }
+    for (let lookFwd = start; lookFwd < text.length; lookFwd++) {
+      if (text[lookFwd] == '\n') {
+        lineEnd = lookFwd - 1;
+        break;
+      }
+      lineEnd = lookFwd;
+    }
+    return [text.slice(lineStart, lineEnd + 1), lineStart];
   }
 
   getHeaderLevel(fullText, selectionStart) {
@@ -186,15 +208,27 @@ export default class EditToolbar extends Component
   }
   
   getListLevel(fullText, selectionStart) {
+    let defaultIndent = " ";
     if (fullText[selectionStart] == '\n') {
       selectionStart = selectionStart -1;
     }
-    let [previousLine, newPosition] = this.getPreviousLine(fullText, selectionStart);
-    const headerRE = /^( *)[-*].*$/;
-    let m = previousLine.match(headerRE);
+    if (selectionStart == 0) {
+      return defaultIndent;
+    }
+    const listRE = /^( *)[-*].*$/;
+    let [currentLine, currentPosition] = this.getCurrentLine(fullText, selectionStart);
+    let m = currentLine.match(listRE);
     if (m) {
       return m[1];
     }
-    return " "
+    // Only examine previous line if at start of a line
+    if (fullText[selectionStart-1] == '\n') {
+      let [previousLine, newPosition] = this.getPreviousLine(fullText, selectionStart);
+      m = previousLine.match(listRE);
+      if (m) {
+        return m[1];
+      }
+    }
+    return defaultIndent;
   }
 }
