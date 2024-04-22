@@ -24,6 +24,15 @@ export default class EditableTextbox extends Component
   
   componentDidMount()
   {
+    DB_instance().getValue(this.props.pageName).then(a => {
+      if (a) {
+        console.log("page cached at " + a.ts);
+      }
+      else {
+        console.log("no cached page");
+      }
+
+    });
     this.data.fetchTagList().then((tags) => this.setState({activeTags:new Set(tags)}));
     this.textAreaRef.current.focus()
   }

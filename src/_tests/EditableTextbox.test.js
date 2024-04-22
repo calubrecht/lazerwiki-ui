@@ -12,22 +12,7 @@ jest.mock("../svc/DataService", () => {
 
 });
 
-/*
-   addValue(key, value)
-    {
-        this.db.pageDrafts.put({pageName: key,text:value, ts: Date.now()});
-    }
-
-    delValue(key)
-    {
-        this.db.pageDrafts.delete(key);
-    }
-
-    // Returns a promise that receives the value
-    getValue(key)
-    {
-*/
-let mockDbGetValuePromise =  new Promise( () => {} );
+let mockDbGetValuePromise =  Promise.resolve(undefined);
 let mockDb = {
   addValue: jest.fn(() => {}),
   delValue: jest.fn(() => {}),
@@ -43,6 +28,10 @@ let setTextCB = null;
 jest.mock("../EditToolbar", () => (props) =>{
   setTextCB = props.setText;
   return "Toolbar-" + props.namespace + "-" + props.pageName + "-" + props.getCurrentText();});
+
+beforeEach(() => {
+  mockDbGetValuePromise =  Promise.resolve(undefined);
+});
 
 test('render', () => {
   TAG_LIST.length = 0;  
@@ -178,6 +167,8 @@ test('cleanup', async () => {
 
 test('edits reflect in DB', async () => {
   const user = userEvent.setup();
+  mockDb.addValue.mockReset();
+  mockDb.delValue.mockReset();
   TAG_LIST.length = 0;
   let cb = null;
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
@@ -207,3 +198,8 @@ test('edits reflect in DB', async () => {
   expect(mockDb.delValue.mock.calls[1][0]).toBe("simplePage");
 });
 
+test('warn about drafts', async () => {
+  mockDbGetValuePromise = Promise.resolve({text: "Some Text", ts: new Date()});
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
+
+});

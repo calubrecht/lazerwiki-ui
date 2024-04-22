@@ -36,7 +36,15 @@ export default class DbService{
     // Returns a promise that receives the value
     getValue(key)
     {
-        return this.db.pageDrafts.get(key); 
+        let promise = this.db.pageDrafts.get(key);
+        return promise.then(val => {
+            if (val.ts) {
+              let ts = val.ts;
+
+              val.ts= new Date(ts);
+            }
+            return val;
+        });
     }
   
 }
