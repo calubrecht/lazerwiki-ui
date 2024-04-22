@@ -102,7 +102,7 @@ export default class RootFrame extends Component
     }
       return <div className="RootFrame">      
       <div className="RootMenu">{this.state.stage === 'editing' && <button className="rootMenuButton button-unstyled" onClick={ev => this.savePage(ev)}>Save Page</button>}<button className="rootMenuButton button-unstyled" onClick={ev => this.cancelEdit(ev)}>Cancel</button>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
-      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
+      <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} setCleanupCB={data => this.setCleanupCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
       </div>;
 
   }
@@ -159,7 +159,12 @@ export default class RootFrame extends Component
     this.clearHash();
     this.data.savePage(this.pageName, this.getText()).then((pageData) => {
       this.setPageData(pageData);
+      this?.cleanupTextbox();
       this.cancelEdit(); }).catch(e => this.handleError(e));
+  }
+
+  setCleanupCB(cb) {
+    this.cleanupTextbox = cb;
   }
  
   setGetEditCB(cb) {

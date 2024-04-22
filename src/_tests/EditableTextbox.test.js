@@ -12,6 +12,33 @@ jest.mock("../svc/DataService", () => {
 
 });
 
+/*
+   addValue(key, value)
+    {
+        this.db.pageDrafts.put({pageName: key,text:value, ts: Date.now()});
+    }
+
+    delValue(key)
+    {
+        this.db.pageDrafts.delete(key);
+    }
+
+    // Returns a promise that receives the value
+    getValue(key)
+    {
+*/
+let mockDbGetValuePromise =  new Promise( () => {} );
+let mockDb = {
+  addValue: jest.fn(() => {}),
+  delValue: jest.fn(() => {}),
+  getValue: jest.fn(() => mockDbGetValuePromise)
+}
+
+jest.mock("../svc/DbService", () => {
+  return {instance: () => mockDb};
+
+});
+
 let setTextCB = null;
 jest.mock("../EditToolbar", () => (props) =>{
   setTextCB = props.setText;
@@ -19,18 +46,18 @@ jest.mock("../EditToolbar", () => (props) =>{
 
 test('render', () => {
   TAG_LIST.length = 0;  
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}}  editable={true} />);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} editable={true} />);
 
 
   expect(screen.getByText("Toolbar--simplePage-Initial Text")).toBeInTheDocument();
   expect(screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0]).toBeInTheDocument();
 
   component.unmount();
-  component = render(<EditableTextbox pageName="ns:simplePage" text="Initial Text" registerTextCB= {() => {}}  editable={true} />);
+  component = render(<EditableTextbox pageName="ns:simplePage" text="Initial Text" registerTextCB= {() => {}}  setCleanupCB= {() => {}} editable={true} />);
   expect(screen.getByText("Toolbar-ns-simplePage-Initial Text")).toBeInTheDocument();
 
   component.unmount();
-  render(<EditableTextbox pageName="ns:simplePage" text="Initial Text" registerTextCB= {() => {}}  editable={false} />);
+  render(<EditableTextbox pageName="ns:simplePage" text="Initial Text" registerTextCB= {() => {}}  setCleanupCB= {() => {}} editable={false} />);
   expect(screen.queryByText("Toolbar", {exact: false})).not.toBeInTheDocument();
 
 });
@@ -39,7 +66,7 @@ test('edits', async () => {
   const user = userEvent.setup();
   TAG_LIST.length = 0;
   let cb = null;
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  editable={true} />);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
 
   expect(cb().text).toBe("Initial Text");
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
@@ -62,7 +89,7 @@ test('keyActions', async () => {
   let cb = null;
   let savePage = jest.fn(() => {});
   let cancelEdit = jest.fn(() => {});
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  editable={true} savePage={savePage} cancelEdit={cancelEdit} />);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} savePage={savePage} cancelEdit={cancelEdit} />);
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
   await fireEvent.keyDown(c, { key: 's', ctrlKey: true});
   
@@ -75,7 +102,7 @@ test('keyActions', async () => {
   expect(cancelEdit.mock.calls).toHaveLength(2);
 
   component.unmount();
-  render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  editable={false} cancelEdit={cancelEdit} />);
+  render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={false} cancelEdit={cancelEdit} />);
   c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
   await fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true});
   expect(cancelEdit.mock.calls).toHaveLength(3);
@@ -88,7 +115,7 @@ test('tagList', async() => {
   TAG_LIST.push('tag2');
   TAG_PROMISE = Promise.resolve(TAG_LIST);
   let cb = null;
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  editable={true} tags={["tag1"]} />);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} tags={["tag1"]} />);
 
   await waitFor( () => {});
 
@@ -126,7 +153,7 @@ test('setText', async () => {
   TAG_PROMISE = new Promise(() => {});
   let cb = null;
 
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}} editable={true} />);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
   act( () => setTextCB("Toolbar override"));
   
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
@@ -134,3 +161,49 @@ test('setText', async () => {
   expect(cb().text).toBe("Toolbar override");
 
 });
+
+
+test('cleanup', async () => {
+  TAG_LIST.length = 0;
+  TAG_PROMISE = new Promise(() => {});
+  let cb = null;
+
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}}  setCleanupCB= {(cleanupCb) => {cb = cleanupCb}} editable={true} />);
+ 
+  cb();
+  expect(mockDb.delValue.mock.calls).toHaveLength(1);
+  expect(mockDb.delValue.mock.calls[0][0]).toBe("simplePage");
+});
+
+
+test('edits reflect in DB', async () => {
+  const user = userEvent.setup();
+  TAG_LIST.length = 0;
+  let cb = null;
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
+
+  expect(cb().text).toBe("Initial Text");
+  let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
+  await user.type(c, "123");
+  expect(mockDb.addValue.mock.calls).toHaveLength(3);
+  expect(mockDb.addValue.mock.calls[2][0]).toBe("simplePage");
+  expect(mockDb.addValue.mock.calls[2][1]).toBe("Initial Text123");
+
+  await user.type(c, "[Backspace][Backspace][Backspace]");
+  expect(mockDb.addValue.mock.calls).toHaveLength(5);
+  expect(mockDb.addValue.mock.calls[4][0]).toBe("simplePage");
+  expect(mockDb.addValue.mock.calls[4][1]).toBe("Initial Text1");
+  expect(mockDb.delValue.mock.calls).toHaveLength(1);
+  expect(mockDb.delValue.mock.calls[0][0]).toBe("simplePage");
+
+  //Toolbar works, too
+  act( () => setTextCB("Toolbar override"));
+  expect(mockDb.addValue.mock.calls).toHaveLength(6);
+  expect(mockDb.addValue.mock.calls[5][0]).toBe("simplePage");
+  expect(mockDb.addValue.mock.calls[5][1]).toBe("Toolbar override");
+
+  act( () => setTextCB("Initial Text"));
+  expect(mockDb.delValue.mock.calls).toHaveLength(2);
+  expect(mockDb.delValue.mock.calls[1][0]).toBe("simplePage");
+});
+

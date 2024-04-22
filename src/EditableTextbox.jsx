@@ -16,14 +16,14 @@ export default class EditableTextbox extends Component
         pageName = this.props.pageName.slice(this.props.pageName.lastIndexOf(':')+1);
     }
     this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName};
-    this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]};});
+    this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]}});
+    this.props.setCleanupCB(() => this.doCleanup());
     this.data = DS_instance();
     this.textAreaRef = React.createRef();
   }
   
   componentDidMount()
   {
-    DB_instance().addValue("Rex", "Manning");
     this.data.fetchTagList().then((tags) => this.setState({activeTags:new Set(tags)}));
     this.textAreaRef.current.focus()
   }
@@ -52,12 +52,21 @@ export default class EditableTextbox extends Component
 
   onChangeText(ev)
   {
-    this.setState({text: ev.target.value, error:""});
+    this.setText(ev.target.value);
   }
   
   setText(text)
   {
     this.setState({text: text, error:""});
+    if (text === this.props.text) {
+      DB_instance().delValue(this.props.pageName);
+      return;      
+    }
+    DB_instance().addValue(this.props.pageName, text);
+  }
+
+  doCleanup() {
+    DB_instance().delValue(this.props.pageName);
   }
 
   onKeydown(ev) {

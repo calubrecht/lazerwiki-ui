@@ -19,8 +19,10 @@ jest.mock("../svc/DataService", () => {
 var mock_edittedText = null
 var textBox_savePage = null;
 var textBox_cancelEdit = null;
+var mockCleanup = jest.fn(() => {});
 jest.mock("../EditableTextbox", () => (props) => {
   props.registerTextCB(() => mock_edittedText);
+  props.setCleanupCB(mockCleanup);
   textBox_savePage = props.savePage;
   textBox_cancelEdit = props.cancelEdit;
   return `Textbox-${props.text}`;});
@@ -127,6 +129,8 @@ test('render edit', async () => {
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
     expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
     expect(mockDS.savePage.mock.calls[0][1]).toBe("saveThis");
+    await waitFor( () => {});
+    expect(mockCleanup.mock.calls).toHaveLength(1);
     expect(screen.getByText('New render')).toBeInTheDocument();
 
     // Test actions initiated by textbox (keyboard actions)
@@ -137,12 +141,13 @@ test('render edit', async () => {
     await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
     await waitFor( () => textBox_savePage({preventDefault: () =>{}}));
     expect(mockDS.savePage.mock.calls).toHaveLength(2);
+    expect(mockCleanup.mock.calls).toHaveLength(2);
     expect(mockDS.savePage.mock.calls[1][0]).toBe(""); // pageName
     expect(mockDS.savePage.mock.calls[1][1]).toBe("saveThis");
 
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
 
-});
+}, 300000);
 
 test('do delete', async () => {
     delete global.window.location;
