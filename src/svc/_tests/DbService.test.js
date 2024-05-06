@@ -1,5 +1,10 @@
 import DbService, {instance, setInstance} from '../DbService';
+import {setInstance as setUserService} from '../UserService';
 import { waitFor } from '@testing-library/react';
+
+
+
+
 
 test('test instance', ()  => {
   let dbService1 = instance();
@@ -10,6 +15,9 @@ test('test instance', ()  => {
 
 test('test db', async () => {
     let dbService = instance();
+
+    setUserService({getUser: () => {return {userName: "Bob"}}});
+
     let dbValues = {};
     let db = {"put": (val) => dbValues[val.pageName] = val.text, "delete": key => dbValues[key] = null, "get": key=> Promise.resolve({"v": dbValues[key]})};
     dbService.db= {'pageDrafts': db};

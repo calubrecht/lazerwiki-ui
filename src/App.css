@@ -275,3 +275,46 @@ table.lazerTable th {
 table.lazerTable tr:hover {
  background: #ffe0a0;
 }
+
+dialog.dlgOverlay {
+  display: block;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height:100%;
+  width:100%;
+  z-index:1000;
+  background: rgba(0,0,0,.7);
+}
+
+dialog.dlgOverlay div.confirmDlg {
+  display: block;
+  position: absolute;
+  background:  white;
+  border-radius: 10px;
+  border-color:black;
+  border-width: 2px;
+  padding:5px;
+  width: max(600px, 45%);
+  margin:auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+dialog.dlgOverlay div.confirmDlg div.confirmDlgBtns {
+  display: flex;
+
+}
+
+dialog.dlgOverlay div.confirmDlg button.cancel {
+  order: 2;
+  margin:5px;
+  margin-right:auto;
+}
+
+dialog.dlgOverlay div.confirmDlg button.confirm {
+  order: 1;
+  margin:5px;
+  margin-left:auto;
+}

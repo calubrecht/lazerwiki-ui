@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
+import {instance as userInstance} from './UserService';
 
 var INSTANCE = null;
-
 
 export function instance() {
     if (INSTANCE == null) {
@@ -25,7 +25,7 @@ export default class DbService{
 
     addValue(key, value)
     {
-        this.db.pageDrafts.put({pageName: key,text:value, ts: Date.now()});
+        this.db.pageDrafts.put({pageName: key,text:value, user:userInstance().getUser().userName, ts: Date.now()});
     }
 
     delValue(key)
@@ -38,7 +38,7 @@ export default class DbService{
     {
         let promise = this.db.pageDrafts.get(key);
         return promise.then(val => {
-            if (val.ts) {
+            if (val && val.ts) {
               let ts = val.ts;
 
               val.ts= new Date(ts);

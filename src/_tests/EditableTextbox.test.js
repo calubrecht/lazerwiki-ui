@@ -12,6 +12,16 @@ jest.mock("../svc/DataService", () => {
 
 });
 
+
+let close= null;
+let confirm= null;
+
+jest.mock("../ConfirmDialog", () => (props) => {
+  close = props.onCancel;
+  confirm = props.onConfirm;
+  return "ConfirmDlg";
+});
+
 let mockDbGetValuePromise =  Promise.resolve(undefined);
 let mockDb = {
   addValue: jest.fn(() => {}),
@@ -33,16 +43,19 @@ beforeEach(() => {
   mockDbGetValuePromise =  Promise.resolve(undefined);
 });
 
-test('render', () => {
+
+test('render', async() => {
   TAG_LIST.length = 0;  
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} editable={true} />);
 
+  await waitFor(() => {});
 
   expect(screen.getByText("Toolbar--simplePage-Initial Text")).toBeInTheDocument();
   expect(screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0]).toBeInTheDocument();
 
   component.unmount();
   component = render(<EditableTextbox pageName="ns:simplePage" text="Initial Text" registerTextCB= {() => {}}  setCleanupCB= {() => {}} editable={true} />);
+  await waitFor(() => {});
   expect(screen.getByText("Toolbar-ns-simplePage-Initial Text")).toBeInTheDocument();
 
   component.unmount();
@@ -56,7 +69,7 @@ test('edits', async () => {
   TAG_LIST.length = 0;
   let cb = null;
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
-
+  await waitFor(() => {});
   expect(cb().text).toBe("Initial Text");
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
   await user.type(c, "123");
@@ -143,6 +156,7 @@ test('setText', async () => {
   let cb = null;
 
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
+  await waitFor(() => {});
   act( () => setTextCB("Toolbar override"));
   
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
@@ -172,7 +186,7 @@ test('edits reflect in DB', async () => {
   TAG_LIST.length = 0;
   let cb = null;
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
-
+  await waitFor(() => {});
   expect(cb().text).toBe("Initial Text");
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
   await user.type(c, "123");
@@ -202,4 +216,44 @@ test('warn about drafts', async () => {
   mockDbGetValuePromise = Promise.resolve({text: "Some Text", ts: new Date()});
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
 
+});
+
+
+test('render ConfirmDlg', async() => {
+  TAG_LIST.length = 0;  
+  let resolveHook = null;
+  mockDbGetValuePromise = new Promise((resolve, reject) => resolveHook=resolve);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} editable={true} />);
+
+  await waitFor(() => {});
+  expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
+
+  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date("2024-05-05")});
+
+  await waitFor(() => {});
+
+  expect(screen.getByText("ConfirmDlg")).toBeInTheDocument();
+
+  close();
+
+  await waitFor(() => {});
+
+  expect(screen.getByText("Initial Text")).toBeInTheDocument();
+
+  mockDbGetValuePromise = new Promise((resolve, reject) => resolveHook=resolve);
+  render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} editable={true} />);
+
+  await waitFor(() => {});
+  expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
+
+  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date("2024-05-05")});
+
+  await waitFor(() => {});
+
+  confirm();
+
+  await waitFor(() => {});
+
+  expect(screen.getByText("Some Text")).toBeInTheDocument();
+  
 });

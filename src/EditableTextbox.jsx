@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
 import {instance as DB_instance} from './svc/DbService';
 import EditToolbar from './EditToolbar';
+import ConfirmDialog from './ConfirmDialog';
 
 import './EditableTextbox.css';
 
@@ -15,21 +16,27 @@ export default class EditableTextbox extends Component
         namespace = this.props.pageName.slice(0, this.props.pageName.lastIndexOf(':'));
         pageName = this.props.pageName.slice(this.props.pageName.lastIndexOf(':')+1);
     }
-    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName};
+    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName, dbChecked:false};
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]}});
     this.props.setCleanupCB(() => this.doCleanup());
     this.data = DS_instance();
     this.textAreaRef = React.createRef();
+    this.closeDraftConfirmDlg = this.closeDraftConfirmDlg.bind(this);
+    this.restoreDraft = this.restoreDraft.bind(this);
   }
   
   componentDidMount()
   {
-    DB_instance().getValue(this.props.pageName).then(a => {
-      if (a) {
-        console.log("page cached at " + a.ts);
+    DB_instance().getValue(this.props.pageName).then(draftDoc => {
+      if (draftDoc) {
+        console.log("page cached at " + draftDoc.ts);
+        let user = draftDoc.user;
+        this.setState({askUser: true,
+          dbChecked:true, cacheQuestion:"This page was edited by " + user + " at " + draftDoc.ts.toLocaleString() + " and left in a draft state. Do you want to restore the draft or edit state as saved?",
+          draftText: draftDoc.text});
       }
       else {
-        console.log("no cached page");
+        this.setState({dbChecked: true})
       }
 
     });
@@ -39,7 +46,12 @@ export default class EditableTextbox extends Component
 
   render()
   {
-    if (!this.props.editable) {
+    if (this.state.askUser) {
+      return <div><div ><textarea ref={this.textAreaRef} autoFocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>
+      <ConfirmDialog onConfirm={this.restoreDraft} onCancel={this.closeDraftConfirmDlg} displayText={this.state.cacheQuestion} className="confirmDraftDlg" btnNames={["Use Draft", "Discard Draft"]}></ConfirmDialog>
+      </div>;      
+    }
+    if (!this.props.editable || ! this.state.dbChecked) {
       return <div onKeyDown={ev => this.onKeydown(ev)}><textarea ref={this.textAreaRef} autoFocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>;
     }
     return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea ref={this.textAreaRef} autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
@@ -145,5 +157,14 @@ export default class EditableTextbox extends Component
       el.focus();
       this.setState({text: newVal, error:""});
     }
+  }
+
+  closeDraftConfirmDlg() {
+    this.setState({askUser:false})
+  }
+
+  restoreDraft() {
+    this.closeDraftConfirmDlg();
+    this.setState({askUser:false, text:this.state.draftText, draftText: ""})
   }
 }
