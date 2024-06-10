@@ -6,6 +6,8 @@ import ConfirmDialog from './ConfirmDialog';
 
 import './EditableTextbox.css';
 
+const MAX_DRAFT_AGE= 60*60*24*6; // 6 days   // Reduce once have check for overwriting on the server.
+
 export default class EditableTextbox extends Component
 {
   constructor(props) {
@@ -29,6 +31,13 @@ export default class EditableTextbox extends Component
   {
     DB_instance().getValue(this.props.pageName).then(draftDoc => {
       if (draftDoc) {
+        let draftAge = (new Date() - draftDoc.ts) / 1000;
+        if (draftAge > MAX_DRAFT_AGE) {
+          DB_instance().delValue(this.props.pageName);
+          console.log("page cached at " + draftDoc.ts + " is older than max age, discarding");
+          this.setState({dbChecked: true})
+          return;
+        }
         console.log("page cached at " + draftDoc.ts);
         let user = draftDoc.user;
         this.setState({askUser: true,

@@ -212,13 +212,6 @@ test('edits reflect in DB', async () => {
   expect(mockDb.delValue.mock.calls[1][0]).toBe("simplePage");
 });
 
-test('warn about drafts', async () => {
-  mockDbGetValuePromise = Promise.resolve({text: "Some Text", ts: new Date()});
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} />);
-
-});
-
-
 test('render ConfirmDlg', async() => {
   TAG_LIST.length = 0;  
   let resolveHook = null;
@@ -228,7 +221,7 @@ test('render ConfirmDlg', async() => {
   await waitFor(() => {});
   expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
 
-  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date("2024-05-05")});
+  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date()});
 
   await waitFor(() => {});
 
@@ -246,7 +239,7 @@ test('render ConfirmDlg', async() => {
   await waitFor(() => {});
   expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
 
-  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date("2024-05-05")});
+  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date()});
 
   await waitFor(() => {});
 
@@ -256,4 +249,22 @@ test('render ConfirmDlg', async() => {
 
   expect(screen.getByText("Some Text")).toBeInTheDocument();
   
+});
+
+test('old draft doesn\'t show ConfirmDlg', async() => {
+  TAG_LIST.length = 0;  
+  let resolveHook = null;
+  mockDbGetValuePromise = new Promise((resolve, reject) => resolveHook=resolve);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} editable={true} />);
+
+  await waitFor(() => {});
+  expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
+
+  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date("2024-05-04")});
+
+  await waitFor(() => {});
+
+  expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
+
+
 });
