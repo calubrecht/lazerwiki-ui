@@ -2,6 +2,7 @@ import MediaFrame from './MediaFrame';
 import PageFrame from './PageFrame';
 import DrawerLink from './DrawerLink';
 import PageSearchFrame from './PageSearchFrame';
+import RecentChangesFrame from './RecentChangesFrame';
 import {useState} from 'react';
 import {useEffect} from 'react';
 import {instance as DS_instance} from './svc/DataService';
@@ -32,5 +33,6 @@ export default function Toolbar() {
        <DrawerLink title="Search" component={PageSearchFrame} />
        <DrawerLink title="Media List" component={MediaFrame} />
        <DrawerLink title="Page List" component={PageFrame} />
+       <DrawerLink title="Recent Changes" component={RecentChangesFrame} />
       </div>
 }

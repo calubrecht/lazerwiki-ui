@@ -62,6 +62,12 @@ export default class DataService
     return fetch(
       this.baseRequest + 'page/history/' + pageDescriptor).then(this.handleErrors).then(response => response.json());
   }
+
+  fetchRecentChanges()
+  {
+    return fetch(
+      this.baseRequest + 'page/recentChanges').then(this.handleErrors).then(response => response.json());
+  }
   
   fetchPageDiff(pageDescriptor, rev1, rev2)
   {
