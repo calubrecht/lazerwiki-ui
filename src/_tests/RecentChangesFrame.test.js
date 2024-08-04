@@ -30,7 +30,7 @@ test('render empty Pages', async () => {
     await waitFor( () => {});
     expect(screen.getByText('Loading')).toBeInTheDocument();
 
-    act( ()=>resolveHistoryHook({"changes":[]}));
+    act( ()=>resolveHistoryHook({"merged":[]}));
     await waitFor( () => {});
 
     expect(screen.getByText('Recent Changes')).toBeInTheDocument();
@@ -43,10 +43,12 @@ test('render empty Pages', async () => {
 test('render some Pages', async () => {
     let doClose = jest.fn(() => {});
     render(<RecentChangesFrame doClose={doClose} initData=""/> );
-    act( ()=>resolveHistoryHook({"changes": [{pageDesc: {pagename: "Page 1", namespace: '', revision: 5, modifiedBy:"Bob"}, action: "Modified"},
-        {pageDesc: {pagename: "Page 2", namespace: '', revision: 3, modifiedBy:"Bob"}, action: "Deleted"},
-        {pageDesc: {pagename: "PageIn NS", namespace: "ns", revision: 1, modifiedBy:"Bob"}, action: "Created"},
-        {pageDesc: {pagename: "", namespace: '', revision: 5, modifiedBy:"Bob"}, action: "Modified"}
+    act( ()=>resolveHistoryHook({"merged": [{pageDesc: {pagename: "Page 1", namespace: '', revision: 5, modifiedBy:"Bob", modified: "2024-08-01"}, action: "Modified"},
+        {pageDesc: {pagename: "Page 2", namespace: '', revision: 3, modifiedBy:"Bob", modified: "2024-07-02"}, action: "Deleted"},
+        {pageDesc: {pagename: "PageIn NS", namespace: "ns", revision: 1, modifiedBy:"Bob", modified: "2024-06-01"}, action: "Created"},
+        {pageDesc: {pagename: "", namespace: '', revision: 5, modifiedBy:"Bob", modified: "2024-05-01"}, action: "Modified"},
+        {fileName: "img1.jpg", namespace: '', ts:"2023-12-01", uploadedBy: "Jim", action: "Uploaded"},
+        {fileName: "img2.jpg", namespace: 'ns', ts:"2022-12-01", uploadedBy: "Jim", action: "Replaced"},
     
     ]}));
     await waitFor( () => {});
@@ -54,10 +56,12 @@ test('render some Pages', async () => {
     expect(screen.getByText('Recent Changes')).toBeInTheDocument();
     let elel = screen.getByText('Recent Changes');
     await waitFor( () => {});
-    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'Page 1 r5 - Modified by Bob')).toBeInTheDocument();
-    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'Page 2 - Deleted by Bob')).toBeInTheDocument();
-    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'ns:PageIn NS r1 - Created by Bob')).toBeInTheDocument();
-    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === '<ROOT> r5 - Modified by Bob')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'Page 1 r5 - Modified by Bob - 2024-08-01')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'Page 2 - Deleted by Bob - 2024-07-02')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'ns:PageIn NS r1 - Created by Bob - 2024-06-01')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === '<ROOT> r5 - Modified by Bob - 2024-05-01')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'img1.jpg - Uploaded by Jim - 2023-12-01')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element.tagName === 'SPAN' && element.textContent === 'ns:img2.jpg - Replaced by Jim - 2022-12-01')).toBeInTheDocument();
 }, 60000);
 
 const getByTextContent = (text) => {

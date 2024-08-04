@@ -25,6 +25,11 @@ div.recentChangesList a, div.recentChangesList a:visited {
   text-decoration: none;
 }
 
+div.recentChangesList span.ts {
+  color: grey;
+  font-size: smaller;
+}
+
 
 div.recentChangesFrame button.close {
   float:right;

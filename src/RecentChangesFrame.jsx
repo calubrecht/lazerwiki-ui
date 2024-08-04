@@ -53,10 +53,14 @@ export default class RecentChangesFrame extends Component
   }
 
   renderLinkName(p) {
-    if (p.action === "Deleted") {
-        return <span><a href={this.renderLinkURL(p.pageDesc)} >{this.renderPageDesc(p.pageDesc)}</a>{" - " + p.action + " by " + p.pageDesc.modifiedBy}</span>;
+    if (!p.pageDesc) {
+      let name = p.namespace === '' ? p.fileName : p.namespace + ":" + p.fileName;
+      return <span>{name + " - " + p.action + " by " + p.uploadedBy + " - "}<span className="ts">{p.ts}</span></span>;
     }
-    return <span><a href={this.renderLinkURL(p.pageDesc)} >{this.renderPageDesc(p.pageDesc)}</a>{" r" + p.pageDesc.revision + " - " + p.action + " by " + p.pageDesc.modifiedBy}</span>;
+    if (p.action === "Deleted") {
+        return <span><a href={this.renderLinkURL(p.pageDesc)} >{this.renderPageDesc(p.pageDesc)}</a>{" - " + p.action + " by " + p.pageDesc.modifiedBy + " - "}<span className="ts">{p.pageDesc.modified}</span></span>;
+    }
+    return <span><a href={this.renderLinkURL(p.pageDesc)} >{this.renderPageDesc(p.pageDesc)}</a>{" r" + p.pageDesc.revision + " - " + p.action + " by " + p.pageDesc.modifiedBy + " - "}<span className="ts">{p.pageDesc.modified}</span></span>;
   }
 
   renderPageDesc(pageDesc) {
@@ -68,15 +72,23 @@ export default class RecentChangesFrame extends Component
     }
     return pageDesc.pagename;
   }
+  
 
   renderLinkURL(p) {
     let name = p.namespace === '' ? p.pagename : p.namespace + ":" + p.pagename;
     return name === '' ? '/' : '/page/' + name;
   }
 
+  historyKey(i) {
+    if (i.pageDesc) {
+      return i.namespace + ":" + i.pageDesc.pagename + i.pageDesc.revision;
+    }
+    return i.id;
+  }
+
 
   renderList() {
-    let pages = this.state.recentChangesList.changes;
+    let pages = this.state.recentChangesList.merged;
     if (!pages || pages.length == 0) {
       if (this.state.loading) {
         return <div>Loading</div>;
@@ -87,7 +99,7 @@ export default class RecentChangesFrame extends Component
         {pages.map( p => {
           let name = this.renderLinkName(p, first);
           first = false;
-          return <div key={p.pageDesc.pagename + p.pageDesc.revision}>{name}</div>;})}
+          return <div key={this.historyKey(p)}>{name}</div>;})}
 
       </div>);
   }
