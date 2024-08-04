@@ -10,9 +10,10 @@ export default class RecentChangesFrame extends Component
   constructor(props) {
     super(props);
     this.pageName = this.props.initData;
-    this.state = {recentChangesList: {"changes":[]}, loading:true};
+    this.state = {recentChangesList: {"changes":[]}, loading:true, selectedFilter:"All"};
     this.userService = US_instance();
     this.data = DS_instance();
+    this.handleFilterChange = this.handleFilterChange.bind(this);
   }
   
   componentDidMount()
@@ -44,12 +45,25 @@ export default class RecentChangesFrame extends Component
       {this.renderClose()}
 
         <h2 className="title">Recent Changes</h2>
+        {this.renderFilter()}
         {this.renderList()}
     </div>;
   }
 
   renderClose() {
     return <button className="close button-unstyled" onClick={() => this.props.doClose()}>X</button>
+  }
+
+  renderRadio(value) {
+    return <label key={value}><input type="radio" value={value} checked={this.state.selectedFilter===value} onChange={this.handleFilterChange} />{value}</label>
+  }
+
+  renderFilter() {
+    return <div className="recentChangesFilter">
+      {this.renderRadio('All')}
+      {this.renderRadio('Pages')}
+      {this.renderRadio('Media')}
+      </div>
   }
 
   renderLinkName(p) {
@@ -88,7 +102,8 @@ export default class RecentChangesFrame extends Component
 
 
   renderList() {
-    let pages = this.state.recentChangesList.merged;
+    let pages = this.state.selectedFilter === 'All' ? this.state.recentChangesList.merged :
+      (this.state.selectedFilter === 'Pages' ? this.state.recentChangesList.changes : this.state.recentChangesList.mediaChanges);
     if (!pages || pages.length == 0) {
       if (this.state.loading) {
         return <div>Loading</div>;
@@ -99,9 +114,12 @@ export default class RecentChangesFrame extends Component
         {pages.map( p => {
           let name = this.renderLinkName(p, first);
           first = false;
-          return <div key={this.historyKey(p)}>{name}</div>;})}
+          return <div className="recentChangesItem" key={this.historyKey(p)}>{name}</div>;})}
 
       </div>);
   }
 
+  handleFilterChange(ev) {
+    this.setState({selectedFilter: ev.target.value});
+  }
 }

@@ -1,7 +1,6 @@
 div.toolbar div.recentChangesFrame {
   position:absolute;
-  width:600px;
-  height:500px;
+  width:615px;
   left: 152px;
   top: 10px;
   background:white;
@@ -13,9 +12,9 @@ div.toolbar div.recentChangesFrame {
 div.recentChangesList  {
   overflow-y: auto;
   overflow-x: hidden;
-  height:380px;
+  max-height:600px;
   width:550px;
-  margin-left: 1.5em;
+  margin: 1.5em;
   border: 1px solid black;
   padding:.5em;
 }
@@ -36,4 +35,12 @@ div.recentChangesFrame button.close {
   margin:1px 3px;
   color: red;
   font-weight: bold;
+}
+
+div.recentChangesFilter {
+  margin:1em;  
+}
+
+div.recentChangesItem {
+  margin-bottom: .3em;
 }

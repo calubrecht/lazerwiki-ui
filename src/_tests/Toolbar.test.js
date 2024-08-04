@@ -10,12 +10,13 @@ var ds = {
   };
   
   jest.mock("../DrawerLink", () => (props) => {
-    return <div className="Drawer">{props.component}</div>;
+    return <div className="Drawer"><props.component /></div>
   });
 
-  jest.mock("../PageSearchFrame", () => "PageSearchFrame");
-  jest.mock("../MediaFrame", () => "MediaFrame");
-  jest.mock("../PageFrame", () => "PageFrame");
+  jest.mock("../PageSearchFrame", () => (props) => <div>PageSearchFrame</div>);
+  jest.mock("../MediaFrame", () => (props) =><div>MediaFrame"</div>);
+  jest.mock("../PageFrame", () => (props) => <div>PageFrame</div>);
+  jest.mock("../RecentChangesFrame", () => (props) => <div>RecentChangesFrame</div>);
 
   test('renders ', async () => {
     set_DS_instance(ds);
