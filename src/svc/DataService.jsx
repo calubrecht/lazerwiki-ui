@@ -113,6 +113,13 @@ export default class DataService
          headers: this.getPostHeaders() }).then(response => response.json());
   }
 
+  clearLock(pageDescriptor, pageLockId) {
+    return fetch(
+      this.baseRequest + 'page/releaseLock/' + pageDescriptor + '/id/' + pageLockId,
+       {method: 'post', credentials: 'include',
+         headers: this.getPostHeaders() });
+  }
+
   getUIVersion()
   {
     return fetch('/meta.json')

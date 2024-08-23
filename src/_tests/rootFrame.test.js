@@ -20,9 +20,11 @@ var mock_edittedText = null
 var textBox_savePage = null;
 var textBox_cancelEdit = null;
 var mockCleanup = jest.fn(() => {});
+var mockCancel = jest.fn(() => {});
 jest.mock("../EditableTextbox", () => (props) => {
   props.registerTextCB(() => mock_edittedText);
   props.setCleanupCB(mockCleanup);
+  props.setCancelCB(mockCancel);
   textBox_savePage = props.savePage;
   textBox_cancelEdit = props.cancelEdit;
   return `Textbox-${props.text}`;});
@@ -122,6 +124,7 @@ test('render edit', async () => {
 
     await userEvent.click(screen.getByRole('button', {name:"Cancel"}));
  
+    expect(mockCancel.mock.calls).toHaveLength(1);
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
     await userEvent.click(screen.getByRole('button', {name:"Save Page"}));

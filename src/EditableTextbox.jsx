@@ -21,6 +21,7 @@ export default class EditableTextbox extends Component
     this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName, dbChecked:false};
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]}});
     this.props.setCleanupCB(() => this.doCleanup());
+    this.props.setCancelCB(() => this.doCancel());
     this.data = DS_instance();
     this.textAreaRef = React.createRef();
     this.closeDraftConfirmDlg = this.closeDraftConfirmDlg.bind(this);
@@ -31,7 +32,6 @@ export default class EditableTextbox extends Component
   {
     if (this.props.editable) {
       this.getPageLock(() => this.checkDraftPage(), this.props.cancelEdit);
-     // this.checkDraftPage();
     }
     else {
       this.setState({ dbChecked: true });
@@ -52,8 +52,8 @@ export default class EditableTextbox extends Component
         console.log("Err, got crap" + lockResponse);
         this.setState({askUser: true, userQuestion: "This page was locked on " + lockResponse.lockTime + " by " + lockResponse.owner + ". Editing this page could risk overwriting their changes",
           action: () => {
-            DS_instance().overrideLock(this.props.pageName).then(lockRepsonse => {
-              this.setLock(lockResponse);
+            DS_instance().overrideLock(this.props.pageName).then(overrideResponse => {
+              this.setLock(overrideResponse);
               successAction();
             });
           },
@@ -90,7 +90,7 @@ export default class EditableTextbox extends Component
         });
       }
       else {
-        this.setState({ dbChecked: true });
+        this.setState({askUser:false, dbChecked: true });
       }
 
     });
@@ -144,6 +144,12 @@ export default class EditableTextbox extends Component
 
   doCleanup() {
     DB_instance().delValue(this.props.pageName);
+  }
+
+  doCancel() {
+    if (this.state.lockId) {
+      DS_instance().clearLock(this.props.pageName, this.state.lockId);
+    }
   }
 
   onKeydown(ev) {
