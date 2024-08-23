@@ -49,7 +49,6 @@ export default class EditableTextbox extends Component
         successAction();
       }
       else {
-        console.log("Err, got crap" + lockResponse);
         this.setState({askUser: true, userQuestion: "This page was locked on " + lockResponse.lockTime + " by " + lockResponse.owner + ". Editing this page could risk overwriting their changes",
           action: () => {
             DS_instance().overrideLock(this.props.pageName).then(overrideResponse => {

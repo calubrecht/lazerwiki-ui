@@ -5,7 +5,8 @@ import EditableTextbox from '../EditableTextbox';
 
 var TAG_LIST = [];
 var TAG_PROMISE = new Promise(() => {});  //(() => Promise.resolve({flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[]})
-let mockDS = {fetchTagList: () => TAG_PROMISE, getPageLock: () => Promise.resolve({success:true, pageLockId: '101'})};
+var LOCK_PROMISE =  Promise.resolve({success:true, pageLockId: '101'})
+let mockDS = {fetchTagList: () => TAG_PROMISE, getPageLock: () => LOCK_PROMISE, overrideLock: () => LOCK_PROMISE, clearLock: jest.fn(() => {})};
 
 jest.mock("../svc/DataService", () => {
     return {instance: () => mockDS};
@@ -41,6 +42,7 @@ jest.mock("../EditToolbar", () => (props) =>{
 
 beforeEach(() => {
   mockDbGetValuePromise =  Promise.resolve(undefined);
+  mockDS = {fetchTagList: () => TAG_PROMISE, getPageLock: () => LOCK_PROMISE, overrideLock: () => LOCK_PROMISE, clearLock: jest.fn(() => {})};
 });
 
 
@@ -249,6 +251,26 @@ test('render ConfirmDlg', async() => {
 
   expect(screen.getByText("Some Text")).toBeInTheDocument();
   
+});
+
+test('failed lock', async() => {
+  mockDS.getPageLock = () =>  Promise.resolve({success:false, owner:'Jerk', lockTime:"2024-08-23T01:24:24.695815944"});
+  let cancelCB = null;
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} setCancelCB={(cb) => {cancelCB=cb}} editable={true} />);
+
+  await waitFor(() => {});
+  expect(screen.queryByText("ConfirmDlg")).toBeInTheDocument();
+
+  cancelCB();
+  expect(mockDS.clearLock.mock.calls).toHaveLength(0);
+
+  confirm();
+
+  await waitFor(() => {});
+  expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
+
+  cancelCB();
+  expect(mockDS.clearLock.mock.calls).toHaveLength(1);
 });
 
 test('old draft doesn\'t show ConfirmDlg', async() => {
