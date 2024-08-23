@@ -99,6 +99,20 @@ export default class DataService
       this.baseRequest + 'page/listTags').then(this.handleErrors).then(response => response.json());
   }
 
+  getPageLock(pageDescriptor) {
+    return fetch(
+      this.baseRequest + 'page/lock/' + pageDescriptor,
+       {method: 'post', credentials: 'include',
+         headers: this.getPostHeaders() }).then(response => response.json());
+  }
+
+  overrideLock(pageDescriptor) {
+    return fetch(
+      this.baseRequest + 'page/lock/' + pageDescriptor + "?overrideLock=true",
+       {method: 'post', credentials: 'include',
+         headers: this.getPostHeaders() }).then(response => response.json());
+  }
+
   getUIVersion()
   {
     return fetch('/meta.json')

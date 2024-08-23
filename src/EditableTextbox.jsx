@@ -29,35 +29,78 @@ export default class EditableTextbox extends Component
   
   componentDidMount()
   {
+    if (this.props.editable) {
+      this.getPageLock(() => this.checkDraftPage(), this.props.cancelEdit);
+     // this.checkDraftPage();
+    }
+    else {
+      this.setState({ dbChecked: true });
+    }
+
+    this.data.fetchTagList().then((tags) => this.setState({activeTags:new Set(tags)}));
+    this.textAreaRef.current.focus()
+  }
+
+  getPageLock(successAction, cancelAction) {
+    DS_instance().getPageLock(this.props.pageName).then(lockResponse => {
+      if (lockResponse.success) {
+        this.setLock(lockResponse);
+        //startLockTimer(lockResponse);  // What to do if page lock expires while page open? Turn to read only mode, add mesage and allow try to reacqire lock. if revision changed....copy current text to clipboard?
+        successAction();
+      }
+      else {
+        console.log("Err, got crap" + lockResponse);
+        this.setState({askUser: true, userQuestion: "This page was locked on " + lockResponse.lockTime + " by " + lockResponse.owner + ". Editing this page could risk overwriting their changes",
+          action: () => {
+            DS_instance().overrideLock(this.props.pageName).then(lockRepsonse => {
+              this.setLock(lockResponse);
+              successAction();
+            });
+          },
+          cancelAction: cancelAction, btnNames: ["Override Lock", "Cancel Edit"], });
+      }
+    });
+  }
+
+  // checkRevision(lockResponse, successAction, cancelAction) {
+  //
+  //}
+
+
+  checkDraftPage() {
+    // Add revision to draft cache.... extra warning if draft was based on outdated revision
     DB_instance().getValue(this.props.pageName).then(draftDoc => {
       if (draftDoc) {
         let draftAge = (new Date() - draftDoc.ts) / 1000;
         if (draftAge > MAX_DRAFT_AGE) {
           DB_instance().delValue(this.props.pageName);
-          console.log("page cached at " + draftDoc.ts + " is older than max age, discarding");
-          this.setState({dbChecked: true})
+          console.log("page cached at " + draftDoc.ts + " is older than max age, discarding");  
+          this.setState({ dbChecked: true });
           return;
         }
         console.log("page cached at " + draftDoc.ts);
         let user = draftDoc.user;
-        this.setState({askUser: true,
-          dbChecked:true, cacheQuestion:"This page was edited by " + user + " at " + draftDoc.ts.toLocaleString() + " and left in a draft state. Do you want to restore the draft or edit state as saved?",
-          draftText: draftDoc.text});
+        this.setState({
+          askUser: true,
+          dbChecked: true, userQuestion: "This page was edited by " + user + " at " + draftDoc.ts.toLocaleString() + " and left in a draft state. Do you want to restore the draft or edit state as saved?",
+          draftText: draftDoc.text,
+          btnNames: ["Use Draft", "Discard Draft"],
+          action: this.restoreDraft,
+          cancelAction: this.closeDraftConfirmDlg
+        });
       }
       else {
-        this.setState({dbChecked: true})
+        this.setState({ dbChecked: true });
       }
 
     });
-    this.data.fetchTagList().then((tags) => this.setState({activeTags:new Set(tags)}));
-    this.textAreaRef.current.focus()
   }
 
   render()
   {
     if (this.state.askUser) {
       return <div><div ><textarea ref={this.textAreaRef} autoFocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>
-      <ConfirmDialog onConfirm={this.restoreDraft} onCancel={this.closeDraftConfirmDlg} displayText={this.state.cacheQuestion} className="confirmDraftDlg" btnNames={["Use Draft", "Discard Draft"]}></ConfirmDialog>
+      <ConfirmDialog onConfirm={this.state.action} onCancel={this.state.cancelAction} displayText={this.state.userQuestion} className="confirmDraftDlg" btnNames={this.state.btnNames}></ConfirmDialog>
       </div>;      
     }
     if (!this.props.editable || ! this.state.dbChecked) {
@@ -93,6 +136,10 @@ export default class EditableTextbox extends Component
       return;      
     }
     DB_instance().addValue(this.props.pageName, text);
+  }
+
+  setLock(lockResponse) {
+    this.setState({lockId: lockResponse.pageLockId});
   }
 
   doCleanup() {
