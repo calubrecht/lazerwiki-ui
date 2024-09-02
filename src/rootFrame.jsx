@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DataService, {instance as DS_instance} from './svc/DataService';
+import {instance as RES_instance} from './svc/RenderEnhancerService';
 import PageSearchFrame from './PageSearchFrame';
 import PreviewFrame from './PreviewFrame';
 import EditableTextbox from './EditableTextbox';
@@ -33,6 +34,7 @@ export default class RootFrame extends Component
     this.data = DS_instance();
     this.imgDlgRef = React.createRef();
     this.delDlgRef = React.createRef();
+    this.rootRef = React.createRef();
   }
 
   componentDidMount()
@@ -46,6 +48,7 @@ export default class RootFrame extends Component
     this.data.getSiteName().then(res => {
       this.setState({siteTitle:res});
       document.title = res + " - " + this.state.pageTitle;});
+    RES_instance().enhanceRenderedCode(this.rootRef.current);
   }
 
   componentWillUnmount() {
@@ -90,7 +93,7 @@ export default class RootFrame extends Component
     let createAction = this.state.pageData.flags.exists ? "Edit Page" : "Create Page";
     let className= "RootBody" + (this.state.pageData.id  ? (" p" + this.state.pageData.id) : "");
     if (this.state.stage === 'viewing') {
-      return <div className="RootFrame">
+      return <div className="RootFrame" ref={this.rootRef}>
         {this.renderDeleteDialog() }
         {this.renderImgDialog() }
         { this.renderMenu(createAction) }
@@ -100,7 +103,7 @@ export default class RootFrame extends Component
         { this.renderTagSearch() }
         </div>;
     }
-      return <div className="RootFrame">      
+      return <div className="RootFrame" ref={this.rootRef}>
       <div className="RootMenu">{this.state.stage === 'editing' && <button className="rootMenuButton button-unstyled" onClick={ev => this.savePage(ev)}>Save Page</button>}<button className="rootMenuButton button-unstyled" onClick={ev => this.cancelEdit(ev)}>Cancel</button>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} setCleanupCB={data => this.setCleanupCB(data)} setCancelCB={data => this.setCancelCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName}/> </div>
       </div>;

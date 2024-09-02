@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import HTMLReactParser from 'html-react-parser';
+import {instance as RES_instance} from './svc/RenderEnhancerService';
 
 import './PreviewFrame.css';
 
@@ -9,6 +10,7 @@ export default class PreviewFrame extends Component
     super(props);
     this.state = {pageData: {rendered: ''}};
     props.initData.initFnc().then( (data) => this.setState({pageData:data}));
+    this.previewRef = React.createRef();
   }
 
   render()
@@ -22,6 +24,10 @@ export default class PreviewFrame extends Component
   }
 
   renderPage() {
-    return <div className="previewFrameContent"> {HTMLReactParser(this.state.pageData.rendered)}</div>  
+    return <div className="previewFrameContent" ref={this.previewRef}> {HTMLReactParser(this.state.pageData.rendered)}</div>
+  }
+
+  componentDidMount() {
+    RES_instance().enhanceRenderedCode(this.previewRef.current);
   }
 }
