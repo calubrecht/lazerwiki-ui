@@ -318,3 +318,12 @@ dialog.dlgOverlay div.confirmDlg button.confirm {
   margin:5px;
   margin-left:auto;
 }
+
+div.hidden input[type='checkbox'].toggle {appearance: none; display:none}
+.hdn-toggle { display: block; font-style: italic; font-family: monospace; font-size: 1.2rem; padding: 0 1rem; cursor: pointer; transition: all 0.25s ease-out; }
+.hdn-toggle::before { content: ' '; display: inline-block; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid currentColor; vertical-align: middle; margin-right: .7rem; transform: translateY(-2px); transition: transform .2s ease-out; }
+.toggle:checked+.hdn-toggle::before { transform: rotate(90deg) translateX(-3px); }
+.collapsible { max-height: 0px; overflow: hidden; transition: max-height .25s ease-in-out; color: #888888}
+.toggle:checked + .hdn-toggle + .collapsible { max-height: unset}
+
+div.hidden {border: black 1px solid; padding: 0 1rem}
