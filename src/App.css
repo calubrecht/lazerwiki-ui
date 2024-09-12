@@ -327,3 +327,31 @@ div.hidden input[type='checkbox'].toggle {appearance: none; display:none}
 .toggle:checked + .hdn-toggle + .collapsible { max-height: unset}
 
 div.hidden {border: black 1px solid; padding: 0 1rem}
+
+@media only screen and (max-height: 440px) {
+  div#toolbar {
+    top: 50px;
+  }
+  
+  div#toolbar div.pageFrame {
+    position:absolute;
+    width:500px;
+    height:280px;
+    overflow-y: auto;
+  }
+  
+  div#toolbar div.pageSearchFrame {
+    position:absolute;
+    width:500px;
+    height:280px;
+    overflow-y: auto;
+  }
+  
+  div#toolbar div.mediaFrame {
+    position:absolute;
+    width:500px;
+    height:280px;
+    overflow-y: auto;
+    top: 0px;
+  }
+}
