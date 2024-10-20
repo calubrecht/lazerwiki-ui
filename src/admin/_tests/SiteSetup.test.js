@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import { render, screen, getByRole, act, waitFor, queryByAttribute } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SiteSetup from '../SiteSetup';
 
@@ -73,4 +73,42 @@ test('addSite', async () => {
   mockDS.addSite = jest.fn(() => Promise.reject("Server error"));
   await userEvent.keyboard("NewSite[TAB]New Site[TAB]newsite.com[ENTER]");
   expect(console.log.mock.calls[0][0]).toBe("Server error");
+});
+
+test('deleteSite', async () => {
+  let setSitesCB = jest.fn(() => {});
+  render(<SiteSetup activeSites={[{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}]} setSites={setSitesCB}/>);
+  
+  let sitesRes = [{siteName:"Site 1", site:"site1"}];
+  mockDS.deleteSite = jest.fn(() => Promise.resolve(sitesRes)); 
+  
+  await userEvent.selectOptions(screen.getByTestId('siteList'), 'Site 2');
+  await userEvent.click(screen.getByRole("button", {name: "Delete Site"}));
+
+  let dlg= document.getElementsByClassName("confirmDeleteDialog")[0];
+  dlg.open = true;
+
+  await userEvent.click(getByRole(dlg, "button", {name: "Cancel"}));
+  expect(mockDS.deleteSite.mock.calls).toHaveLength(0);
+
+  await userEvent.click(getByRole(dlg, "button", {name: "Delete Site"}));
+  expect(mockDS.deleteSite.mock.calls).toHaveLength(0); // Delete doesn't work if what site name not entered
+
+  let siteInput = screen.getByLabelText("Site Name:");
+  await(siteInput.focus());
+  await userEvent.keyboard("Site 2");
+  await waitFor( () => {});
+  await userEvent.click(getByRole(dlg, "button", {name: "Delete Site"}));
+  expect(mockDS.deleteSite.mock.calls).toHaveLength(1);
+  expect(mockDS.deleteSite.mock.calls[0][0]).toBe("Site 2");
+
+  expect(setSitesCB.mock.calls[0][0]).toStrictEqual(sitesRes);
+
+    // test error
+    await(siteInput.focus());
+    console.log = jest.fn(() => {});
+    mockDS.deleteSite = jest.fn(() => Promise.reject("Server error"));
+    await userEvent.keyboard("Site 2");
+    await userEvent.click(getByRole(dlg, "button", {name: "Delete Site"}));
+    expect(console.log.mock.calls[0][0]).toBe("Server error");
 });

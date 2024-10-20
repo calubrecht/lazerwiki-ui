@@ -310,9 +310,17 @@ export default class DataService
          headers: this.getPostHeaders()})
          .then(this.handleErrors)
          .then(res => res.json());
-
   }
 
+  deleteSite(siteName) {
+    return fetch(
+      this.baseRequest + "admin/site/" + siteName ,
+       {method: 'delete', credentials: 'include',
+         headers: {'x-xsrf-token': this.getTokenCookie() }})
+         .then(this.handleErrors)
+         .then(res => res.json());
+  
+  }
 
   getTokenCookie()
   {
