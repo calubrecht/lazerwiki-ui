@@ -40,10 +40,18 @@ jest.mock("../EditToolbar", () => (props) =>{
   setTextCB = props.setText;
   return "Toolbar-" + props.namespace + "-" + props.pageName + "-" + props.getCurrentText();});
 
+MOCK_CONSOLE = jest.fn(() => {});
+let REAL_CONSOLE = console.log;
+
 beforeEach(() => {
   mockDbGetValuePromise =  Promise.resolve(undefined);
   mockDS = {fetchTagList: () => TAG_PROMISE, getPageLock: () => LOCK_PROMISE, overrideLock: () => LOCK_PROMISE, clearLock: jest.fn(() => {})};
+  console.log= MOCK_CONSOLE;
 });
+
+afterEach(() => {
+  console.log= REAL_CONSOLE;
+})
 
 
 test('render', async() => {
@@ -95,11 +103,11 @@ test('keyActions', async () => {
   let cancelEdit = jest.fn(() => {});
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} setCancelCB={() => {}} savePage={savePage} cancelEdit={cancelEdit} />);
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
-  await fireEvent.keyDown(c, { key: 's', ctrlKey: true});
+  act(() =>fireEvent.keyDown(c, { key: 's', ctrlKey: true}));
   
   expect(savePage.mock.calls).toHaveLength(1);
 
-  await fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true});
+  act(() => fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true}));
   expect(cancelEdit.mock.calls).toHaveLength(1);
 
   await user.keyboard('{Escape}');
@@ -108,7 +116,7 @@ test('keyActions', async () => {
   component.unmount();
   render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} setCancelCB={() => {}} editable={false} cancelEdit={cancelEdit} />);
   c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
-  await fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true});
+  act(() => fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true}));
   expect(cancelEdit.mock.calls).toHaveLength(3);
 });
 
@@ -173,9 +181,9 @@ test('cleanup', async () => {
   TAG_PROMISE = new Promise(() => {});
   let cb = null;
 
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}}  setCleanupCB= {(cleanupCb) => {cb = cleanupCb}} setCancelCB={() => {}} editable={true} />);
- 
-  cb();
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}}  setCleanupCB= {(cleanupCb) => {cb = cleanupCb}} setCancelCB={() => {}} editable={true}/>);
+  await waitFor(() => {});
+  act (() => cb());
   expect(mockDb.delValue.mock.calls).toHaveLength(1);
   expect(mockDb.delValue.mock.calls[0][0]).toBe("simplePage");
 });
@@ -223,13 +231,13 @@ test('render ConfirmDlg', async() => {
   await waitFor(() => {});
   expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
 
-  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date()});
+  act( () => resolveHook({user: "Bob", "text": "Some Text", "ts": new Date()}));
 
   await waitFor(() => {});
 
   expect(screen.getByText("ConfirmDlg")).toBeInTheDocument();
 
-  close();
+  act(() => close());
 
   await waitFor(() => {});
 
@@ -241,11 +249,11 @@ test('render ConfirmDlg', async() => {
   await waitFor(() => {});
   expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
 
-  resolveHook({user: "Bob", "text": "Some Text", "ts": new Date()});
+  act( () =>resolveHook({user: "Bob", "text": "Some Text", "ts": new Date()}));
 
   await waitFor(() => {});
 
-  confirm();
+  act( () => confirm());
 
   await waitFor(() => {});
 
@@ -254,9 +262,9 @@ test('render ConfirmDlg', async() => {
 });
 
 test('failed lock', async() => {
-  mockDS.getPageLock = () =>  Promise.resolve({success:false, owner:'Jerk', lockTime:"2024-08-23T01:24:24.695815944"});
+  mockDS.getPageLock = () =>  Promise.resolve({success:false, owner:'Jerk', lockTime:"2024-08-23T01:24:24.695815944", revision:10});
   let cancelCB = null;
-  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} setCancelCB={(cb) => {cancelCB=cb}} editable={true} />);
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} setCancelCB={(cb) => {cancelCB=cb}} editable={true} revision={10}/>);
 
   await waitFor(() => {});
   expect(screen.queryByText("ConfirmDlg")).toBeInTheDocument();
@@ -289,4 +297,24 @@ test('old draft doesn\'t show ConfirmDlg', async() => {
   expect(screen.queryByText("ConfirmDlg")).not.toBeInTheDocument();
 
 
+});
+
+test('Lock shows revision update', async() => {
+  TAG_LIST.length = 0;
+  TAG_LIST.push('t1');
+  TAG_LIST.push('t2');
+  TAG_LIST.push('t3');
+  TAG_PROMISE = Promise.resolve(TAG_LIST);
+  mockDS.getPageLock = () =>  Promise.resolve({success:true, owner:'Jerk', lockTime:"2024-08-23T01:24:24.695815944", revision:10});
+  mockDS.fetchPage = jest.fn(() => Promise.resolve({source:"NewPageSource", revision:10, tags:["t1","t2"], title:"NewTitle"}))
+
+  let cancelCB = null;
+  let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {() => {}} setCleanupCB= {() => {}} setCancelCB={(cb) => {cancelCB=cb}} editable={true} revision={9} tags={["t3"]}/>);
+
+
+  await waitFor(() => {});
+
+  // Component should have loaded new and used new page data.
+  //expect(mockDS.fetchPage.mock.calls).toHaveLength(1);
+  expect(screen.getByText("Toolbar--simplePage-NewPageSource")).toBeInTheDocument();
 });

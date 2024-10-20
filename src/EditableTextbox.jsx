@@ -18,7 +18,9 @@ export default class EditableTextbox extends Component
         namespace = this.props.pageName.slice(0, this.props.pageName.lastIndexOf(':'));
         pageName = this.props.pageName.slice(this.props.pageName.lastIndexOf(':')+1);
     }
-    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName, dbChecked:false};
+    this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName, dbChecked:false,
+      revisionChecked:false
+    };
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]}});
     this.props.setCleanupCB(() => this.doCleanup());
     this.props.setCancelCB(() => this.doCancel());
@@ -31,7 +33,7 @@ export default class EditableTextbox extends Component
   componentDidMount()
   {
     if (this.props.editable) {
-      this.getPageLock(() => this.checkDraftPage(), this.props.cancelEdit);
+      this.getPageLock((lockResponse) => this.checkDraftPage(lockResponse, (lockResponse) => this.checkPageRevision(lockResponse)), this.props.cancelEdit);
     }
     else {
       this.setState({ dbChecked: true });
@@ -46,14 +48,14 @@ export default class EditableTextbox extends Component
       if (lockResponse.success) {
         this.setLock(lockResponse);
         //startLockTimer(lockResponse);  // What to do if page lock expires while page open? Turn to read only mode, add mesage and allow try to reacqire lock. if revision changed....copy current text to clipboard?
-        successAction();
+        successAction(lockResponse);
       }
       else {
         this.setState({askUser: true, userQuestion: "This page was locked on " + lockResponse.lockTime + " by " + lockResponse.owner + ". Editing this page could risk overwriting their changes",
           action: () => {
             DS_instance().overrideLock(this.props.pageName).then(overrideResponse => {
               this.setLock(overrideResponse);
-              successAction();
+              successAction(lockResponse);
             });
           },
           cancelAction: cancelAction, btnNames: ["Override Lock", "Cancel Edit"], });
@@ -61,20 +63,16 @@ export default class EditableTextbox extends Component
     });
   }
 
-  // checkRevision(lockResponse, successAction, cancelAction) {
-  //
-  //}
-
-
-  checkDraftPage() {
+  checkDraftPage(lockResponse, successAction) {
     // Add revision to draft cache.... extra warning if draft was based on outdated revision
     DB_instance().getValue(this.props.pageName).then(draftDoc => {
       if (draftDoc) {
         let draftAge = (new Date() - draftDoc.ts) / 1000;
         if (draftAge > MAX_DRAFT_AGE) {
           DB_instance().delValue(this.props.pageName);
-          console.log("page cached at " + draftDoc.ts + " is older than max age, discarding");  
+          console.log("page cached at " + draftDoc.ts + " is older than max age, discarding");
           this.setState({ dbChecked: true });
+          successAction(lockResponse);
           return;
         }
         console.log("page cached at " + draftDoc.ts);
@@ -90,9 +88,23 @@ export default class EditableTextbox extends Component
       }
       else {
         this.setState({askUser:false, dbChecked: true });
+        successAction(lockResponse);
       }
 
     });
+  }
+
+  checkPageRevision(lockResponse) {
+    if (lockResponse.revision == this.props.revision) {
+      this.setState({ revisionChecked: true });
+    }
+    else {
+      DS_instance().fetchPage(this.props.pageName).then(pageData => {
+        console.log("loaded page out of date, reloaded revision " + pageData.revision);
+        this.setState({ revisionChecked: true, text:pageData.source, tags:new Set(pageData.tags) });
+      });
+    }
+
   }
 
   render()
@@ -102,7 +114,7 @@ export default class EditableTextbox extends Component
       <ConfirmDialog onConfirm={this.state.action} onCancel={this.state.cancelAction} displayText={this.state.userQuestion} className="confirmDraftDlg" btnNames={this.state.btnNames}></ConfirmDialog>
       </div>;      
     }
-    if (!this.props.editable || ! this.state.dbChecked) {
+    if (!this.props.editable || ! this.state.dbChecked || !this.state.revisionChecked) {
       return <div onKeyDown={ev => this.onKeydown(ev)}><textarea ref={this.textAreaRef} autoFocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>;
     }
     return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea ref={this.textAreaRef} autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
