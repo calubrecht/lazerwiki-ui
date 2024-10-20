@@ -11,7 +11,7 @@ export default class EditToolbar extends Component
 {
   constructor(props) {
     super(props);
-    this.state= {showFrame: null};
+    this.state= {showFrame: null, selectedBtn: null};
     this.buttons = [
       {name:"Add Header", icon:"header.png", click:() => {
          let area = this.getTextArea();
@@ -45,11 +45,19 @@ export default class EditToolbar extends Component
          this.replaceSelectionText(startNLIfNeeded + listLevel + '*', '\n', 'List Item');
       }},
       {name:"Page Link", icon:"addPage.png", click:() => {
-        this.setState({showFrame:PageFrame, selectItem:p => this.addPageLink(p)});
+        if (this.state.selectedBtn === 'Page Link') {
+          this.clearFrame();
+          return;
+        }
+        this.setState({selectedBtn: "Page Link", showFrame:PageFrame, selectItem:p => this.addPageLink(p)});
       }},
       {name:"Image", icon:"addImage.png", click:() => {
-        this.setState({showFrame:MediaFrame, selectItem: p => this.addImageLink(p)});
-      }},
+        if (this.state.selectedBtn === 'Image') {
+          this.clearFrame();
+          return;
+        }
+        this.setState({selectedBtn: "Image", showFrame:MediaFrame, selectItem: p => this.addImageLink(p)});
+      }}
       
     ];
     let pluginActions = LAZERWIKI_PLUGINS;
@@ -104,8 +112,10 @@ export default class EditToolbar extends Component
   }
 
   renderButtons() {
-    return this.buttons.map( (def) => <button className="toolbar-button button-unstyled" onClick={def.click} title={def.name} key={def.name}>
-      <img src={"/_resources/" + def.icon} alt={def.name}/></button>);
+    return this.buttons.map( (def) => {
+      let className = "toolbar-button button-unstyled" + (this.state.selectedBtn == def.name ? " open" :"");
+      return <button className={className} onClick={def.click} title={def.name} key={def.name}>
+      <img src={"/_resources/" + def.icon} alt={def.name}/></button>; });
 
   }
 
@@ -113,7 +123,7 @@ export default class EditToolbar extends Component
     if (!this.state.showFrame) {
       return ;
     }
-    return <this.state.showFrame doClose={() => this.setState({showFrame: null})} selectItem={this.state.selectItem} namespace={this.props.namespace}/>
+    return <this.state.showFrame doClose={() => this.clearFrame()} selectItem={this.state.selectItem} namespace={this.props.namespace}/>
   }
 
   
@@ -150,13 +160,17 @@ export default class EditToolbar extends Component
   }
 
   addPageLink(p) {
-    this.setState({showFrame:null});
+    this.clearFrame();
     this.replaceSelectionText('[[' + p + '|', ']]', '');
   }
   
   addImageLink(i) {
-    this.setState({showFrame:null});
+    this.clearFrame();
     this.replaceSelectionText('{{' + i + '|', '}}', '');
+  }
+
+  clearFrame() {
+    this.setState({showFrame:null, selectedBtn: null});
   }
   
   getPreviousLine(text, start) {

@@ -252,6 +252,26 @@ test('pageFrame', async () => {
 
 });
 
+test('pageFrame clicking button again closes', async () => {
+  let currentText = "";
+  let getCurrentText = () => currentText;
+  let text = "";
+  let setText = t => text=t;
+
+  render (<div><EditToolbar getCurrentText = {getCurrentText} setText={setText}/><textarea id="pageSource"></textarea></div>);
+  let ta = screen.getByRole("textbox");
+  ta.value = currentText;
+  let max = currentText.length;
+
+  let btn = screen.getByRole("button", {name:"Page Link"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  expect(screen.getByText("PageFrame")).toBeInTheDocument();
+
+  await userEvent.click(btn);
+  expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
+});
+
 jest.mock("../MediaFrame", () => (props) => {
   callSelectItem = (item) => props.selectItem(item);
   doFrameClose = props.doClose;
@@ -275,7 +295,7 @@ test('mediaFrame', async () => {
   expect(screen.getByText("MediaFrame")).toBeInTheDocument();
 
   await act( () => callSelectItem("newImage"));
-  expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
+  expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 
   
   expect(text).toBe("{{newImage|}}");
@@ -284,6 +304,26 @@ test('mediaFrame', async () => {
   await act(() => doFrameClose());
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 
+});
+
+test('mediaFrame clicking button again closes', async () => {
+  let currentText = "";
+  let getCurrentText = () => currentText;
+  let text = "";
+  let setText = t => text=t;
+
+  render (<div><EditToolbar getCurrentText = {getCurrentText} setText={setText}/><textarea id="pageSource"></textarea></div>);
+  let ta = screen.getByRole("textbox");
+  ta.value = currentText;
+  let max = currentText.length;
+
+  let btn = screen.getByRole("button", {name:"Image"});
+  ta.setSelectionRange(max, max);
+  await userEvent.click(btn);
+  expect(screen.getByText("MediaFrame")).toBeInTheDocument();
+
+  await userEvent.click(btn);
+  expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 });
 
 test('pluginActions', async () => { 

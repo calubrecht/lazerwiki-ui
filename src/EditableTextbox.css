@@ -36,3 +36,8 @@ div.editToolbar button.toolbar-button {
 div.editToolbar button.toolbar-button:active {
   border-style: inset;
 }
+
+div.editToolbar button.toolbar-button.open {
+  border-style: inset;
+  opacity: .2;
+}
