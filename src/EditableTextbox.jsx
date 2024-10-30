@@ -19,7 +19,7 @@ export default class EditableTextbox extends Component
         pageName = this.props.pageName.slice(this.props.pageName.lastIndexOf(':')+1);
     }
     this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName, dbChecked:false,
-      revisionChecked:false
+      revisionChecked:false, lockWarnMsg: ''
     };
     this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]}});
     this.props.setCleanupCB(() => this.doCleanup());
@@ -43,11 +43,20 @@ export default class EditableTextbox extends Component
     this.textAreaRef.current.focus()
   }
 
+  componentWillUnmount() {
+    if (this.state.warningTimeoutHandle) {
+      clearTimeout(this.state.warningTimeoutHandle);
+    }
+    if (this.state.lockTimeoutHandle) {
+      clearTimeout(this.state.lockTimeoutHandle);
+    }
+  }
+
   getPageLock(successAction, cancelAction) {
     DS_instance().getPageLock(this.props.pageName).then(lockResponse => {
       if (lockResponse.success) {
         this.setLock(lockResponse);
-        //startLockTimer(lockResponse);  // What to do if page lock expires while page open? Turn to read only mode, add mesage and allow try to reacqire lock. if revision changed....copy current text to clipboard?
+        this.startLockTimer(lockResponse);
         successAction(lockResponse);
       }
       else {
@@ -55,6 +64,7 @@ export default class EditableTextbox extends Component
           action: () => {
             DS_instance().overrideLock(this.props.pageName).then(overrideResponse => {
               this.setLock(overrideResponse);
+              this.startLockTimer(lockResponse);
               successAction(lockResponse);
             });
           },
@@ -117,7 +127,11 @@ export default class EditableTextbox extends Component
     if (!this.props.editable || ! this.state.dbChecked || !this.state.revisionChecked) {
       return <div onKeyDown={ev => this.onKeydown(ev)}><textarea ref={this.textAreaRef} autoFocus={true} rows="50" cols="80" name="pageSource" className="pageSource disabled" value={this.state.text}  readOnly={true}></textarea></div>;
     }
-    return <div onKeyDown={ev => this.onKeydown(ev)}><EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea ref={this.textAreaRef} autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+    return <div onKeyDown={ev => this.onKeydown(ev)}>{this.renderLockWarn()}<EditToolbar getCurrentText={() => this.state.text} setText={(t)=>this.setText(t)} namespace={this.state.namespace} pageName={this.state.pageName}/> <textarea ref={this.textAreaRef} autoFocus rows="40" cols="80" name="pageSource" className="pageSource" id="pageSource" value={this.state.text} onChange={ev => this.onChangeText(ev)} onKeyDown={(e) => this.handleAutoIndent(e)} ></textarea> {this.renderTagList()} {this.renderErrorMsg()}</div>
+  }
+
+  renderLockWarn() {
+    return this.state.lockWarnMsg && <div className="lockWarn">{this.state.lockWarnMsg}</div>;
   }
 
   renderTagList() {
@@ -239,5 +253,24 @@ export default class EditableTextbox extends Component
 
   restoreDraft() {
     this.setState({askUser:false, text:this.state.draftText, draftText: "", revisionChecked: true });
+  }
+
+  startLockTimer(lockResponse) {
+     let lockTimeout = Date.parse(lockResponse.lockTime);
+     let lockTimeRemaining = lockTimeout - new Date();
+     let timeTillWarning = lockTimeRemaining - 120*1000;
+     let warningTimeoutHandle = setTimeout(() => this.showLockTimeoutWarning(), timeTillWarning);
+     let lockTimeoutHandle =setTimeout(() => this.showLockTimeout(), lockTimeRemaining);
+     this.setState({warningTimeoutHandle, lockTimeoutHandle});
+  }
+
+  showLockTimeoutWarning() {
+    console.log("Lock timeout warning");
+    this.setState({warningTimeoutHandle: undefined, lockWarnMsg: "The page lock will expire soon. You should save your work soon"});
+  }
+
+  showLockTimeout() {
+    console.log("Lock timeout");
+    this.setState({lockTimeoutHandle: undefined, lockWarnMsg: "The page lock has expired. Saving now may overwrite an update"});
   }
 }

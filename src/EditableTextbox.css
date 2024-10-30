@@ -26,6 +26,12 @@ div.error {
   color: red;
 }
 
+div.lockWarn {
+  background: red;
+  color: white;
+  padding:4px;
+}
+
 div.editToolbar button.toolbar-button {
   border-style: outset;
   border-width: 2px;
