@@ -6,7 +6,7 @@ import ConfirmDialog from './ConfirmDialog';
 
 import './EditableTextbox.css';
 
-const MAX_DRAFT_AGE= 60*60*24*6; // 6 days   // Reduce once have check for overwriting on the server.
+const MAX_DRAFT_AGE= 60*60; // 1 hour
 
 export default class EditableTextbox extends Component
 {
@@ -83,7 +83,7 @@ export default class EditableTextbox extends Component
           draftText: draftDoc.text,
           btnNames: ["Use Draft", "Discard Draft"],
           action: this.restoreDraft,
-          cancelAction: this.closeDraftConfirmDlg
+          cancelAction: () => this.closeDraftConfirmDlg(successAction, lockResponse)
         });
       }
       else {
@@ -232,12 +232,12 @@ export default class EditableTextbox extends Component
     }
   }
 
-  closeDraftConfirmDlg() {
+  closeDraftConfirmDlg(successAction, argument) {
     this.setState({askUser:false})
+    successAction(argument);
   }
 
   restoreDraft() {
-    this.closeDraftConfirmDlg();
-    this.setState({askUser:false, text:this.state.draftText, draftText: ""})
+    this.setState({askUser:false, text:this.state.draftText, draftText: "", revisionChecked: true });
   }
 }
