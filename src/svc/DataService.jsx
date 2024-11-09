@@ -196,7 +196,7 @@ export default class DataService
   {
     return fetch(
       this.baseRequest + 'page/' + pageName + '/savePage',
-       {method: 'post', body: JSON.stringify({pageName: pageName, text: pageData.text, tags:pageData.tags}), credentials: 'include',
+       {method: 'post', body: JSON.stringify({pageName: pageName, text: pageData.text, tags:pageData.tags, revision:pageData.revision, force:pageData.force}), credentials: 'include',
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
          .then(res => res.json());

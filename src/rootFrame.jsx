@@ -162,6 +162,8 @@ export default class RootFrame extends Component
     ev.preventDefault();
     this.clearHash();
     this.data.savePage(this.pageName, this.getText()).then((pageData) => {
+      // Check if save success, if not, check if problem was revision, offer choice. Discard changes, Force Save, Return to edit.
+      // If force save, send force Save to savePage
       this.setPageData(pageData);
       this?.cleanupTextbox();
       this.cancelEdit(); }).catch(e => this.handleError(e));

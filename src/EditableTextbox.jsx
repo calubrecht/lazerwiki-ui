@@ -19,9 +19,9 @@ export default class EditableTextbox extends Component
         pageName = this.props.pageName.slice(this.props.pageName.lastIndexOf(':')+1);
     }
     this.state = {text: props.text, tags: new Set(props.tags), activeTags:new Set(), newTag:'', error:"", namespace:namespace, pageName:pageName, dbChecked:false,
-      revisionChecked:false, lockWarnMsg: ''
+      revisionChecked:false, lockWarnMsg: '', revision: props.revision, force:false
     };
-    this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags]}});
+    this.props.registerTextCB(() => { return {text: this.state.text, tags: [...this.state.tags], revision: this.state.revision, force: this.state.force}});
     this.props.setCleanupCB(() => this.doCleanup());
     this.props.setCancelCB(() => this.doCancel());
     this.data = DS_instance();
@@ -111,7 +111,7 @@ export default class EditableTextbox extends Component
     else {
       DS_instance().fetchPage(this.props.pageName).then(pageData => {
         console.log("loaded page out of date, reloaded revision " + pageData.revision);
-        this.setState({ revisionChecked: true, text:pageData.source, tags:new Set(pageData.tags) });
+        this.setState({ revisionChecked: true, text:pageData.source, tags:new Set(pageData.tags), revision:pageData.revision });
       });
     }
 
