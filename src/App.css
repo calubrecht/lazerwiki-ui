@@ -280,6 +280,35 @@ dialog.showImageDialog div.imgTitle {
   margin:.5em;
 }
 
+dialog.confirmRevOverrideDialog {
+  position: absolute;
+  z-index:10;
+  top:60px;
+  background: grey;
+}
+
+dialog.confirmRevOverrideDialog div.confirmRevOverrideDialogButtons {
+  display: inline-flex;
+}
+
+dialog.confirmRevOverrideDialog div.confirmRevOverrideDialogButtons button.cancel {
+  order: 3;
+}
+
+dialog.confirmRevOverrideDialog div.confirmRevOverrideDialogButtons button.return {
+  order: 2;
+}
+
+dialog.confirmRevOverrideDialog div.confirmRevOverrideDialogButtons button.overwrite {
+  order: 1;
+}
+
+
+dialog.confirmRevOverrideDialog::backdrop {
+  z-index:10;
+  background: rgba(0,0,0,0.7);
+}
+
 table.lazerTable, table.lazerTable td, table.lazerTable th {
   border: 1px solid;
 }

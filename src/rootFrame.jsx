@@ -35,6 +35,7 @@ export default class RootFrame extends Component
     this.imgDlgRef = React.createRef();
     this.delDlgRef = React.createRef();
     this.rootRef = React.createRef();
+    this.confirmOverwriteRef = React.createRef();
   }
 
   componentDidMount()
@@ -104,6 +105,7 @@ export default class RootFrame extends Component
         </div>;
     }
       return <div className="RootFrame" ref={this.rootRef}>
+      {this.renderConfirmRevOverrideDialog()}
       <div className="RootMenu">{this.state.stage === 'editing' && <button className="rootMenuButton button-unstyled" onClick={ev => this.savePage(ev)}>Save Page</button>}<button className="rootMenuButton button-unstyled" onClick={ev => this.cancelEdit(ev)}>Cancel</button>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} setCleanupCB={data => this.setCleanupCB(data)} setCancelCB={data => this.setCancelCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName} revision={this.state.pageData.revision}/> </div>
       </div>;
@@ -161,11 +163,28 @@ export default class RootFrame extends Component
   savePage(ev) {
     ev.preventDefault();
     this.clearHash();
-    this.data.savePage(this.pageName, this.getText()).then((pageData) => {
-      // Check if save success, if not, check if problem was revision, offer choice. Discard changes, Force Save, Return to edit.
-      // If force save, send force Save to savePage
+    let pageName = this.pageName;
+    let text = this.getText();
+    this.doSavePage(pageName, text);
+  }
+
+  overwriteRevision(){ 
+    let pageName = this.pageName;
+    let text = this.getText();
+    text.force = true;
+    this.doSavePage(pageName, text);
+  }
+
+  doSavePage(pageName, data) {
+    this.data.savePage(pageName, data).then((pageData) => {
+      if (!pageData.success ){
+        this.setState({savedPageData: {pageName, data}});
+        this.confirmOverwriteRef.current?.showModal?.();
+        return;
+      }
       this.setPageData(pageData);
       this?.cleanupTextbox();
+      this.confirmOverwriteRef.current?.close?.();
       this.cancelEdit(); }).catch(e => this.handleError(e));
   }
 
@@ -200,6 +219,17 @@ export default class RootFrame extends Component
     <div><button onClick={() => this.closeShowImgDialog()}>Close</button></div>
     </dialog>);
   }
+
+  renderConfirmRevOverrideDialog()  {
+    return (<dialog className="confirmRevOverrideDialog" ref={this.confirmOverwriteRef} >
+      <div>A newer revision of this page has been saved since you started editing. Are you sure you want to save and overwrite this page?</div>
+      <div className="confirmRevOverrideDialogButtons">
+        <button className="cancel" onClick={() => this.closeConfirmOverwriteDialog(true)} autoFocus >Cancel Edit</button>
+        <button className="return" onClick={() => this.closeConfirmOverwriteDialog(false)} autoFocus >Return to Edit</button>
+        <button className="overwrite" onClick={  ()=> this.overwriteRevision()}>Overwrite Page</button>
+        </div>
+      </dialog>);
+  }
   
   doDelete() {
     this.delDlgRef.current?.showModal?.();
@@ -218,6 +248,14 @@ export default class RootFrame extends Component
  closeShowImgDialog() {
    this.setState({showImgDlg: null});
    this.imgDlgRef.current?.close?.();
+ }
+
+ closeConfirmOverwriteDialog(stopEdit) {
+  this.confirmOverwriteRef.current?.close?.();
+  this.setState({savedPageData: null, stage: stopEdit ? "viewing" : "editing"})
+  if (stopEdit) {
+    this?.cleanupTextbox();
+  }
  }
 
  openShowImgDialog(src) {

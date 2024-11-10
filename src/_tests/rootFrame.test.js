@@ -4,10 +4,11 @@ import RootFrame from '../rootFrame';
 import UserService, {instance as US_instance} from '../svc/UserService';
 
 let FETCH_PAGE_PROMISE = new Promise(() => {});
+let savePageData = {};
 
 let mockDS = {fetchPage: jest.fn(() => FETCH_PAGE_PROMISE), getUIVersion: () => Promise.resolve({version:"test.0"}),
  getVersion: () => Promise.resolve({version:"uttest.0"} ), getSiteName: () => Promise.resolve("Test Site"),
- savePage: jest.fn(() => Promise.resolve({flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[]})),
+ savePage: jest.fn(() => Promise.resolve(savePageData)),
  deletePage: jest.fn(() => Promise.resolve()),
  previewPage: (pn, t) => `Previewed`};
 
@@ -39,7 +40,10 @@ let realConsoleLog = console.log
 beforeEach(() => {
     FETCH_PAGE_PROMISE = new Promise(() => {});
     mockDS.fetchPage.mockClear();
+    mockCleanup.mockClear();
+    mockDS.savePage.mockClear();
     mockDS.deletePage = jest.fn(() => Promise.resolve());
+    savePageData = {flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[], success:true};
     US_instance().setUser(null);
     console.log = jest.fn(() => {});
 
@@ -150,6 +154,59 @@ test('render edit', async () => {
 
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
 
+});
+
+test('saveConfirmOverwrite', async () => {
+    savePageData = {flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[], success:false};
+    window.location.hash ="#Edit";
+    US_instance().setUser({userName:"Bob"});
+    let resolveHook = null
+    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
+    let comp = render(<RootFrame/>);
+    resolveHook({flags: {exists:true, userCanWrite: true}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
+    await waitFor( () => {});
+ 
+    expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+    mock_edittedText = {source:'saveThis'};
+    
+    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+
+    expect(mockDS.savePage.mock.calls).toHaveLength(1);
+    expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
+    expect(mockDS.savePage.mock.calls[0][1]).toStrictEqual({source: "saveThis"});
+    await waitFor( () => {});
+
+    let dlg= document.getElementsByClassName("confirmRevOverrideDialog")[0];
+    dlg.open = true;
+
+    await userEvent.click(screen.getByRole('button', {name:"Return to Edit"}));
+    expect(mockDS.savePage.mock.calls).toHaveLength(1);
+    dlg.open = false;
+    expect(screen.queryByRole('button', {name:"Return to Edit"})).not.toBeInTheDocument();
+    expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+    expect(mockCleanup.mock.calls).toHaveLength(0);
+
+    dlg.open = true;
+    await userEvent.click(screen.getByRole('button', {name:"Cancel Edit"}));
+    dlg.open = false;
+    expect(mockDS.savePage.mock.calls).toHaveLength(1);
+    expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
+    expect(mockCleanup.mock.calls).toHaveLength(1);
+
+    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
+    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    dlg.open = true;
+
+    savePageData = {flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[], success:true};
+    await userEvent.click(screen.getByRole('button', {name:"Overwrite Page"}));
+    dlg.open = false;
+    expect(mockDS.savePage.mock.calls).toHaveLength(3);
+    expect(mockDS.savePage.mock.calls[2][0]).toBe(""); // pageName
+    expect(mockDS.savePage.mock.calls[2][1]).toStrictEqual({source: "saveThis", force:true});
+
+
+
+    expect(screen.getByText('New render')).toBeInTheDocument();
 }, 300000);
 
 test('do delete', async () => {
@@ -318,6 +375,7 @@ test('test errors',  async () => {
     await waitFor( () => {});
 
     console.log.mockClear();
+    let realMock = mockDS.savePage;
     mockDS.savePage = () => Promise.reject("Cannot Save");
     await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
     await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
@@ -325,6 +383,7 @@ test('test errors',  async () => {
 
     let calls = console.log.mock.calls;
     expect(console.log.mock.calls[0][0]).toBe("Cannot Save");
+    mockDS.savePage= realMock;
 });
 
 test('render wID', async () => {
