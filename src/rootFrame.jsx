@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import DataService, {instance as DS_instance} from './svc/DataService';
+import {instance as DS_instance} from './svc/DataService';
 import {instance as RES_instance} from './svc/RenderEnhancerService';
 import PageSearchFrame from './PageSearchFrame';
 import PreviewFrame from './PreviewFrame';
@@ -9,6 +9,7 @@ import HTMLReactParser from 'html-react-parser';
 import DrawerLink from './DrawerLink';
 import BacklinksFrame from './BacklinksFrame'
 import HistoryFrame from './HistoryFrame'
+import MovePageFrame from './MovePageFrame'
 
 export default class RootFrame extends Component
 {
@@ -119,7 +120,18 @@ export default class RootFrame extends Component
         if (! this.loggedIn() || !this.state.pageData.flags.userCanWrite ){
           return <div className="RootMenu"><button className="rootMenuButton button-unstyled" onClick={() => this.viewSource()}>View Source</button><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
         }
-        return <div className="RootMenu"><button className="rootMenuButton button-unstyled" onClick={() => this.editPage()}>{createAction}</button>   {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&  <button className="rootMenuButton button-unstyled" onClick={() => this.doDelete()}>Delete Page</button>}<DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
+        return <div className="RootMenu">
+          <button className="rootMenuButton button-unstyled" onClick={() => this.editPage()}>{createAction}</button>
+          <DrawerLink title="MovePage" component={MovePageFrame} initData={this.pageName} extraClasses="rootMenuButton"/>
+          {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&
+              <button className="rootMenuButton button-unstyled" onClick={() => this.doDelete()}>Delete
+                Page</button>}<DrawerLink title="Backlinks" component={BacklinksFrame}
+                                          initData={this.state.pageData.backlinks}
+                                          extraClasses="rootMenuButton"/><DrawerLink title="History"
+                                                                                     component={HistoryFrame}
+                                                                                     initData={this.pageName}
+                                                                                     extraClasses="rootMenuButton"/>
+        </div>;
   }
 
   renderTags() {

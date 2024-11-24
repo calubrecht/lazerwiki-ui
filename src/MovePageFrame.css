@@ -1,0 +1,53 @@
+div.RootMenu div.movePageFrame {
+    position:absolute;
+    width:900px;
+    height:800px;
+    right: 100px;
+    top: 0px;
+    background:white;
+    border-style:solid;
+    padding:5px;
+    z-index: 1;
+}
+
+
+div.movePageFrame button.close {
+    float:right;
+    margin:1px 3px;
+    color: red;
+    font-weight: bold;
+}
+
+div#message.error {
+    color: red;
+}
+
+div#message {
+    margin-bottom: 1em;
+    height:12px;
+}
+
+div.nsTreeSelector {
+    display:inline-block;
+    vertical-align: top;
+    width:300px;
+}
+
+div.movePageSelector {
+    display:inline-block;
+    vertical-align: top;
+    width:200px;
+    padding-right: .5em;
+}
+
+label.label {
+    color:#0000a0;
+}
+
+input {
+    margin: 0 .5em 0 .25em;
+}
+
+form.moveLocationBox div {
+    margin-bottom: .5em;
+}

@@ -247,6 +247,16 @@ export default class DataService
            .then(res => res.text());
   }
 
+  movePage(oldNS, oldPage, newNS, newPage) {
+    return fetch(
+        this.baseRequest + 'page/' + oldNS + ':' + oldPage + '/movePage',
+        {method: 'post', credentials: 'include',
+          body: JSON.stringify({oldNS, oldPage, newNS, newPage}),
+          headers: this.getPostHeaders()})
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
   deleteRole(userName, userRole) {
     return fetch(
       this.baseRequest + "admin/role/" + userName + "/" + userRole,
