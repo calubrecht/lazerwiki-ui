@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import React, {Component} from 'react';
 import {PropTypes} from 'prop-types';
 import {instance as DS_instance} from './svc/DataService';
 import {instance as US_instance} from './svc/UserService';
@@ -16,12 +16,13 @@ export default class MovePageFrame extends Component
         this.dataService = DS_instance();
         this.userService = US_instance();
         let namespace = ''
-        let pageName = props.initData ?  props.initData : '';
+        let pageName = props.initData;
         if (pageName && pageName.indexOf(':') !== -1 ) {
             namespace = pageName.slice(0, pageName.lastIndexOf(':'));
             pageName = pageName.slice(pageName.lastIndexOf(':')+1);
         }
         this.state = {namespace: namespace, pageName: pageName, initialNS: namespace, initialPage: pageName, user:this.userService.getUser(), serverImages:[], enabled:false, message:"", errorMessage:false, nsTree:{children:[]}};
+        this.redirectDlgRef = React.createRef();
     }
 
     componentDidMount()
@@ -44,7 +45,7 @@ export default class MovePageFrame extends Component
         let messageClass = this.state.errorMessage ? "error" : "message";
         let enabled = this.state.enabled;
         let moveEnabled = !(this.state.pageName === this.state.initialPage && this.state.namespace === this.state.initialNS);
-        let confirmD = this.state.confirmMessage ? this.renderConfirmDialog() : '';
+        let redirectD = this.renderRedirectDlg();
         return <div className="movePageFrame">
             <button onClick={() => this.props.doClose()} className="close button-unstyled">X</button>
             <h2 className="title">Move Page</h2>
@@ -63,7 +64,7 @@ export default class MovePageFrame extends Component
                     <div id="message" className={messageClass}>{this.state.message}</div>
                 </div>
             </div>
-            {confirmD}
+            {redirectD}
         </div>;
     }
 
@@ -76,21 +77,27 @@ export default class MovePageFrame extends Component
         this.setState({enabled: false});
         DS_instance().movePage(this.state.initialNS, this.state.initialPage, this.state.namespace, this.state.pageName).then( data => {
             if (data.success) {
-                // Page successfully moved. Give Message then forward to new page.
+                this.redirectDlgRef?.current?.showModal?.();
             }
             else {
                 this.handleError(data);
             }
-        }).catch(e => this.handleError(e));
+        }).catch(e => this.handleError({message: e}));
     }
 
 
     setUser(user) {
         this.setState({user: user});
-        this.fetchImageList();
+        this.fetchPageList();
     }
 
     selectNS(ns) {
         this.setState({namespace: ns});
+    }
+
+    renderRedirectDlg() {
+        return (<dialog className="moveRedirectDialog" ref={this.redirectDlgRef} >
+            <div>Page Moved to {this.state.pageName}</div>
+        </dialog>);
     }
 }
