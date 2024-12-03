@@ -44,6 +44,7 @@ test('render', async () => {
     expect(screen.getByLabelText("Page Name")).toHaveValue("page1");
 
     expect(screen.getByRole("button", {name: 'Move'})).toBeDisabled();
+    expect(screen.getByText("to page1")).toBeInTheDocument();
 });
 
 test('renderWNS', async () => {
@@ -95,7 +96,6 @@ test("moveFile", async() => {
     render(<MovePageFrame doClose={doClose} initData={"ns:page1"}/>);
     await waitFor(() => {});
 
-
     await screen.getByLabelText("Page Name").focus();
     await userEvent.keyboard("moved");
     expect(screen.getByRole("button", {name: 'Move'})).not.toBeDisabled();
@@ -110,11 +110,13 @@ test("moveFile", async() => {
     expect(mockDS.movePage.mock.calls[0][1]).toBe("page1");
     expect(mockDS.movePage.mock.calls[0][2]).toBe("ns2");
     expect(mockDS.movePage.mock.calls[0][3]).toBe("page1moved");
+    expect(screen.getByText("to ns2:page1moved")).toBeInTheDocument();
 
     let dlg= document.getElementsByClassName("moveRedirectDialog")[0];
     dlg.open = true;
 
-    expect(screen.getByText("Page Moved to page1moved"))
+    expect(screen.getByText("Page Moved to"))
+    expect(screen.getByRole("link", {name: 'ns2:page1moved'})).toBeInTheDocument();
 });
 
 test("moveFileFails", async() => {

@@ -59,7 +59,7 @@ export default class MovePageFrame extends Component
                     {this.state.user && <form className="moveLocationBox">
                         <div><label htmlFor="moveFileNS" className="label">NS</label><input id="moveFileNS" disabled={!enabled} onChange={evt => this.setState({namespace: evt.target.value})} value={this.state.namespace}></input></div>
                         <div><label htmlFor="moveFilePagename" className="label">Page Name</label><input id="moveFilePagename" disabled={!enabled} onChange={evt => this.setState({pageName: evt.target.value})} value={this.state.pageName}></input></div>
-                        <div><button onClick={(ev) => this.movePage(ev)} disabled={!moveEnabled}>Move</button></div>
+                        <div><button onClick={(ev) => this.movePage(ev)} disabled={!moveEnabled}>Move</button> to {this.renderPage()}</div>
                     </form>}
                     <div id="message" className={messageClass}>{this.state.message}</div>
                 </div>
@@ -95,9 +95,14 @@ export default class MovePageFrame extends Component
         this.setState({namespace: ns});
     }
 
+    renderPage() {
+        return this.state.namespace ? this.state.namespace + ":" + this.state.pageName : this.state.pageName;
+    }
+
     renderRedirectDlg() {
+        let pageName = this.renderPage();
         return (<dialog className="moveRedirectDialog" ref={this.redirectDlgRef} >
-            <div>Page Moved to {this.state.pageName}</div>
+            <div>Page Moved to <a href={"/page/"+pageName}>{pageName}</a></div>
         </dialog>);
     }
 }
