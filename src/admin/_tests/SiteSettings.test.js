@@ -9,7 +9,7 @@ test('render', () => {
   expect(screen.getByText("Settings for - Test Site"));
   expect(screen.getByRole("group", {name: "SettingSiteBody"}));
   expect(screen.getByLabelText('Site Name:')).toBeInTheDocument();
-  expect(screen.getByLabelText('Site Name:').value).toBe("Test Site");
+  expect(screen.getByLabelText('Site Name:').value).toBe("testSite");
 });
 
 test('render novisible', () => {
@@ -18,7 +18,7 @@ test('render novisible', () => {
   expect(screen.getByText("Settings for - Test Site"));
   expect(screen.getByRole("group", {name: "SettingSiteBodyHidden"}));
   expect(screen.getByLabelText('Site Name:')).toBeInTheDocument();
-  expect(screen.getByLabelText('Site Name:').value).toBe("Test Site");
+  expect(screen.getByLabelText('Site Name:').value).toBe("testSite");
 });
 
 test('enterField', async () => {
@@ -29,5 +29,5 @@ test('enterField', async () => {
 
   await userEvent.keyboard("1");
 
-  expect(screen.getByLabelText('Site Name:').value).toBe("Test Site1");
+  expect(screen.getByLabelText('Site Name:').value).toBe("testSite");
 });

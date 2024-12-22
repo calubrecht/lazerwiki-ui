@@ -332,6 +332,16 @@ export default class DataService
   
   }
 
+  saveSiteSettings(siteName, siteHostname, siteSettings) {
+    return fetch(
+        this.baseRequest + "admin/site/settings/" + siteName,
+        {method: 'post', credentials: 'include',
+          body: JSON.stringify({hostName: siteHostname, siteSettings}),
+          headers: this.getPostHeaders()})
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

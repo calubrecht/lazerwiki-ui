@@ -27,7 +27,7 @@ function renderGlobalSettings(sites, setSites, visible) {
 function renderDlgBody(tab, sites, setSites) {
  return <div>
     {renderGlobalSettings(sites, setSites, tab === 'Global Settings')}
-    {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} visible={site.siteName === tab}/>)}</div>
+    {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} siteSettings={site.settings} siteHostname={site.hostname} visible={site.siteName === tab}/>)}</div>
 }
 
 function AdminDialog(props) {

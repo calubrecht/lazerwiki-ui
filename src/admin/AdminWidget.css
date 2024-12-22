@@ -70,8 +70,17 @@ div#adminSidebar label {
   }
 
 dialog.AdminDialog div.settingsBody {
+  overflow-x: hidden;
 }
 
 dialog.AdminDialog div.settingsBody.hidden {
   display: none
 }
+
+
+div.SettingsField textarea {
+  resize: none;
+  vertical-align: top;
+  width:400px;
+}
+
