@@ -1,7 +1,9 @@
-import React, {Component} from 'react';
-import DataService, {instance as DS_instance} from './svc/DataService';
-import UserService, {instance as US_instance} from './svc/UserService';
+import {Component} from 'react';
+import {instance as DS_instance} from './svc/DataService';
+import {instance as US_instance} from './svc/UserService';
 import NsTree from './NsTree';
+import TextField from './TextField';
+import {PropTypes} from "prop-types";
 
 import './PageFrame.css';
 
@@ -12,8 +14,10 @@ export default class PageFrame extends Component
     this.dataService = DS_instance();
     this.userService = US_instance();
     let initialNS = this.props.namespace ? this.props.namespace : "";
-    this.state = {nsTree: {}, pageData: {}, namespace: initialNS}
+    this.state = {nsTree: {}, pageData: {}, namespace: initialNS, filter:""}
   }
+
+  static propTypes = {namespace: PropTypes.string, doClose: PropTypes.func, selectItem:PropTypes.func};
 
   componentDidMount()
   {
@@ -36,7 +40,6 @@ export default class PageFrame extends Component
 
   render()
   {
-    let counter = 0;
     return <div className="pageFrame">
       <button onClick={() => this.props.doClose()} className="close button-unstyled">X</button>
       <h2 className="title">Page List</h2>
@@ -47,6 +50,7 @@ export default class PageFrame extends Component
         </div>
         <div className="pageSelector">
           <h3>Pages - [{this.state.namespace}]</h3>
+          <TextField name="Filter" label="Filter:" onChange={(v,) => this.setState({filter: v})} disabled={false} varName="filter" autofocus={true} value={this.state.filter}/>
           {this.renderList()}
         </div>
         </div>
@@ -64,11 +68,18 @@ export default class PageFrame extends Component
     return name + title;
   }
 
-  renderList() {
-    let pages = this.state.pageData[this.state.namespace];
-    if (!pages) {
-      return <div></div>;
+  filteredPages() {
+    if (!this.state.pageData[this.state.namespace]) {
+      return [];
     }
+    let filter = this.state.filter.toLowerCase();
+    return this.state.pageData[this.state.namespace].filter(
+       p => filter === '' || p.pagename.toLowerCase().includes(filter) || p.title && p.title.toLowerCase().includes(filter) || p.pagename === '' && '<root>'.includes(filter)
+    );
+  }
+
+  renderList() {
+    let pages = this.filteredPages();
     if (this.asLinks() ) {
       return (<div className="pageList">
         {pages.map( p => <div key={p.pagename}><a href={this.renderLinkURL(p)} >{this.renderLinkName(p)}</a></div>)}

@@ -1,9 +1,11 @@
-import React, {Component} from 'react';
-import DataService, {instance as DS_instance} from './svc/DataService';
-import UserService, {instance as US_instance} from './svc/UserService';
+import {Component} from 'react';
+import {instance as DS_instance} from './svc/DataService';
+import {instance as US_instance} from './svc/UserService';
 import NsTree from './NsTree';
+import TextField from './TextField';
 
 import './MediaFrame.css';
+import {PropTypes} from "prop-types";
 
 export default class MediaFrame extends Component
 {
@@ -12,8 +14,10 @@ export default class MediaFrame extends Component
     this.dataService = DS_instance();
     this.userService = US_instance();
     let initialNS = this.props.namespace ? this.props.namespace : "";
-    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:false, displayDeleteDlg: false, namespace: initialNS, nsTree:{children:[]}, uploadNS: initialNS};
+    this.state = {fileToUpload: "", mediaFiles: [], user:this.userService.getUser(), serverImages:[], enabled:true, message:"", errorMessage:false, displayDeleteDlg: false, namespace: initialNS, nsTree:{children:[]}, uploadNS: initialNS, filter: ''};
   }
+
+  static propTypes = {namespace: PropTypes.string, doClose: PropTypes.func, selectItem:PropTypes.func};
 
   componentDidMount()
   {
@@ -50,6 +54,7 @@ export default class MediaFrame extends Component
         <div><input id="mediaFileUpload" type="file" disabled={!enableUpload}/>
         <label htmlFor="mediaFileUploadNS" className="label">NS</label><input id="mediaFileUploadNS" disabled={!enableUpload} onChange={evt => this.setState({uploadNS: evt.target.value})} value={this.state.uploadNS}></input><button onClick={(ev) => this.uploadFile(ev)} disabled={!enableUpload}>Upload</button></div>
       </form>}
+      <TextField name="Filter" label="Filter:" onChange={(v,) => this.setState({filter: v})} disabled={false} varName="filter" autofocus={true} value={this.state.filter}/>
       <div id="message" className={messageClass}>{this.state.message}</div>
       {this.state.displayDeleteDlg && this.renderDeleteDialog() }
       {this.renderList()}
@@ -58,10 +63,18 @@ export default class MediaFrame extends Component
     </div>;
   }
 
+  filteredImages() {
+    if (!  this.state.serverImages[this.state.namespace]) {
+      return [];
+    }
+    let filter = this.state.filter.toLowerCase();
+    return this.state.serverImages[this.state.namespace].filter(
+       img => filter === '' || img.fileName.toLowerCase().includes(filter)
+    );
+  }
+
   renderList() {
-      if (!  this.state.serverImages[this.state.namespace]) {
-        return <div className="mediaList"> <div className="imageFrame" title="Hover over filename to preview">Image Preview</div></div>;
-      }
+      let imgs = this.filteredImages();
       let counter = 0;
       let nsPrefix = this.state.namespace ? this.state.namespace + ":" : '';
       if (this.props.selectItem) {
@@ -69,7 +82,7 @@ export default class MediaFrame extends Component
         <div className="imageFrame" title="Hover over filename to preview">Image Preview</div>
           <div className="mediaList">
         {
-          this.state.serverImages[this.state.namespace].map( img => {
+          imgs.map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
               <div><button className="button-unstyled" onClick={(ev) => this.doAction(ev, nsPrefix + img.fileName)}>{img.fileName}</button> - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <button className="delete button-unstyled" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}</div>
@@ -84,7 +97,7 @@ export default class MediaFrame extends Component
         <div className="imageFrame" title="Hover over filename to preview">Image Preview</div>
           <div className="mediaList">
         {
-          this.state.serverImages[this.state.namespace].map( img => {
+          imgs.map( img => {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
               <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName,"/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} - uploaded by {img.uploadedBy}  {this.state.user && <button className="delete button-unstyled" onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}</div>
@@ -139,7 +152,7 @@ export default class MediaFrame extends Component
     ev.preventDefault();
     this.setState({"message": "Uploading", "errorMessage":false, "enabled": false});
     this.dataService.saveMedia(mediaFileUpload.files, mediaFileUploadNS.value).then(
-      (e) => {
+      () => {
         mediaFileUpload.value = null;
         this.setState({"message": "Upload Complete", "errorMessage": false, enabled:true});
         this.fetchImageList();}).catch(

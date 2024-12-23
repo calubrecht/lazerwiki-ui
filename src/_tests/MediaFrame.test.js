@@ -28,10 +28,11 @@ beforeEach(() => {
 
 
 function getByStartText(text) {
-    return screen.getAllByText((content, node) => {
-        return node.textContent.startsWith(text);
-      }
-      )[0];
+    let all = screen.queryAllByText((content, node) => {
+            return node.textContent.startsWith(text);
+        }
+    );
+    return all && all[0];
 }
 
 // props = namespace (optional), doClose, selectItem(optional)
@@ -197,4 +198,23 @@ test('upload', async() => {
     await waitFor(() => {});
     expect(screen.getByText("Uplaod failed")).toBeInTheDocument();
     
+});
+
+test('filter',  async () => {
+  let doClose = jest.fn(() => {});
+  IMG_PROMISE = Promise.resolve({media: {"": [
+    {fileName:"file.png", fileSize:1000, width:10, height:10, uploadedBy:"Bob", },
+    {fileName:"bigFile.png", fileSize:1000000, width:120, height:100, uploadedBy:"Bob", },
+    {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
+]}, namespaces: { namespace:"", children:[]}});
+
+  render(<MediaFrame doClose={doClose}/>);
+  await waitFor(() => {});
+  
+  await userEvent.keyboard("big");
+
+  expect(screen.getByText("NsTree")).toBeInTheDocument();
+  expect(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).toBeFalsy();
+  expect(getByStartText('bigFile.png - 976.56 kb -  120x100 - uploaded by Bob')).toBeInTheDocument();
+  expect(getByStartText('bigestFile.png - 953.67 mb -  520x500 - uploaded by Bob')).toBeInTheDocument();
 });
