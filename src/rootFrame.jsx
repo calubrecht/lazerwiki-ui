@@ -122,7 +122,7 @@ export default class RootFrame extends Component
         }
         return <div className="RootMenu">
           <button className="rootMenuButton button-unstyled" onClick={() => this.editPage()}>{createAction}</button>
-          <DrawerLink title="MovePage" component={MovePageFrame} initData={this.pageName} extraClasses="rootMenuButton"/>
+      {this.pageName !== '' && <DrawerLink title="MovePage" component={MovePageFrame} initData={this.pageName} extraClasses="rootMenuButton"/>}
           {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&
               <button className="rootMenuButton button-unstyled" onClick={() => this.doDelete()}>Delete
                 Page</button>}<DrawerLink title="Backlinks" component={BacklinksFrame}
