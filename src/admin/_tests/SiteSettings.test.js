@@ -22,12 +22,48 @@ test('render novisible', () => {
 });
 
 test('enterField', async () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible="true" siteName="testSite"/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings="{}"/>);
     
   await waitFor( () => {});
-  screen.getByLabelText('Site Name:').focus();
-
-  await userEvent.keyboard("1");
-
   expect(screen.getByLabelText('Site Name:').value).toBe("testSite");
+  expect(screen.getByLabelText('Site Hostname:').value).toBe("host");
+  screen.getByLabelText("Site Hostname:").focus();
+  
+  await act( () => userEvent.keyboard("1"));
+  expect(screen.getByLabelText('Site Hostname:').value).toBe("host1");
+
+});
+
+
+var saveSettingsPromise =  null;
+let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise)};
+
+jest.mock("../../svc/DataService", () => {
+  return {instance: () => mockDS};
+
+});
+
+test('button', async () => {
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings="{}"/>);
+    
+  await waitFor( () => {});
+  screen.getByLabelText("Site Hostname:").focus();
+
+  await act( () => userEvent.keyboard("1"));
+  expect(screen.getByLabelText('Site Hostname:').value).toBe("host1");
+
+  saveSettingsPromise =  Promise.resolve({site: {hostName: "host1", settings: "{}"}, success: true, msg:""})
+  await userEvent.click(screen.getByRole("button", {name: "Save"}));
+
+  expect(mockDS.saveSiteSettings).toHaveBeenCalled();
+  saveSettingsPromise =  Promise.resolve({site: {hostName: "host1", settings: "{}"}, success: false, msg:"oops"})
+  screen.getByLabelText("Settings:").focus();
+
+  await act( () => userEvent.keyboard("1"));
+  await userEvent.click(screen.getByRole("button", {name: "Save"}));
+
+  await waitFor( () => {});
+
+  expect(screen.getByText("oops"));
+
 });
