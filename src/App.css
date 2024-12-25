@@ -381,6 +381,8 @@ div.hidden input[type='checkbox'].toggle {appearance: none; display:none}
 
 div.hidden {border: black 1px solid; padding: 0 1rem}
 
+div.clear {clear:both}
+
 @media only screen and (max-height: 440px) {
   div#toolbar {
     top: 50px;

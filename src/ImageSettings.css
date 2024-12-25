@@ -1,0 +1,24 @@
+span.selectBox {
+    margin: .25em;
+    padding: .1em;
+
+}
+
+span.selected {
+    border: 1px solid darkblue
+}
+
+
+
+
+div.imageSettings {
+    border: 2px black solid;
+    height:125px;
+    width: 290px;
+    padding: .5em;
+    border-width:2px;
+    border-style:solid;
+    border-color:black;
+    margin-left: 1em;
+    float: left;
+}
