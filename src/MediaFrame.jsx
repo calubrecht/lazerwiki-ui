@@ -31,7 +31,7 @@ export default class MediaFrame extends Component {
     };
   }
 
-  static propTypes = {namespace: PropTypes.string, doClose: PropTypes.func, selectItem: PropTypes.func};
+  static propTypes = {namespace: PropTypes.string, doClose: PropTypes.func, selectItem: PropTypes.func, width: PropTypes.number, height: PropTypes.number};
 
   componentDidMount() {
     this.userService.addListener(this);
@@ -98,7 +98,7 @@ export default class MediaFrame extends Component {
     if (this.props.selectItem) {
       return <div className="mediaBox">
         <div className="imageFrame" title="Hover over filename to preview">Image Preview</div>
-        <ImageSettings chooseAlignment={(alignment) => this.setState({alignment})}></ImageSettings>
+        <ImageSettings chooseAlignment={(alignment) => this.setState({alignment})} chooseX={(x) => this.setState({width:x})} chooseY={(y) => this.setState({height:y})}></ImageSettings>
         <div className="clear"></div>
         <div className="mediaList">
           {
@@ -237,7 +237,7 @@ export default class MediaFrame extends Component {
   }
 
   doAction(ev, img) {
-    this.props.selectItem(img, this.state.alignment);
+    this.props.selectItem(img, this.state.alignment, this.state.width, this.state.height);
     ev.preventDefault();
   }
 }

@@ -3,6 +3,7 @@ import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import {instance as US_instance} from '../svc/UserService';
 import MediaFrame from '../MediaFrame';
+import {PropTypes} from "prop-types";
 
 var IMG_PROMISE = new Promise(() => {});
 var DELETE_PROMISE = () =>Promise.resolve("Success");
@@ -14,9 +15,13 @@ jest.mock("../svc/DataService", () => {
 });
 
 var setAlignment = null;
+var setX = null;
+var setY = null;
 
 jest.mock("../ImageSettings", () => (props) => {
-    setAlignment = props.chooseAlignment
+    setAlignment = props.chooseAlignment;
+    setX = props.chooseX;
+    setY = props.chooseY;
     return <div>ImageSettings</div>;
 });
 
@@ -68,7 +73,7 @@ test('renderWithSelect', async () => {
       {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
   ]}, namespaces: { namespace:"", children:[]}});
   
-    let container = render(<MediaFrame doClose={doClose} selectItem={doSelect}/>);
+    render(<MediaFrame doClose={doClose} selectItem={doSelect}/>);
     await waitFor(() => {});
   
     expect(screen.getByText("NsTree")).toBeInTheDocument();
@@ -80,12 +85,16 @@ test('renderWithSelect', async () => {
     expect(screen.getByRole("button", {name: 'bigestFile.png'})).toBeInTheDocument();
 
     setAlignment("Left");
+    setX(10);
+    setY(20);
     await waitFor(() => {});
 
     await screen.getByRole("button", {name: 'file.png'}).click();
 
     expect(doSelect.mock.calls[0][0]).toBe("file.png");
     expect(doSelect.mock.calls[0][1]).toBe("Left");
+    expect(doSelect.mock.calls[0][2]).toBe(10);
+    expect(doSelect.mock.calls[0][3]).toBe(20);
   });
 
 test('basicButtons', async () => {

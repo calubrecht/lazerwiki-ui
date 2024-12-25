@@ -56,7 +56,7 @@ export default class EditToolbar extends Component
           this.clearFrame();
           return;
         }
-        this.setState({selectedBtn: "Image", showFrame:MediaFrame, selectItem: (p, alignment) => this.addImageLink(p, alignment)});
+        this.setState({selectedBtn: "Image", showFrame:MediaFrame, selectItem: (p, alignment, w, h) => this.addImageLink(p, alignment, w, h)});
       }}
       
     ];
@@ -164,11 +164,13 @@ export default class EditToolbar extends Component
     this.replaceSelectionText('[[' + p + '|', ']]', '');
   }
   
-  addImageLink(i, alignment) {
+  addImageLink(i, alignment, width, height) {
     this.clearFrame();
     let alignmentPre = (alignment === "Center" || alignment === "Right") ? " " : "";
     let alignmentPost = (alignment === "Center" || alignment === "Left") ? " " : "";
-    this.replaceSelectionText('{{' + alignmentPre + i + alignmentPost + '|', '}}', '');
+    let size = (!width && !height) ? "" :
+        (!height ? ("?" + width.toString()) : !width ? ("?0x" + height.toString()) : "?" + width.toString() + "x" + height.toString());
+    this.replaceSelectionText('{{' + alignmentPre + i + alignmentPost + size + '|', '}}', '');
   }
 
   clearFrame() {

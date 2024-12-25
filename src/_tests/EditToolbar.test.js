@@ -273,7 +273,7 @@ test('pageFrame clicking button again closes', async () => {
 });
 
 jest.mock("../MediaFrame", () => (props) => {
-  callSelectItem = (item, alignment) => props.selectItem(item, alignment);
+  callSelectItem = (item, alignment, x, y) => props.selectItem(item, alignment, x, y);
   doFrameClose = props.doClose;
   return "MediaFrame";}
 );
@@ -294,20 +294,29 @@ test('mediaFrame', async () => {
   await userEvent.click(btn);
   expect(screen.getByText("MediaFrame")).toBeInTheDocument();
 
-  await act( () => callSelectItem("newImage", "Flow"));
+  await act( () => callSelectItem("newImage", "Flow", null, null));
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 
   
   expect(text).toBe("{{newImage|}}");
 
-  await act( () => callSelectItem("newImageLeft", "Left"));
+  await act( () => callSelectItem("newImageLeft", "Left", null, null));
   expect(text).toBe("{{newImageLeft |}}");
 
-  await act( () => callSelectItem("newImageRight", "Right"));
+  await act( () => callSelectItem("newImageRight", "Right", null, null));
   expect(text).toBe("{{ newImageRight|}}");
 
-  await act( () => callSelectItem("newImageCenter", "Center"));
+  await act( () => callSelectItem("newImageCenter", "Center", null, null));
   expect(text).toBe("{{ newImageCenter |}}");
+
+  await act( () => callSelectItem("newImageCenter", "Flow", 10, null));
+  expect(text).toBe("{{newImageCenter?10|}}");
+
+  await act( () => callSelectItem("newImageCenter", "Flow", 10, 20));
+  expect(text).toBe("{{newImageCenter?10x20|}}");
+
+  await act( () => callSelectItem("newImageCenter", "Flow", null, 20));
+  expect(text).toBe("{{newImageCenter?0x20|}}");
 
   await userEvent.click(btn);
   await act(() => doFrameClose());
