@@ -66,9 +66,9 @@ test('renderWithSelect', async () => {
     await waitFor(() => {});
   
     expect(screen.getByText("NsTree")).toBeInTheDocument();
-    expect(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).toBeInTheDocument();
-    expect(getByStartText('bigFile.png - 976.56 kb -  120x100 - uploaded by Bob')).toBeInTheDocument();
-    expect(getByStartText('bigestFile.png - 953.67 mb -  520x500 - uploaded by Bob')).toBeInTheDocument();
+    expect(getByStartText('file.png- 1000 bytes -  10x10 - uploaded by Bob')).toBeInTheDocument();
+    expect(getByStartText('bigFile.png- 976.56 kb -  120x100 - uploaded by Bob')).toBeInTheDocument();
+    expect(getByStartText('bigestFile.png- 953.67 mb -  520x500 - uploaded by Bob')).toBeInTheDocument();
     expect(screen.getByRole("button", {name: 'file.png'})).toBeInTheDocument();
     expect(screen.getByRole("button", {name: 'bigFile.png'})).toBeInTheDocument();
     expect(screen.getByRole("button", {name: 'bigestFile.png'})).toBeInTheDocument();
@@ -129,7 +129,7 @@ test('basicButtonsWithSelect', async () => {
 
     expect(doSelect.mock.calls[0][0]).toBe('ns:file.png');
 
-    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+    await userEvent.click(within(getByStartText('file.png- 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
     expect (screen.getByRole("dialog")).toBeInTheDocument();
 });
 
