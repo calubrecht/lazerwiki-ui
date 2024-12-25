@@ -1,7 +1,7 @@
-import { render, screen, act, waitFor, queryByAttribute, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, queryByAttribute, fireEvent } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import UserService, {instance as US_instance} from '../svc/UserService';
+import {instance as US_instance} from '../svc/UserService';
 import MediaFrame from '../MediaFrame';
 
 var IMG_PROMISE = new Promise(() => {});
@@ -11,6 +11,13 @@ let mockDS = {fetchImageList: () => IMG_PROMISE, deleteFile: jest.fn(() => DELET
 jest.mock("../svc/DataService", () => {
     return {instance: () => mockDS};
 
+});
+
+var setAlignment = null;
+
+jest.mock("../ImageSettings", () => (props) => {
+    setAlignment = props.chooseAlignment
+    return <div>ImageSettings</div>;
 });
 
 let NsTreeSelectNS=null;
@@ -35,7 +42,6 @@ function getByStartText(text) {
     return all && all[0];
 }
 
-// props = namespace (optional), doClose, selectItem(optional)
 test('render', async () => {
   let doClose = jest.fn(() => {});
   IMG_PROMISE = Promise.resolve({media: {"": [
@@ -62,7 +68,7 @@ test('renderWithSelect', async () => {
       {fileName:"bigestFile.png", fileSize:1000000000, width:520, height:500, uploadedBy:"Bob", },
   ]}, namespaces: { namespace:"", children:[]}});
   
-    render(<MediaFrame doClose={doClose} selectItem={doSelect}/>);
+    let container = render(<MediaFrame doClose={doClose} selectItem={doSelect}/>);
     await waitFor(() => {});
   
     expect(screen.getByText("NsTree")).toBeInTheDocument();
@@ -72,6 +78,14 @@ test('renderWithSelect', async () => {
     expect(screen.getByRole("button", {name: 'file.png'})).toBeInTheDocument();
     expect(screen.getByRole("button", {name: 'bigFile.png'})).toBeInTheDocument();
     expect(screen.getByRole("button", {name: 'bigestFile.png'})).toBeInTheDocument();
+
+    setAlignment("Left");
+    await waitFor(() => {});
+
+    await screen.getByRole("button", {name: 'file.png'}).click();
+
+    expect(doSelect.mock.calls[0][0]).toBe("file.png");
+    expect(doSelect.mock.calls[0][1]).toBe("Left");
   });
 
 test('basicButtons', async () => {

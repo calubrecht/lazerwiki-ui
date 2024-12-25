@@ -273,7 +273,7 @@ test('pageFrame clicking button again closes', async () => {
 });
 
 jest.mock("../MediaFrame", () => (props) => {
-  callSelectItem = (item) => props.selectItem(item);
+  callSelectItem = (item, alignment) => props.selectItem(item, alignment);
   doFrameClose = props.doClose;
   return "MediaFrame";}
 );
@@ -294,11 +294,20 @@ test('mediaFrame', async () => {
   await userEvent.click(btn);
   expect(screen.getByText("MediaFrame")).toBeInTheDocument();
 
-  await act( () => callSelectItem("newImage"));
+  await act( () => callSelectItem("newImage", "Flow"));
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 
   
   expect(text).toBe("{{newImage|}}");
+
+  await act( () => callSelectItem("newImageLeft", "Left"));
+  expect(text).toBe("{{newImageLeft |}}");
+
+  await act( () => callSelectItem("newImageRight", "Right"));
+  expect(text).toBe("{{ newImageRight|}}");
+
+  await act( () => callSelectItem("newImageCenter", "Center"));
+  expect(text).toBe("{{ newImageCenter |}}");
 
   await userEvent.click(btn);
   await act(() => doFrameClose());
