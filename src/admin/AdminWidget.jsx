@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import './AdminWidget.css';
 import {instance as US_instance} from '../svc/UserService';
 import {instance as DS_instance} from '../svc/DataService';

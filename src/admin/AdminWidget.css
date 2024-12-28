@@ -78,6 +78,11 @@ dialog.AdminDialog div.settingsBody.hidden {
 }
 
 
+div.error {
+    color: red;
+}
+
+
 div.SettingsField textarea {
   resize: none;
   vertical-align: top;

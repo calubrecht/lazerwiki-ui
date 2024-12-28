@@ -1,8 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import  {useEffect, useState} from 'react';
 import './App.css';
 import {instance as DS_instance, FOUR_O_THREE} from './svc/DataService';
 import {instance as US_instance} from './svc/UserService';
+import DrawerLink from './DrawerLink';
 import LoginFrame from './LoginFrame';
+import UserAdminDialog from './admin/UserAdminDialog';
 
 
 function logout() {
@@ -40,7 +42,7 @@ function UserWidget() {
       {
         initted ? (
           userName ? (
-             <div><span>Hi, {userName}</span> <button className="logout button-unstyled" onClick={logout}>LogOut</button></div>
+             <div><DrawerLink extraClasses="AdminWidget UserAdminWidget" title={"Hi, " + userName} component={UserAdminDialog} initData={{}}/>  <button className="logout button-unstyled" onClick={logout}>LogOut</button></div>
           ) :
              <div>
                <div><span>Hi, Guest</span></div>

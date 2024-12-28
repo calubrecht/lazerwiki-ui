@@ -156,6 +156,15 @@ export default class DataService
          .then(this.handleErrors)
          .then(res => res.json());
   }
+
+  setPassword(username, password) {
+    return fetch(
+        this.baseRequest + 'users/setPassword',
+        {method: 'post', body: JSON.stringify({userName: username, password:password}), credentials: 'include',
+          headers: this.getPostHeaders() })
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
   
   getUsers() {
     return fetch(
