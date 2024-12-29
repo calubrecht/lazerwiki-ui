@@ -11,6 +11,7 @@ jest.mock("../svc/DataService", () => {
 });
 
 jest.mock("../LoginFrame", () => () =>  "Login Frame" );
+jest.mock("../admin/UserAdminDialog", () => () =>  "");
 
 let realConsolelog = console.log;
 let realConsoleerror = console.error;
@@ -81,16 +82,19 @@ test('render already logged in',  async() => {
     expect(screen.getByText('Login Frame')).toBeInTheDocument();
 });
 
+
+
 test('Logout with error',  async() => {
     let resolveHook = null
-    mockDS.getUser = jest.fn(() => new Promise((resolve, reject) => resolveHook=resolve));
+    mockDS.getUser = jest.fn(() => new Promise((resolve,) => resolveHook=resolve));
     mockDS.logout = () => Promise.reject("oof");
     await render(<UserWidget  /> );
     
-    await waitFor(() => {resolveHook({userName: 'Joe'})});
+    await act(async() => await resolveHook({userName: 'Joe'}));
+    await act( () => waitFor(() => {}));
 
-    await userEvent.click(screen.getByRole("button", {name: "LogOut"}));
-    await waitFor(() => {});
+    await act(() =>  userEvent.click(screen.getByRole("button", {name: "LogOut"})));
+    await act( () => waitFor(() => {}));
     
     await expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
     expect(screen.getByText('Login Frame')).toBeInTheDocument();

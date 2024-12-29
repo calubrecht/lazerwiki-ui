@@ -25,10 +25,13 @@ function renderGeneralSettings( visible, setters) {
     const className = "settingsBody"; // visible ? "settingsBody" : "settingsBody hidden";
     let disabled = false;
     let savePasswordEnabled = setters.newPassword && (setters.newPassword === setters.confirmPassword);
+    //The text and password here are to prevent FF from auto filling login credentials because it ignores autocomplete="off"
     return <div className={className} aria-label="SettingSiteBody" ><h1>General Settings</h1>
         <h2>Change Password</h2>
-        <TextField name="Password" label="New Password:" onChange={(v,) => setters.setNewPassword(v)} disabled={disabled} varName="password" isPassword={true} value={setters.newPassword}/>
-        <TextField name="Password" label="Confirm Password:" onChange={(v,) => setters.setConfirmPassword(v)} disabled={disabled} varName="confirmPassword" isPassword={true} value={setters.confirmPassword}/>
+        <input type="text" style={{display: "none"}}></input>
+            <input type="password" style={{display: "none"}}></input>
+        <TextField name="New Password" label="New Password:" onChange={(v,) => setters.setNewPassword(v)} disabled={disabled} varName="password" isPassword={true} value={setters.newPassword} autoComplete="off"/>
+        <TextField name="Confirm Password" label="Confirm Password:" onChange={(v,) => setters.setConfirmPassword(v)} disabled={disabled} varName="confirmPassword" isPassword={true} value={setters.confirmPassword} autoComplete="off"/>
         <button disabled = {!savePasswordEnabled} onClick={() => submitSavePassword(setters) }>Save Password</button>
 
         <div className="error">{setters.error}</div>

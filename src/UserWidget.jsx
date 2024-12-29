@@ -42,7 +42,7 @@ function UserWidget() {
       {
         initted ? (
           userName ? (
-             <div><DrawerLink extraClasses="AdminWidget UserAdminWidget" title={"Hi, " + userName} component={UserAdminDialog} initData={{}}/>  <button className="logout button-unstyled" onClick={logout}>LogOut</button></div>
+             <div><DrawerLink extraClasses="UserAdminWidget" title={"Hi, " + userName} component={UserAdminDialog} initData={{}}/>  <button className="logout button-unstyled" onClick={logout}>LogOut</button></div>
           ) :
              <div>
                <div><span>Hi, Guest</span></div>

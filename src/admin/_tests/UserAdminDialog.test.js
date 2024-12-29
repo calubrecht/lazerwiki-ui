@@ -28,15 +28,15 @@ test('enter passwords', async () => {
         US_instance().setUser({userName: "bob", siteName:"test",userRoles:[]});
         render(<UserAdminDialog/>);
 
-        screen.queryByLabelText('New Password:').focus();
-        await userEvent.keyboard("a password");
-        expect(screen.queryByText('Save Password')).not.toBeEnabled();
-        screen.queryByLabelText('Confirm Password:').focus();
-        await userEvent.keyboard("a password");
-        expect(screen.queryByText('Save Password')).toBeEnabled();
+    screen.queryByLabelText('New Password:').focus();
+    await act( () => userEvent.keyboard("a password"));
+    expect(screen.queryByText('Save Password')).not.toBeEnabled();
+    screen.queryByLabelText('Confirm Password:').focus();
+    await act( () => userEvent.keyboard("a password"));
+    expect(screen.queryByText('Save Password')).toBeEnabled();
 
-        SET_PASSWORD_PROMISE = Promise.resolve({success: false, message: "no good"});
-        await userEvent.click( screen.queryByText('Save Password'));
+    SET_PASSWORD_PROMISE = Promise.resolve({success: false, message: "no good"});
+    await act(async () => await userEvent.click( screen.queryByText('Save Password')));
 
     expect(screen.queryByText('no good')).toBeInTheDocument();
 
@@ -45,11 +45,10 @@ test('enter passwords', async () => {
     let resolveFnc = null;
     SET_PASSWORD_PROMISE = new Promise((resolve, ) => resolveFnc = resolve);
 
-    await userEvent.click( screen.queryByText('Save Password'));
+    await act(async () => await userEvent.click( screen.queryByText('Save Password')));
     expect(screen.queryByText('no good')).not.toBeInTheDocument();
 
-    await act( () => resolveFnc({success: true}));
-    await waitFor( () => {});
+    await act( async () => await resolveFnc({success: true}));
 
     expect(screen.queryByText('Save Password')).not.toBeEnabled();
 });
