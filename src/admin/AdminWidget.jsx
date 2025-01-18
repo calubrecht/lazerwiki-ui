@@ -3,6 +3,7 @@ import './AdminWidget.css';
 import {instance as US_instance} from '../svc/UserService';
 import {instance as DS_instance} from '../svc/DataService';
 import DrawerLink from '../DrawerLink';
+import SliderInput from '../SliderInput';
 import SiteSetup from './SiteSetup';
 import UserSetup from './UserSetup';
 import SiteSettings from './SiteSettings';
@@ -17,16 +18,20 @@ function userHasGlobalAdmin(roles) {
 }
 
 function renderGlobalSettings(sites, setSites, visible) {
+    let enableSelfReg = true;
+    let setEnableSelfReg = (t) => {};
   const className = visible ? "settingsBody" : "settingsBody hidden";
-  return <div className={className} aria-label="SettingSiteBody" ><h1>Global Settings</h1>
+  return <div className={className} aria-label="SettingSiteBody"><h1>Global Settings</h1>
       <SiteSetup activeSites={sites} setSites={setSites}/>
-      <UserSetup />
-    </div>;
+      <UserSetup/>
+      <div className='clear'></div>
+      <div className='enableSelfReg'><SliderInput label="Enable Self Registration" id="globalEnableSelfReg" value={enableSelfReg} setter={setEnableSelfReg}/></div>
+  </div>;
 }
 
 function renderDlgBody(tab, sites, setSites) {
- return <div>
-    {renderGlobalSettings(sites, setSites, tab === 'Global Settings')}
+    return <div>
+        {renderGlobalSettings(sites, setSites, tab === 'Global Settings')}
     {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} siteSettings={site.settings} siteHostname={site.hostname} visible={site.siteName === tab}/>)}</div>
 }
 

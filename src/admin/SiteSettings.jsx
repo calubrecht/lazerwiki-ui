@@ -46,5 +46,5 @@ export default function SiteSettings(props) {
 }
 
 SiteSettings.propTypes = {
-  siteDisplayName: PropTypes.string, siteName: PropTypes.string, siteHostname: PropTypes.string, siteSettings: PropTypes.string, visible: PropTypes.bool
+  siteDisplayName: PropTypes.string, siteName: PropTypes.string, siteHostname: PropTypes.string, siteSettings: PropTypes.object, visible: PropTypes.bool
 };

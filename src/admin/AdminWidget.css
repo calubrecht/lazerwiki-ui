@@ -88,4 +88,6 @@ div.SettingsField textarea {
   vertical-align: top;
   width:400px;
 }
-
+div.enableSelfReg {
+    margin-top:1em;
+}
