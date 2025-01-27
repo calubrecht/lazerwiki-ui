@@ -3,7 +3,7 @@ import './SliderInput.css';
 
 export default function SliderInput(props) {
     return <span><label className='realLabel' htmlFor={props.id}>{props.label}</label><label className="sliderSwitch">
-        <input id={props.id} type="checkbox"/>
+        <input id={props.id} type="checkbox" checked={props.value} onChange={(e) => props.setter(e.target.checked)}/>
         <span className="slider round"></span>
     </label></span>;
 }

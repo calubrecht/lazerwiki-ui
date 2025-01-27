@@ -351,6 +351,23 @@ export default class DataService
         .then(res => res.json());
   }
 
+  getGlobalSettings() {
+    return fetch(
+        this.baseRequest + 'admin/globalSettings')
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
+  setGlobalSettings(settings) {
+    return fetch(
+        this.baseRequest + 'admin/globalSettings',
+        {method: 'post', credentials: 'include',
+          body: JSON.stringify(settings),
+          headers: this.getPostHeaders()})
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

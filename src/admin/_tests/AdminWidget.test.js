@@ -6,10 +6,22 @@ import AdminWidget from '../AdminWidget';
 
 let dUser = {userName: 'joe', userRoles:[]};
 
-let mockDS = {getSites: () => Promise.resolve([{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}, {siteName:"Site 3", name:"site3"}])};
+let mockDS = {
+    getSites: () => Promise.resolve([{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}, {siteName:"Site 3", name:"site3"}]),
+    getGlobalSettings: () => Promise.resolve({settings: {enableSelfReg: true}}),
+    setGlobalSettings: jest.fn(() => {})
+};
 
 jest.mock("../../svc/DataService", () => {
     return {instance: () => mockDS};
+
+});
+
+let  sliderChange = undefined;
+
+jest.mock("../../SliderInput", () => (props) => {
+    sliderChange = props.setter;
+    return <div>Slider</div>;
 
 });
 
@@ -68,7 +80,7 @@ test('render sidebar', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
     let component = render(<AdminWidget/>);
 
-    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    await act ( () => userEvent.click(screen.getByRole("button", {name: "admin"})));
     let d = document.getElementsByClassName("AdminDialog")[0];
     document.getElementsByClassName("AdminDialog")[0].open = true;
 
@@ -78,7 +90,7 @@ test('render sidebar', async () => {
     expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toHaveClass("selectedTab");
 
-    await userEvent.click(screen.getByRole("button", {name: "X"}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: "X"})));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
@@ -87,7 +99,7 @@ test('render sidebar as site Admin', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN:test"]});
     let component = render(<AdminWidget/>);
 
-    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: "admin"})));
     let d = document.getElementsByClassName("AdminDialog")[0];
     document.getElementsByClassName("AdminDialog")[0].open = true;
 
@@ -97,7 +109,7 @@ test('render sidebar as site Admin', async () => {
     expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Site 1"})).toHaveClass("selectedTab");
 
-    await userEvent.click(screen.getByRole("button", {name: "X"}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: "X"})));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 }, 300000);
@@ -106,7 +118,7 @@ test('selectTab', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
     let component = render(<AdminWidget/>);
 
-    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    await act(()=>userEvent.click(screen.getByRole("button", {name: "admin"})));
     document.getElementsByClassName("AdminDialog")[0].open = true;
 
     let settingBody = screen.getByLabelText("SettingSiteBody");
@@ -115,7 +127,7 @@ test('selectTab', async () => {
     expect(within(settingBody).getByText("UserSetup")).toBeInTheDocument();
 
     let sidebar = screen.getByLabelText("SettingSiteTabs");
-    await userEvent.click(within(sidebar).getByRole("button", {name: "Site 1"}));
+    await act(()=>userEvent.click(within(sidebar).getByRole("button", {name: "Site 1"})));
     expect(screen.getByText("Settings for - Site 1 - visible")).toBeInTheDocument();
     expect(screen.getByText("Settings for - Site 2 - hidden")).toBeInTheDocument();
     expect(screen.getByText("Settings for - Site 3 - hidden")).toBeInTheDocument();
@@ -125,7 +137,7 @@ test('update Sitelist', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
     let component = render(<AdminWidget/>);
 
-    await userEvent.click(screen.getByRole("button", {name: "admin"}));
+    await act(()=>userEvent.click(screen.getByRole("button", {name: "admin"})));
     let d = document.getElementsByClassName("AdminDialog")[0];
     document.getElementsByClassName("AdminDialog")[0].open = true;
 
@@ -141,3 +153,18 @@ test('update Sitelist', async () => {
     expect(within(sidebar).getByRole("button", {name: "Site 5"})).toBeInTheDocument();
     expect(within(sidebar).queryByRole("button", {name: "Site 2"})).not.toBeInTheDocument();
 });
+
+test('test Slider', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
+    let component = render(<AdminWidget/>);
+
+    await act(()=>userEvent.click(screen.getByRole("button", {name: "admin"})));
+    let d = document.getElementsByClassName("AdminDialog")[0];
+    document.getElementsByClassName("AdminDialog")[0].open = true;
+
+    sliderChange(true);
+
+    expect(mockDS.setGlobalSettings.mock.calls.length).toBe(1);
+    expect(mockDS.setGlobalSettings.mock.calls[0][0]).toStrictEqual({id: 1, settings:{enableSelfReg: true}});
+});
+
