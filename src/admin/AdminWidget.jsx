@@ -2,6 +2,7 @@ import {useEffect, useState, useRef} from 'react';
 import './AdminWidget.css';
 import {instance as US_instance} from '../svc/UserService';
 import {instance as DS_instance} from '../svc/DataService';
+import {instance as SS_instance} from '../svc/SettingsService';
 import DrawerLink from '../DrawerLink';
 import SliderInput from '../SliderInput';
 import SiteSetup from './SiteSetup';
@@ -23,7 +24,7 @@ function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings
     let setEnableSelfReg = (t) => {
         let newSettings = {...globalSettings, enableSelfReg: t};
         setGlobalSettings(newSettings);
-        DS_instance().setGlobalSettings({id: 1, settings: newSettings});
+        SS_instance().updateSettings(newSettings);
     };
   const className = visible ? "settingsBody" : "settingsBody hidden";
   return <div className={className} aria-label="SettingSiteBody"><h1>Global Settings</h1>
@@ -54,9 +55,8 @@ function AdminDialog(props) {
     DS_instance().getSites().then(sites => {
       setSites(sites);
     });
-    DS_instance().getGlobalSettings().then(settings => {
-        setGlobalSettings(settings.settings);
-    })
+    setGlobalSettings(SS_instance().getSettings());
+    SS_instance().addListener({setSettings: setGlobalSettings })
  }, []);
  const dlgRef = useRef();
  useEffect(() => {

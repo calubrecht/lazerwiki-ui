@@ -1,0 +1,9 @@
+div.loginForm button.drawerPull::after {
+    content: ' \25BC';
+    color: gray;
+}
+
+div.loginForm button.drawerPull.open::after {
+    content: ' \25B2';
+    color: #aa0000;
+}

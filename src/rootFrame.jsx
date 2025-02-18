@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {instance as DS_instance} from './svc/DataService';
 import {instance as RES_instance} from './svc/RenderEnhancerService';
+import {instance as SS_instance} from './svc/SettingsService';
 import PageSearchFrame from './PageSearchFrame';
 import PreviewFrame from './PreviewFrame';
 import EditableTextbox from './EditableTextbox';
@@ -51,6 +52,8 @@ export default class RootFrame extends Component
       this.setState({siteTitle:res});
       document.title = res + " - " + this.state.pageTitle;});
     RES_instance().enhanceRenderedCode(this.rootRef.current);
+    DS_instance().getGlobalSettings().then(settings => {
+      SS_instance().setSettings(settings.settings);});
   }
 
   componentWillUnmount() {
