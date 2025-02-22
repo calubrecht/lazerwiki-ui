@@ -37,6 +37,12 @@ export default class DataService
          e.promise = response.text();
          throw e;
       }
+      let text = response.text();
+      if (text) {
+        let e = Error(response.statusText);
+        e.promise = text;
+        throw e;
+      }
       throw Error(response.statusText);
     }
     return response;

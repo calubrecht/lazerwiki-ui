@@ -15,7 +15,11 @@ export default class LoginFrame extends Component
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleError = this.handleError.bind(this);
-    this.state = {error:'', username:'', password:'', disabled: false, 'enableSelfReg': this.checkSelfRegSetting()};
+    this.state = {error:'', username:'', password:'', disabled: false, 'enableSelfReg': false};
+  }
+
+  componentDidMount() {
+    this.checkSelfRegSetting();
   }
 
   render()
@@ -64,10 +68,10 @@ export default class LoginFrame extends Component
   checkSelfRegSetting() {
     SS_instance().addListener(this);
     let settings = SS_instance().getSettings();
-    return settings.enableSelfReg;
+    this.setSettings(settings);
   }
 
   setSettings(settings) {
-    this.setState({enableSelfRef: settings.enableSelfReg});
+    this.setState({enableSelfReg: settings.enableSelfReg});
   }
 }

@@ -7,6 +7,7 @@ let FETCH_PAGE_PROMISE = new Promise(() => {});
 let savePageData = {};
 
 let mockDS = {fetchPage: jest.fn(() => FETCH_PAGE_PROMISE), getUIVersion: () => Promise.resolve({version:"test.0"}),
+        getGlobalSettings: () => Promise.resolve({settings: {}}),
  getVersion: () => Promise.resolve({version:"uttest.0"} ), getSiteName: () => Promise.resolve("Test Site"),
  savePage: jest.fn(() => Promise.resolve(savePageData)),
  deletePage: jest.fn(() => Promise.resolve()),
@@ -113,8 +114,8 @@ test('render edit', async () => {
     window.location.hash ="#Edit";
     US_instance().setUser({userName:"Bob"});
     let resolveHook = null
-    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
-    let comp = render(<RootFrame/>);
+    FETCH_PAGE_PROMISE = new Promise((resolve, ) => {resolveHook=resolve;});
+    render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: true}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
     await waitFor( () => {});
  
@@ -126,12 +127,12 @@ test('render edit', async () => {
     expect(screen.getByText('DrawerLink-Show Preview')).toBeInTheDocument();
     expect(previewDrawerInit()).toBe("Previewed");
 
-    await userEvent.click(screen.getByRole('button', {name:"Cancel"}));
+    await act(async () => await userEvent.click(screen.getByRole('button', {name:"Cancel"})));
  
     expect(mockCancel.mock.calls).toHaveLength(1);
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
-    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    await act(async() => await userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
+    await act(async() => await userEvent.click(screen.getByRole('button', {name:"Save Page"})));
 
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
     expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
@@ -141,12 +142,12 @@ test('render edit', async () => {
     expect(screen.getByText('New render')).toBeInTheDocument();
 
     // Test actions initiated by textbox (keyboard actions)
-    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
-    await waitFor( () => textBox_cancelEdit());
+    await act(async() => await userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
+    await act( () => textBox_cancelEdit());
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
-    await waitFor( () => textBox_savePage({preventDefault: () =>{}}));
+    await act(async() => await userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
+    await act(async () => await textBox_savePage({preventDefault: () =>{}}));
     expect(mockDS.savePage.mock.calls).toHaveLength(2);
     expect(mockCleanup.mock.calls).toHaveLength(2);
     expect(mockDS.savePage.mock.calls[1][0]).toBe(""); // pageName
@@ -162,14 +163,14 @@ test('saveConfirmOverwrite', async () => {
     US_instance().setUser({userName:"Bob"});
     let resolveHook = null
     FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
-    let comp = render(<RootFrame/>);
+    render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: true}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
     await waitFor( () => {});
  
     expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
     mock_edittedText = {source:'saveThis'};
     
-    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    await act( async() => await userEvent.click(screen.getByRole('button', {name:"Save Page"})));
 
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
     expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
@@ -179,7 +180,7 @@ test('saveConfirmOverwrite', async () => {
     let dlg= document.getElementsByClassName("confirmRevOverrideDialog")[0];
     dlg.open = true;
 
-    await userEvent.click(screen.getByRole('button', {name:"Return to Edit"}));
+    await act( async() => await userEvent.click(screen.getByRole('button', {name:"Return to Edit"})));
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Return to Edit"})).not.toBeInTheDocument();
@@ -187,18 +188,18 @@ test('saveConfirmOverwrite', async () => {
     expect(mockCleanup.mock.calls).toHaveLength(0);
 
     dlg.open = true;
-    await userEvent.click(screen.getByRole('button', {name:"Cancel Edit"}));
+    await act( async ()=> await userEvent.click(screen.getByRole('button', {name:"Cancel Edit"})));
     dlg.open = false;
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
     expect(mockCleanup.mock.calls).toHaveLength(1);
 
-    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
-    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    await act (async() => await userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
+    await act( async() => await userEvent.click(screen.getByRole('button', {name:"Save Page"})));
     dlg.open = true;
 
     savePageData = {flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[], success:true};
-    await userEvent.click(screen.getByRole('button', {name:"Overwrite Page"}));
+    await act( async() => userEvent.click(screen.getByRole('button', {name:"Overwrite Page"})));
     dlg.open = false;
     expect(mockDS.savePage.mock.calls).toHaveLength(3);
     expect(mockDS.savePage.mock.calls[2][0]).toBe(""); // pageName
@@ -207,7 +208,7 @@ test('saveConfirmOverwrite', async () => {
 
 
     expect(screen.getByText('New render')).toBeInTheDocument();
-}, 300000);
+});
 
 test('do delete', async () => {
     delete global.window.location;
@@ -221,30 +222,30 @@ test('do delete', async () => {
     await waitFor( () => {});
  
 
-    await userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
+    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete Page"})));
     expect(screen.getByText('Are you sure you want to delete this page?')).toBeInTheDocument();
     let dlg= document.getElementsByClassName("deletePageDialog")[0];
     dlg.open = true;
-    
 
-    await userEvent.click(screen.getByRole('button', {name:"Cancel"}));
+
+    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Cancel"})));
     expect(mockDS.deletePage.mock.calls).toHaveLength(0);
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
-    
-    await userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
+
+    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete Page"})));
     dlg.open = true;
-    await userEvent.click(screen.getByRole('button', {name:"Delete"}));
+    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete"})));
     expect(mockDS.deletePage.mock.calls).toHaveLength(1);
     expect(mockDS.deletePage.mock.calls[0][0]).toBe("page1"); // pageName
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
+    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete Page"})));
     dlg.open = true;
     console.log.mockClear();
     mockDS.deletePage = jest.fn(() => Promise.reject("Failure"));
-    await userEvent.click(screen.getByRole('button', {name:"Delete"}));
+    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete"})));
     expect(console.log.mock.calls[0][0]).toBe("Failure");
 });
 
@@ -300,14 +301,14 @@ test('image dialog', async () => {
     await waitFor( () => {});
     
     // First opens dialog
-    await userEvent.click(screen.getByTitle("img1"));
+    await act(async() =>userEvent.click(screen.getByTitle("img1")));
     let dlg= document.getElementsByClassName("showImageDialog")[0];
     let img= dlg.getElementsByTagName("img")[0];
     dlg.open = true;
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(img).toHaveAttribute("src", "http://localhost/test.png");
 
-    await userEvent.click(screen.getByRole("button", {name: "Close"}));
+    await act(async() => userEvent.click(screen.getByRole("button", {name: "Close"})));
     document.getElementsByClassName("showImageDialog")[0].open = false;
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(img).not.toHaveAttribute("src", "http://localhost/test.png");
@@ -320,7 +321,6 @@ jest.mock("../PageSearchFrame", () => (props) => {
 });
 
 test('render tags', async () => {
-    let resolveHook = null;
     US_instance().setUser({userName:"Bob"});
     FETCH_PAGE_PROMISE = Promise.resolve({flags: {exists:true}, rendered: "Page with Tags", tags:["blue", "green"]});
     render(<RootFrame/>);
@@ -330,30 +330,30 @@ test('render tags', async () => {
     expect(screen.getByRole('button', {name: 'blue'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'green'})).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    await act(async() => userEvent.click(screen.getByRole('button', {name: 'blue'})));
     expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
     await waitFor(() => pageSearchClose());
     expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    await act(async() => userEvent.click(screen.getByRole('button', {name: 'blue'})));
     expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
     // Clicking a tag button while the tag search window is open will close it.
-    await userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    await act(async() => userEvent.click(screen.getByRole('button', {name: 'blue'})));
     expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
 });
 
 test('render view source', async () => {
     US_instance().setUser({userName:"Bob"});
     let resolveHook = null
-    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
-    let comp = render(<RootFrame/>);
+    FETCH_PAGE_PROMISE = new Promise((resolve, ) => {resolveHook=resolve;});
+    render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: false}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
     await waitFor( () => {});
  
-    await userEvent.click(screen.getByRole('button', {name:"View Source"}));
+    await act(async() => userEvent.click(screen.getByRole('button', {name:"View Source"})));
     expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', {name:"Cancel"}));
+    await act(async() => userEvent.click(screen.getByRole('button', {name:"Cancel"})));
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
     expect(screen.getByText('Rendered Text for Bob')).toBeInTheDocument();
 
@@ -368,8 +368,6 @@ test('test errors',  async () => {
     expect(console.log.mock.calls[2][0]).toBe("Not for you");
     comp.unmount();
 
-    let rejectHook = null
-    let savePagePromise = new Promise((resolve, reject) => {rejectHook=reject;});
     FETCH_PAGE_PROMISE = Promise.resolve({flags: {exists:true, userCanWrite:true}, rendered: "Rendered", source:"source", tags:[]});
     render(<RootFrame/>);
     await waitFor( () => {});
@@ -377,11 +375,10 @@ test('test errors',  async () => {
     console.log.mockClear();
     let realMock = mockDS.savePage;
     mockDS.savePage = () => Promise.reject("Cannot Save");
-    await userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
-    await userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    await act(async() => userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
+    await act(async() => userEvent.click(screen.getByRole('button', {name:"Save Page"})));
     await waitFor( () => {});
 
-    let calls = console.log.mock.calls;
     expect(console.log.mock.calls[0][0]).toBe("Cannot Save");
     mockDS.savePage= realMock;
 });

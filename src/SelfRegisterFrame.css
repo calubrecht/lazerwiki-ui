@@ -1,7 +1,7 @@
 div.selfRegisterFrame {
   position:absolute;
-  width:200px;
-  height:200px;
+  width:320px;
+  height:150px;
   right: 0;
   top:130px;
   background:white;
@@ -21,4 +21,13 @@ div.selfRegisterFrame button.close {
 
 div.selfRegisterFrame div.box {
   clear: both;
+  margin-bottom: .75em;
+}
+
+div.selfRegisterFrame div.passwordMessage {
+  color: darkred;
+}
+
+div.selfRegisterFrame button.submitButton {
+  margin-right: .5em;
 }

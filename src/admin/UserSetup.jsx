@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {instance as DS_instance} from '../svc/DataService';
 import './UserSetup.css';
 

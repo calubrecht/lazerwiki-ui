@@ -45,7 +45,7 @@ div#userWidget {
 div.UserWidget {
   background: lightgray;
   padding:10px;
-  height:110px;
+  max-height:110px;
 }
 
 div#appWrapper {
