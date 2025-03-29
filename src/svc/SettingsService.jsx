@@ -43,6 +43,6 @@ export function instance() {
     return INSTANCE;
 }
 
-export function setInstance(instance) {
+/*export function setInstance(instance) {
     INSTANCE = instance;
-}
+}*/
