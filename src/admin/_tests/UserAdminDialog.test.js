@@ -58,7 +58,8 @@ test('enter passwords', async () => {
     let resolveFnc = null;
     SET_PASSWORD_PROMISE = new Promise((resolve, ) => resolveFnc = resolve);
 
-    await act(async () => await userEvent.click( screen.queryByText('Save Password')));
+    screen.queryByLabelText('Confirm Password:').focus();
+    await act( () => userEvent.keyboard("[Enter]"));
     expect(screen.queryByText('no good')).not.toBeInTheDocument();
 
     await act( async () => await resolveFnc({success: true}));
@@ -101,7 +102,8 @@ test('enter email', async () => {
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.com");
     expect(screen.queryByText('Save Email')).toBeEnabled();
 
-    await(act(async () => await screen.queryByText('Save Email').click()));
+    screen.queryByLabelText('Email:').focus();
+    await act( () => userEvent.keyboard("[Enter]"));
 
     expect(screen.queryByText('Verify Email')).toBeInTheDocument();
 

@@ -54,13 +54,15 @@ function renderGeneralSettings( visible, setters) {
         <TextField name="New Password" label="New Password:" onChange={(v,) => setters.setNewPassword(v)}
                    disabled={disabled} varName="password" isPassword={true} value={setters.newPassword}
                    autoComplete="off"/>
+        <div onKeyDown={(ev) => handleKeyDown(ev, savePasswordEnabled, () => submitSavePassword(setters))}>
         <TextField name="Confirm Password" label="Confirm Password:" onChange={(v,) => setters.setConfirmPassword(v)}
                    disabled={disabled} varName="confirmPassword" isPassword={true} value={setters.confirmPassword}
-                   autoComplete="off"/>
+                   autoComplete="off"/></div>
         <button disabled={!savePasswordEnabled} onClick={() => submitSavePassword(setters)}>Save Password</button>
+        <div onKeyDown={(ev) => handleKeyDown(ev, saveEmailEnabled, () => submitSaveEmail(setters))}>
         <TextField name="Email" label="Email:" onChange={(v,) => setters.setEmail(v)}
                    disabled={disabled} varName="email" isPassword={false} value={setters.email || ''}
-                   autoComplete="off"/>
+                   autoComplete="off"/></div>
         <button disabled={!saveEmailEnabled} onClick={() => submitSaveEmail(setters)}>Save Email</button>
 
         <div className="error">{setters.error}</div>
@@ -70,6 +72,19 @@ function renderGeneralSettings( visible, setters) {
 function renderDlgBody(tab, setters) {
     return <div>
         {renderGeneralSettings(tab === 'General', setters)}</div>
+}
+
+function handleKeyDown(ev, isactive, action)
+{
+    if (ev.key === "Enter")
+    {
+        ev.stopPropagation();
+        ev.preventDefault();
+        if (!isactive) {
+            return;
+        }
+        action();
+    }
 }
 
 function UserAdminDialog(props) {
