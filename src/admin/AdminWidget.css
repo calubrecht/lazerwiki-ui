@@ -91,3 +91,34 @@ div.SettingsField textarea {
 div.enableSelfReg {
     margin-top:1em;
 }
+
+div.VerifyEmailBackdrop {
+    position:fixed;
+    left:0px;
+    top:0px;
+    height:100%;
+    width:100%;
+    background:rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.VerifyEmailFrame {
+    padding: 1em;
+    border: 3px solid black;
+    height:10em;
+    width:30em;
+    background:white;
+}
+
+div.VerifyEmailFrame > div {
+    margin-bottom: 1em;
+}
+
+div.VerifyEmailFrame button.close{
+    float:right;
+    margin:-1em -.5em;
+    color: red;
+    font-weight: bold;
+}

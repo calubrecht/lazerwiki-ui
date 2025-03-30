@@ -2,12 +2,44 @@ import {useEffect, useState, useRef} from 'react';
 import './AdminWidget.css';
 import {PropTypes} from "prop-types";
 import UserAdminDialog from "./UserAdminDialog.jsx";
+import {instance as DS_instance} from '../svc/DataService';
+import TextField from "../TextField.jsx";
 
-function VerifyEmailFrame(props) {
-  return "verifyEmail";
+
+function doVerify(token, onSuccess, setMessage) {
+  setMessage("");
+  DS_instance().verifyEmailToken(token).then(response => {
+     if (response.success) {
+       onSuccess();
+     }
+     else {
+       setMessage(response.message);
+     }
+  })
 }
 
-//UserAdminDialog.propTypes = {doClose:PropTypes.func};
+function VerifyEmailFrame(props) {
+  let email = "something@what.com";
+  const [token, setToken] = useState("");
+  const [message, setMessage] = useState("");
+  let disabled = false;
+  return <div className="VerifyEmailBackdrop" onClick = {(ev) => {if (ev.target === ev.currentTarget) {props.doClose()}}}>
+    <div className="VerifyEmailFrame">
+      <button onClick={() => props.doClose()} className="close button-unstyled">X</button>
+      <div className="heading">An email has been sent to {email} containing a verification code. Please verify your
+        email
+        by entering the code here.
+      </div>
+      <TextField name="VerificationToken" label="Verification Token:" onChange={setToken}
+                 disabled={disabled} varName="VerificationToken" isPassword={false} value={token}
+                 autoComplete="off"/>
+      <button onClick={() => doVerify(token, props.onSuccess, setMessage)}>Verify Token</button>
+      <div className="error">{message}</div>
+    </div>
+  </div>;
+}
+
+VerifyEmailFrame.propTypes = {doClose: PropTypes.func, onSuccess: PropTypes.func};
 
 
 export default VerifyEmailFrame;

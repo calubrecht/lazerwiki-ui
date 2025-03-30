@@ -180,6 +180,15 @@ export default class DataService
         .then(this.handleErrors)
         .then(res => res.json());
   }
+
+  verifyEmailToken(token) {
+    return fetch(
+        this.baseRequest + 'users/verifyEmailToken',
+        {method: 'post', body: token, credentials: 'include',
+          headers: this.getPostHeaders() })
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
   
   getUsers() {
     return fetch(
