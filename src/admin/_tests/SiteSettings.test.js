@@ -22,7 +22,7 @@ test('render novisible', () => {
 });
 
 test('enterField', async () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings="{}"/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}/>);
     
   await waitFor( () => {});
   expect(screen.getByLabelText('Site Name:').value).toBe("testSite");
@@ -44,7 +44,7 @@ jest.mock("../../svc/DataService", () => {
 });
 
 test('button', async () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings="{}"/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}/>);
     
   await waitFor( () => {});
   screen.getByLabelText("Site Hostname:").focus();
@@ -53,14 +53,14 @@ test('button', async () => {
   expect(screen.getByLabelText('Site Hostname:').value).toBe("host1");
 
   saveSettingsPromise =  Promise.resolve({site: {hostName: "host1", settings: "{}"}, success: true, msg:""})
-  await userEvent.click(screen.getByRole("button", {name: "Save"}));
+  await act( () => userEvent.click(screen.getByRole("button", {name: "Save"})));
 
   expect(mockDS.saveSiteSettings).toHaveBeenCalled();
   saveSettingsPromise =  Promise.resolve({site: {hostName: "host1", settings: "{}"}, success: false, msg:"oops"})
   screen.getByLabelText("Settings:").focus();
 
   await act( () => userEvent.keyboard("1"));
-  await userEvent.click(screen.getByRole("button", {name: "Save"}));
+  await act( () => userEvent.click(screen.getByRole("button", {name: "Save"})));
 
   await waitFor( () => {});
 

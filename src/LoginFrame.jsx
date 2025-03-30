@@ -58,7 +58,7 @@ export default class LoginFrame extends Component
 
   handleError()
   {
-    this.setState({error:'Invalid username or password', disabled: ''});
+    this.setState({error:'Invalid username or password', disabled: false});
   }
 
   onChangeField(val, field) {

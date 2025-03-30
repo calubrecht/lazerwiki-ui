@@ -55,17 +55,17 @@ test('size', async () => {
     expect(screen.getByLabelText("Width:")).toHaveValue("");
 
     await screen.getByLabelText("Width:").focus();
-    await userEvent.keyboard("10");
+    await act( () => userEvent.keyboard("10"));
     expect(screen.getByLabelText("Width:")).toHaveValue("10");
     expect(chooseX.mock.calls[0][0]).toBe(1);
     expect(chooseX.mock.calls[1][0]).toBe(10);
-    await userEvent.keyboard("{Backspace}{Backspace}");
+    await act( () => userEvent.keyboard("{Backspace}{Backspace}"));
     expect(chooseX.mock.calls[3][0]).toBe(null);
-    await userEvent.keyboard("a");
+    await act( () => userEvent.keyboard("a"));
     expect(screen.getByLabelText("Width:")).toHaveValue("");
     expect(chooseX.mock.calls).toHaveLength(4);
 
     await screen.getByLabelText("Height:").focus();
-    await userEvent.keyboard("5");
+    await act( () => userEvent.keyboard("5"));
     expect(chooseY.mock.calls[0][0]).toBe(5);
 });

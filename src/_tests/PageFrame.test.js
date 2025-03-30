@@ -124,7 +124,7 @@ test('filter',  async () => {
   act( ()=>resolvePageListHook(mockRes(mockPages)));
   await waitFor( () => {});
 
-  await userEvent.keyboard("page");
+  await act( () => userEvent.keyboard("page"));
 
   expect(screen.getByText('NSTREE')).toBeInTheDocument();
   expect(screen.getByText("Pages - []")).toBeInTheDocument();
@@ -134,13 +134,13 @@ test('filter',  async () => {
   expect(screen.queryByRole('link', {name: "<ROOT> - ROOT"})).not.toBeInTheDocument();
 
 
-  await userEvent.keyboard("{Control>}a{/Control}frank");
+  await act( () => userEvent.keyboard("{Control>}a{/Control}frank"));
   expect(screen.queryByRole('link', {name: "page1 - Page 1"})).not.toBeInTheDocument();
   expect(screen.queryByRole('link', {name: "page2"})).not.toBeInTheDocument();
   expect(screen.getByRole('link', {name: "Page3 - frank"})).toBeInTheDocument();
   expect(screen.queryByRole('link', {name: "<ROOT> - ROOT"})).not.toBeInTheDocument();
 
-  await userEvent.keyboard("{Control>}a{/Control}root");
+  await act( () => userEvent.keyboard("{Control>}a{/Control}root"));
   expect(screen.queryByRole('link', {name: "page1 - Page 1"})).not.toBeInTheDocument();
   expect(screen.queryByRole('link', {name: "page2"})).not.toBeInTheDocument();
   expect(screen.queryByRole('link', {name: "Page3 - frank"})).not.toBeInTheDocument();

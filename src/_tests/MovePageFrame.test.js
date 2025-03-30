@@ -97,12 +97,12 @@ test("moveFile", async() => {
     await waitFor(() => {});
 
     await screen.getByLabelText("Page Name").focus();
-    await userEvent.keyboard("moved");
+    await act( () => userEvent.keyboard("moved"));
     expect(screen.getByRole("button", {name: 'Move'})).not.toBeDisabled();
     await screen.getByLabelText("NS").focus();
-    await userEvent.keyboard("2");
+    await act( () => userEvent.keyboard("2"));
 
-    await userEvent.click(screen.getByRole("button", {name: 'Move'}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: 'Move'})));
 
 
     expect(mockDS.movePage).toHaveBeenCalled();
@@ -128,12 +128,12 @@ test("moveFileFails", async() => {
 
 
     await screen.getByLabelText("Page Name").focus();
-    await userEvent.keyboard("moved");
+    await act( () => userEvent.keyboard("moved"));
     expect(screen.getByRole("button", {name: 'Move'})).not.toBeDisabled();
     await screen.getByLabelText("NS").focus();
-    await userEvent.keyboard("2");
+    await act( () => userEvent.keyboard("2"));
 
-    await userEvent.click(screen.getByRole("button", {name: 'Move'}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: 'Move'})));
 
 
     expect(screen.getByText("No moving for you")).toBeInTheDocument();
@@ -142,7 +142,7 @@ test("moveFileFails", async() => {
     MOVE_PAGE_PROMISE = new Promise((resolve, reject) => {
         rejectCB = reject;
     });
-    await userEvent.click(screen.getByRole("button", {name: 'Move'}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: 'Move'})));
     await waitFor(() => {});
     await act( async () => {
         rejectCB("ERROR");

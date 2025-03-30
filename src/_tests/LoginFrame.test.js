@@ -21,14 +21,14 @@ test('attemptLogin', async () => {
     render(<LoginFrame  /> );
     await waitFor( () => {});
 
-    await userEvent.keyboard("myUser[Tab]myPass[Enter]");
+    await act( () => userEvent.keyboard("myUser[Tab]myPass[Enter]"));
 
     expect(US_instance().getUser()).toBe("myUser-loggedIn");
     let rejectCall = null
     mockDS.login = jest.fn((u, p) => new Promise((resolve, reject) => {rejectCall=reject}));
     
     await US_instance().setUser(null);
-    await userEvent.keyboard("[Enter]");
+    await act( () => userEvent.keyboard("[Enter]"));
     await rejectCall("Login Failed");
     await waitFor( () => {});
     expect(US_instance().getUser()).toBe(null);
