@@ -171,6 +171,15 @@ export default class DataService
         .then(this.handleErrors)
         .then(res => res.json());
   }
+
+  saveEmail(username, email) {
+    return fetch(
+        this.baseRequest + 'users/saveEmail',
+        {method: 'post', body: JSON.stringify({userName: username, email:email}), credentials: 'include',
+          headers: this.getPostHeaders() })
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
   
   getUsers() {
     return fetch(

@@ -1,6 +1,7 @@
 import {useEffect, useState, useRef} from 'react';
 import './AdminWidget.css';
 import TextField from "../TextField.jsx";
+import VerifyEmailFrame from "./VerifyEmailFrame.jsx";
 import {instance as DS_instance} from '../svc/DataService';
 import {instance as US_instance} from '../svc/UserService';
 import {PropTypes} from "prop-types";
@@ -20,19 +21,47 @@ function submitSavePassword(setters)
     });
 }
 
+function submitSaveEmail(setters)
+{
+    let u = US_instance().getUser().userName;
+    setters.setError("");
+    DS_instance().saveEmail(u, setters.email).then( (res) => {
+        if (res.success) {
+            setters.setDisplayVerifyEmail(true);
+        }
+        else {
+            setters.setError(res.message);
+        }
+    });
+}
+
+function verifyEmail(email) {
+    let regex = /^[\w\-.]+@[\w\-.]+(\.[\w\-.]+)+$/ ;
+    return regex.test(email);
+}
+
 
 function renderGeneralSettings( visible, setters) {
     const className = "settingsBody"; // visible ? "settingsBody" : "settingsBody hidden";
     let disabled = false;
     let savePasswordEnabled = setters.newPassword && (setters.newPassword === setters.confirmPassword);
+    let saveEmailEnabled = setters.email && (setters.email !== setters.savedEmail) && verifyEmail(setters.email);
     //The text and password here are to prevent FF from auto filling login credentials because it ignores autocomplete="off"
-    return <div className={className} aria-label="SettingSiteBody" ><h1>General Settings</h1>
+    return <div className={className} aria-label="SettingSiteBody"><h1>General Settings</h1>
         <h2>Change Password</h2>
         <input type="text" style={{display: "none"}}></input>
-            <input type="password" style={{display: "none"}}></input>
-        <TextField name="New Password" label="New Password:" onChange={(v,) => setters.setNewPassword(v)} disabled={disabled} varName="password" isPassword={true} value={setters.newPassword} autoComplete="off"/>
-        <TextField name="Confirm Password" label="Confirm Password:" onChange={(v,) => setters.setConfirmPassword(v)} disabled={disabled} varName="confirmPassword" isPassword={true} value={setters.confirmPassword} autoComplete="off"/>
-        <button disabled = {!savePasswordEnabled} onClick={() => submitSavePassword(setters) }>Save Password</button>
+        <input type="password" style={{display: "none"}}></input>
+        <TextField name="New Password" label="New Password:" onChange={(v,) => setters.setNewPassword(v)}
+                   disabled={disabled} varName="password" isPassword={true} value={setters.newPassword}
+                   autoComplete="off"/>
+        <TextField name="Confirm Password" label="Confirm Password:" onChange={(v,) => setters.setConfirmPassword(v)}
+                   disabled={disabled} varName="confirmPassword" isPassword={true} value={setters.confirmPassword}
+                   autoComplete="off"/>
+        <button disabled={!savePasswordEnabled} onClick={() => submitSavePassword(setters)}>Save Password</button>
+        <TextField name="Email" label="Email:" onChange={(v,) => setters.setEmail(v)}
+                   disabled={disabled} varName="email" isPassword={false} value={setters.email || ''}
+                   autoComplete="off"/>
+        <button disabled={!saveEmailEnabled} onClick={() => submitSaveEmail(setters)}>Save Email</button>
 
         <div className="error">{setters.error}</div>
     </div>;
@@ -48,11 +77,17 @@ function UserAdminDialog(props) {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [email, setEmail] = useState(US_instance().getUser().settings["email"]);
+    const [savedEmail, setSavedEmail] = useState("");
+    const [displayVerifyEmail, setDisplayVerifyEmail] = useState(false);
     let showSelectedTab = selectedTab;
     let tabList = ["General"];
     const dlgRef = useRef();
     useEffect(() => {
         dlgRef.current?.showModal?.();
+    }, [])
+    useEffect(() => {
+        // Get current setting emaildlgRef.current?.showModal?.();
     }, [])
     return (<dialog className="AdminDialog" ref={dlgRef}>
         <button onClick={() => props.doClose()} className="close button-unstyled">X</button>
@@ -64,7 +99,11 @@ function UserAdminDialog(props) {
                 return <button key={tab} className={className} onClick={() => setSelectedTab(tab)}>{tab}</button>
             })}
         </div>
-        {renderDlgBody(showSelectedTab, {newPassword, setNewPassword, confirmPassword, setConfirmPassword, error, setError})}
+        {renderDlgBody(showSelectedTab, {newPassword, setNewPassword, confirmPassword, setConfirmPassword, error, setError, email, setEmail, savedEmail, setSavedEmail, setDisplayVerifyEmail})}
+        {displayVerifyEmail && <VerifyEmailFrame doClose={() => setDisplayVerifyEmail(false)} onSuccess={() => {
+            setDisplayVerifyEmail(false);
+            setSavedEmail(email);
+        }}/>}
     </dialog>);
 }
 
