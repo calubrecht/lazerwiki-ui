@@ -24,7 +24,7 @@ export default function SelfRegisterFrame(props) {
 
     return <div className='selfRegisterFrame'>
         <button onClick={() => props.doClose()} className="close button-unstyled">X</button>
-        <div className='box'><TextField name="New Username" label="Username:"
+        <div className='box' onKeyDown={(ev) => handleKeyDown(ev, username, password, confirmPassword, setDisabled, setButtonDisabled, setMessage, setUserCreated(setUsername, setPassword, setConfirmPassword, setCompleted))}><TextField name="New Username" label="Username:"
                                         onChange={(v,) => setAndCheckPasswords(v, setUsername, password, confirmPassword, v, setButtonDisabled, setMessage)}
                                         disabled={disabled} varName="username" autofocus={true}
                                         autoComplete="new-password" value={username}/>
@@ -49,7 +49,7 @@ function setAndCheckPasswords(newValue, setter, password, confirmPassword, user,
 {
     setter(newValue);
     if (password === confirmPassword) {
-        setButtonDisabled(password === "" || user === "");
+        setButtonDisabled(password.trim() === "" || user.trim() === "");
         setMessage("");
     }
     else {
@@ -82,6 +82,22 @@ function setUserCreated(setUsername, setPassword, setConfirmPassword, setComplet
     setPassword("");
     setConfirmPassword("");
     setCompleted(true);};
+}
+
+function handleKeyDown(ev, user, password, confirmPassword, setDisabled, setButtonDisabled, setMessage, setCompleted)
+{
+    if (ev.key === "Enter")
+    {
+        ev.stopPropagation();
+        ev.preventDefault();
+        if (password !== confirmPassword) {
+            return;
+        }
+        if (password.trim() === '' || user.trim()=== '') {
+            return;
+        }
+        createUser(user, password, setDisabled, setButtonDisabled, setMessage, setCompleted);
+    }
 }
 
 
