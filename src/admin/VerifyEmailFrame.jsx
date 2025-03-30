@@ -1,7 +1,6 @@
-import {useEffect, useState, useRef} from 'react';
+import {useState} from 'react';
 import './AdminWidget.css';
 import {PropTypes} from "prop-types";
-import UserAdminDialog from "./UserAdminDialog.jsx";
 import {instance as DS_instance} from '../svc/DataService';
 import TextField from "../TextField.jsx";
 
@@ -23,7 +22,7 @@ function VerifyEmailFrame(props) {
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
   let disabled = false;
-  return <div className="VerifyEmailBackdrop" onClick = {(ev) => {if (ev.target === ev.currentTarget) {props.doClose()}}}>
+  return <div data-testid="VerifyEmailBackdrop" className="VerifyEmailBackdrop" onClick = {(ev) => {if (ev.target === ev.currentTarget) {props.doClose()}}}>
     <div className="VerifyEmailFrame">
       <button onClick={() => props.doClose()} className="close button-unstyled">X</button>
       <div className="heading">An email has been sent to {email} containing a verification code. Please verify your

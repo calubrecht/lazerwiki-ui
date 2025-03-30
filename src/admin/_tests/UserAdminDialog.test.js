@@ -114,6 +114,29 @@ test('enter email', async () => {
 
 });
 
+test('enter email Fail', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:[], settings:{email: "bob@example.com"}});
+    render(<UserAdminDialog/>);
+
+    expect(screen.queryByLabelText('Email:').value).toBe("bob@example.com");
+    screen.queryByLabelText('Email:').focus();
+
+    await act(() => userEvent.tripleClick(screen.queryByLabelText('Email:')));
+    await act( () => userEvent.keyboard("jake@other.com"));
+    expect(screen.queryByLabelText('Email:').value).toBe("jake@other.com");
+    expect(screen.queryByText('Save Email')).toBeEnabled();
+
+
+    SAVE_EMAIL_PROMISE = Promise.resolve({success: false, message: "an error"});
+
+    await(act(async () => await screen.queryByText('Save Email').click()));
+
+    expect(mockDS.saveEmail).toHaveBeenCalled();
+    expect(screen.queryByText('an error')).toBeInTheDocument();
+    expect(screen.queryByText('Verify Email')).not.toBeInTheDocument();
+
+});
+
 test('simple verify email', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:[], settings:{}});
     render(<UserAdminDialog/>);
@@ -129,7 +152,7 @@ test('simple verify email', async () => {
     await act( () => userEvent.keyboard(".domain.com"));
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.domain.com");
     expect(screen.queryByText('Save Email')).toBeEnabled();
-    await act( () => userEvent.keyboard("@aol.com"));
+    await act( () => userEvent.keyboard("@aol.com[Enter]"));
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.domain.com@aol.com");
     expect(screen.queryByText('Save Email')).not.toBeEnabled();
 
