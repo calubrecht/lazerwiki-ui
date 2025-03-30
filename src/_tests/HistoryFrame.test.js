@@ -55,7 +55,6 @@ const getByTextContent = (text) => {
 test('render Diff', async () => {
     let doClose = jest.fn(() => {});
     let h = [1, 2, 3];
-    let hr = h.toReversed();
     mockHistory = [
         {revision:1, modified:"2024-01-25", modifiedBy:"Bob", deleted:false},
         {revision:2, modified:"2024-01-26", modifiedBy:"Bob", deleted:true},
@@ -69,7 +68,7 @@ test('render Diff', async () => {
         {first:-1, second: "This line <span>was new</span>"},
         {first:3, second: "This is in both again"}
     ];
-    mockDS.fetchPageDiff = jest.fn((pageName, startSelect, endSelect) => Promise.resolve(diffInfo));
+    mockDS.fetchPageDiff = jest.fn(() => Promise.resolve(diffInfo));
     render(<HistoryFrame doClose={doClose} initData="page1"/> );
     await waitFor( () => {});
     act( () => resolveHistoryHook(mockHistory));
@@ -84,9 +83,9 @@ test('render Diff', async () => {
     expect(diffSelectors).toHaveLength(3);
 
     // Diffing between rev 3 and 1
-    await userEvent.click(diffSelectors[0]);
-    await userEvent.click(diffSelectors[2]);
-    await userEvent.click(screen.getByRole("button", {name: "View Diff"}));
+    await act(() => userEvent.click(diffSelectors[0]));
+    await act(() => userEvent.click(diffSelectors[2]));
+    await act(() => userEvent.click(screen.getByRole("button", {name: "View Diff"})));
     await waitFor( () => {});
 
     expect(screen.getByText("Diff - page1 - 1 -> 3"));
@@ -101,7 +100,7 @@ test('render Diff', async () => {
 
 
 
-    await userEvent.click(screen.getByRole("button", {name: "Back"}));
+    await act(() => userEvent.click(screen.getByRole("button", {name: "Back"})));
     expect(screen.getByText('History - page1')).toBeInTheDocument();
 
 });
@@ -122,7 +121,6 @@ test('setUser', async () => {
 test('doSelect', async () => {
     let doClose = jest.fn(() => {});
     let h = [1, 2, 3];
-    let hr = h.toReversed();
     mockHistory = [
         {revision:1, modified:"2024-01-25", modifiedBy:"Bob", deleted:false},
         {revision:2, modified:"2024-01-26", modifiedBy:"Bob", deleted:true},
@@ -132,40 +130,40 @@ test('doSelect', async () => {
 
     ];
 
-    let frame =render(<HistoryFrame doClose={doClose} initData="page1"/> );
+    render(<HistoryFrame doClose={doClose} initData="page1"/> );
     await waitFor( () => {});
     act( () => resolveHistoryHook(mockHistory));
     await waitFor( () => {});
 
     let diffSelectors = screen.getAllByRole("button", {name:"diffSelect"});
-    await userEvent.click(diffSelectors[0]);
+    await act(() => userEvent.click(diffSelectors[0]));
     // selecting maxRevision first, sets it as endSelect, with no start select
     expect(within(diffSelectors[0]).queryByAltText("endSelect")).toBeInTheDocument();
 
-    await userEvent.click(diffSelectors[2]);
+    await act(() => userEvent.click(diffSelectors[2]));
     expect(within(diffSelectors[0]).queryByAltText("endSelect")).toBeInTheDocument();
     expect(within(diffSelectors[2]).queryByAltText("startSelect")).toBeInTheDocument();
 
-    await userEvent.click(diffSelectors[1]);
+    await act(() => userEvent.click(diffSelectors[1]));
     expect(within(diffSelectors[0]).queryByAltText("noSelect")).toBeInTheDocument();
     expect(within(diffSelectors[1]).queryByAltText("endSelect")).toBeInTheDocument();
     expect(within(diffSelectors[2]).queryByAltText("startSelect")).toBeInTheDocument();
 
     // Selecting current end state, flips end to start and sets end at max revision
-    await userEvent.click(diffSelectors[1]);
+    await act(() => userEvent.click(diffSelectors[1]));
     expect(within(diffSelectors[0]).queryByAltText("endSelect")).toBeInTheDocument();
     expect(within(diffSelectors[1]).queryByAltText("startSelect")).toBeInTheDocument();
     expect(within(diffSelectors[2]).queryByAltText("noSelect")).toBeInTheDocument();
 
     // Move start select down
-    await userEvent.click(diffSelectors[3]);
+    await act(() => userEvent.click(diffSelectors[3]));
     expect(within(diffSelectors[0]).queryByAltText("endSelect")).toBeInTheDocument();
     expect(within(diffSelectors[1]).queryByAltText("noSelect")).toBeInTheDocument();
     expect(within(diffSelectors[3]).queryByAltText("startSelect")).toBeInTheDocument();
 
-    await userEvent.click(diffSelectors[2]);
+    await act(() => userEvent.click(diffSelectors[2]));
     // Move end select up
-    await userEvent.click(diffSelectors[1]);
+    await act(() => userEvent.click(diffSelectors[1]));
     expect(within(diffSelectors[1]).queryByAltText("endSelect")).toBeInTheDocument();
     expect(within(diffSelectors[2]).queryByAltText("noSelect")).toBeInTheDocument();
     expect(within(diffSelectors[3]).queryByAltText("startSelect")).toBeInTheDocument();
@@ -190,12 +188,12 @@ test('render show historical page', async () => {
     act( () => resolveHistoryHook(mockHistory));
     await waitFor( () => {});
 
-    await userEvent.click(screen.getByText('Revision 1 - Modified 2024-01-25 - by Bob'));
+    await act(() =>  userEvent.click(screen.getByText('Revision 1 - Modified 2024-01-25 - by Bob')));
 
     expect(screen.getByText("page1 - 1")).toBeInTheDocument();
     expect(screen.getByText("That is rendered")).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", {name: "Back"}));
+    await act(() => userEvent.click(screen.getByRole("button", {name: "Back"})));
     expect(screen.getByText('History - page1')).toBeInTheDocument();
 
 }, 300000);

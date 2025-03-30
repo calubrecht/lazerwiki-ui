@@ -82,14 +82,14 @@ test('edits', async () => {
   await waitFor(() => {});
   expect(cb().text).toBe("Initial Text");
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
-  await user.type(c, "123");
+  await act( () => user.type(c, "123"));
   expect(cb().text).toBe("Initial Text123");
   expect(screen.getByText("Toolbar--simplePage-Initial Text123")).toBeInTheDocument();
 
   //Autoindent
-  await user.clear(c);
-  await user.type(c, '  Two space indent');
-  await user.keyboard('[Enter]secondline');
+  await act( () => user.clear(c));
+  await act( () => user.type(c, '  Two space indent'));
+  await act( () => user.keyboard('[Enter]secondline'));
 
   expect(cb().text).toBe("  Two space indent\n  secondline");
 
@@ -110,7 +110,7 @@ test('keyActions', async () => {
   act(() => fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true}));
   expect(cancelEdit.mock.calls).toHaveLength(1);
 
-  await user.keyboard('{Escape}');
+  await act( () => user.keyboard('{Escape}'));
   expect(cancelEdit.mock.calls).toHaveLength(2);
 
   component.unmount();
@@ -137,20 +137,20 @@ test('tagList', async() => {
   let tag1Span = screen.getByText("tag1").parentElement;
   let tag1Check = within(tag1Span).getByRole('checkbox');
   expect(tag1Check.checked).toBe(true);
-  await userEvent.click(tag1Check);
+  await act( () => userEvent.click(tag1Check));
   expect(tag1Check.checked).toBe(false);
-  await userEvent.click(tag1Label);
+  await act( () =>userEvent.click(tag1Label));
   expect(tag1Check.checked).toBe(true);  
   let tagEntry = screen.getAllByRole("textbox").filter(el => el.name === "tagEntry")[0];
 
   tagEntry.focus();
-  await userEvent.keyboard("AnIv@lidTag[Enter]")
+  await act( () => userEvent.keyboard("AnIv@lidTag[Enter]"));
   expect(screen.getByText("invalid tag value")).toBeInTheDocument();
   expect(screen.getAllByRole('checkbox')).toHaveLength(2);
-  await userEvent.keyboard('1');
+  await act( () => userEvent.keyboard('1'));
   expect(screen.queryByText("invalid tag value")).not.toBeInTheDocument();
-  await userEvent.clear(tagEntry);
-  await userEvent.keyboard("NewTag[Enter]");
+  await act( () => userEvent.clear(tagEntry));
+  await act( () => userEvent.keyboard("NewTag[Enter]"));
   expect(screen.getAllByRole('checkbox')).toHaveLength(3);
   let newTagLabel =  screen.getByText("NewTag");
   let newTagSpan = screen.getByText("NewTag").parentElement;
@@ -199,12 +199,12 @@ test('edits reflect in DB', async () => {
   await waitFor(() => {});
   expect(cb().text).toBe("Initial Text");
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
-  await user.type(c, "123");
+  await act( () => user.type(c, "123"));
   expect(mockDb.addValue.mock.calls).toHaveLength(3);
   expect(mockDb.addValue.mock.calls[2][0]).toBe("simplePage");
   expect(mockDb.addValue.mock.calls[2][1]).toBe("Initial Text123");
 
-  await user.type(c, "[Backspace][Backspace][Backspace]");
+  await act( () => user.type(c, "[Backspace][Backspace][Backspace]"));
   expect(mockDb.addValue.mock.calls).toHaveLength(5);
   expect(mockDb.addValue.mock.calls[4][0]).toBe("simplePage");
   expect(mockDb.addValue.mock.calls[4][1]).toBe("Initial Text1");

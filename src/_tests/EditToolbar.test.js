@@ -237,7 +237,7 @@ test('pageFrame', async () => {
 
   let btn = screen.getByRole("button", {name:"Page Link"});
   ta.setSelectionRange(max, max);
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   expect(screen.getByText("PageFrame")).toBeInTheDocument();
 
   await act( () => callSelectItem("newPage"));
@@ -246,7 +246,7 @@ test('pageFrame', async () => {
   
   expect(text).toBe("[[newPage|]]");
 
-  userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   await act(() => doFrameClose());
   expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
 
@@ -265,10 +265,10 @@ test('pageFrame clicking button again closes', async () => {
 
   let btn = screen.getByRole("button", {name:"Page Link"});
   ta.setSelectionRange(max, max);
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   expect(screen.getByText("PageFrame")).toBeInTheDocument();
 
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   expect(screen.queryByText("PageFrame")).not.toBeInTheDocument();
 });
 
@@ -291,7 +291,7 @@ test('mediaFrame', async () => {
 
   let btn = screen.getByRole("button", {name:"Image"});
   ta.setSelectionRange(max, max);
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   expect(screen.getByText("MediaFrame")).toBeInTheDocument();
 
   await act( () => callSelectItem("newImage", "Flow", null, null));
@@ -318,7 +318,7 @@ test('mediaFrame', async () => {
   await act( () => callSelectItem("newImageCenter", "Flow", null, 20));
   expect(text).toBe("{{newImageCenter?0x20|}}");
 
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   await act(() => doFrameClose());
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 
@@ -337,10 +337,10 @@ test('mediaFrame clicking button again closes', async () => {
 
   let btn = screen.getByRole("button", {name:"Image"});
   ta.setSelectionRange(max, max);
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   expect(screen.getByText("MediaFrame")).toBeInTheDocument();
 
-  await userEvent.click(btn);
+  await act( () => userEvent.click(btn));
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
 });
 

@@ -67,8 +67,8 @@ test('doSearch', async () => {
     render(<PageSearchFrame /> );
     await waitFor( () => {});
     screen.getByRole('textbox').focus();
-    await userEvent.keyboard("search text");
-    await userEvent.keyboard("[Enter]");
+    await act( () => userEvent.keyboard("search text"));
+    await act( () => userEvent.keyboard("[Enter]"));
 
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
     await waitFor( () => {});
@@ -96,10 +96,10 @@ test('doTagSearch', async () => {
 
     render(<PageSearchFrame /> );
     await waitFor( () => {});
-    userEvent.selectOptions(screen.queryByRole('combobox'), 'tag');
+    await act( () => userEvent.selectOptions(screen.queryByRole('combobox'), 'tag'));
     screen.getByRole('textbox').focus();
-    await userEvent.keyboard("aTag");
-    await userEvent.click(screen.queryByRole('button', {name: "Search"}));
+    await act( () => userEvent.keyboard("aTag"));
+    await act( () => userEvent.click(screen.queryByRole('button', {name: "Search"})));
 
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
     await waitFor( () => {});
@@ -120,8 +120,8 @@ test('doSearch empty lists', async () => {
     render(<PageSearchFrame /> );
     await waitFor( () => {});
     screen.getByRole('textbox').focus();
-    await userEvent.keyboard("search text");
-    await userEvent.keyboard("[Enter]");
+    await act( () => userEvent.keyboard("search text"));
+    await act( () => userEvent.keyboard("[Enter]"));
 
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
     await waitFor( () => {});
@@ -133,7 +133,7 @@ test('doSearch empty lists', async () => {
     expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
     
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
-    await userEvent.keyboard("[Enter]");
+    await act( () => userEvent.keyboard("[Enter]"));
     await waitFor( () => {});
     resolveHook({title: [], text: [{pageName:"", namespace:""}]});
 
@@ -144,7 +144,7 @@ test('doSearch empty lists', async () => {
 
 
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
-    await userEvent.keyboard("[Enter]");
+    await act( () => userEvent.keyboard("[Enter]"));
     await waitFor( () => {});
     resolveHook({title: [], text: []});
 
@@ -160,8 +160,8 @@ test('setUser triggers additional search', async () => {
     render(<PageSearchFrame /> );
     await waitFor( () => {});
     screen.getByRole('textbox').focus();
-    await userEvent.keyboard("search text");
-    await userEvent.keyboard("[Enter]");
+    await act( () => userEvent.keyboard("search text"));
+    await act( () => userEvent.keyboard("[Enter]"));
 
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
     await waitFor( () => {});
@@ -170,7 +170,7 @@ test('setUser triggers additional search', async () => {
 
     await waitFor( () => {});
 
-    US_instance().setUser({userName:"user"});
+    act( () => US_instance().setUser({userName:"user"}));
     await waitFor( () => {});
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(2);
     

@@ -162,7 +162,7 @@ test('test Slider', async () => {
     let d = document.getElementsByClassName("AdminDialog")[0];
     document.getElementsByClassName("AdminDialog")[0].open = true;
 
-    sliderChange(true);
+    act( () => sliderChange(true));
 
     expect(mockDS.setGlobalSettings.mock.calls.length).toBe(1);
     expect(mockDS.setGlobalSettings.mock.calls[0][0]).toStrictEqual({id: 1, settings:{enableSelfReg: true}});

@@ -1,9 +1,8 @@
-import { render, screen, waitFor, queryByAttribute, fireEvent } from '@testing-library/react';
+import {render, screen, waitFor, queryByAttribute, fireEvent, act} from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import {instance as US_instance} from '../svc/UserService';
 import MediaFrame from '../MediaFrame';
-import {PropTypes} from "prop-types";
 
 var IMG_PROMISE = new Promise(() => {});
 var DELETE_PROMISE = () =>Promise.resolve("Success");
@@ -18,9 +17,13 @@ var setAlignment = null;
 var setX = null;
 var setY = null;
 
+// eslint-disable-next-line react/display-name
 jest.mock("../ImageSettings", () => (props) => {
+    // eslint-disable-next-line react/prop-types
     setAlignment = props.chooseAlignment;
+    // eslint-disable-next-line react/prop-types
     setX = props.chooseX;
+    // eslint-disable-next-line react/prop-types
     setY = props.chooseY;
     return <div>ImageSettings</div>;
 });
@@ -84,12 +87,12 @@ test('renderWithSelect', async () => {
     expect(screen.getByRole("button", {name: 'bigFile.png'})).toBeInTheDocument();
     expect(screen.getByRole("button", {name: 'bigestFile.png'})).toBeInTheDocument();
 
-    setAlignment("Left");
-    setX(10);
-    setY(20);
+    act( () => setAlignment("Left"));
+    act( () => setX(10));
+    act( () => setY(20));
     await waitFor(() => {});
 
-    await screen.getByRole("button", {name: 'file.png'}).click();
+    await act( () => screen.getByRole("button", {name: 'file.png'}).click());
 
     expect(doSelect.mock.calls[0][0]).toBe("file.png");
     expect(doSelect.mock.calls[0][1]).toBe("Left");
@@ -107,29 +110,29 @@ test('basicButtons', async () => {
     render(<MediaFrame doClose={doClose}/>);
     await waitFor(() => {});
   
-    await userEvent.click(screen.getByRole("button", {name: "X"}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: "X"})));
 
     expect (doClose.mock.calls).toHaveLength(1);
 
-    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+    await act( () => userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"})));
 
     expect (screen.getByRole("dialog")).toBeInTheDocument();
     // Just close
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Cancel"}));
+    await act( () => userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Cancel"})));
     expect (screen.queryByRole("dialog")).not.toBeInTheDocument();
     // verify delete not called
     expect(mockDS.deleteFile.mock.calls).toHaveLength(0);
 
-    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Delete"}));
+    await act( () => userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"})));
+    await act( async () => await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Delete"})));
     expect (screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect (screen.getByText("File Deleted")).toBeInTheDocument();
     expect(mockDS.deleteFile.mock.calls).toHaveLength(1);
 
     // Error upload
     DELETE_PROMISE = () => Promise.reject({message:"Bad"});
-    await userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Delete"}));
+    await act( () => userEvent.click(within(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"})));
+    await act( async () => await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", {name:"Delete"})));
     expect (screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect (screen.queryByText("File Deleted")).not.toBeInTheDocument();
     expect (screen.queryByText("Bad")).toBeInTheDocument();
@@ -148,11 +151,11 @@ test('basicButtonsWithSelect', async () => {
     await waitFor(() => {});
     await waitFor(() => US_instance().setUser({userName:"joe"}));
 
-    await userEvent.click(screen.getByRole("button", {name: 'file.png'}));
+    await act( () => userEvent.click(screen.getByRole("button", {name: 'file.png'})));
 
     expect(doSelect.mock.calls[0][0]).toBe('ns:file.png');
 
-    await userEvent.click(within(getByStartText('file.png- 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"}));
+    await act( () => userEvent.click(within(getByStartText('file.png- 1000 bytes -  10x10 - uploaded by Bob')).getByRole("button", {name: "Delete"})));
     expect (screen.getByRole("dialog")).toBeInTheDocument();
 });
 
@@ -196,15 +199,15 @@ test('upload', async() => {
 
     let uploadPromiseResolveHook = null;
     let uploadPromiseRejectHook = null;
-    mockDS.saveMedia = jest.fn((files, ns) => new Promise((resolve, reject) => {uploadPromiseResolveHook= resolve; uploadPromiseRejectHook = reject;}));
+    mockDS.saveMedia = jest.fn(() => new Promise((resolve, reject) => {uploadPromiseResolveHook= resolve; uploadPromiseRejectHook = reject;}));
   
     let component = render(<MediaFrame doClose={doClose}/>);
     await waitFor(() => {});
 
     await fireEvent.change(queryByAttribute("id", component.container, "mediaFileUpload"), { target: {files: 'f'}});
     await screen.getByLabelText("NS").focus();
-    await userEvent.keyboard("newNS");
-    await userEvent.click(screen.getByRole("button", {name:"Upload"}));
+    await act( () => userEvent.keyboard("newNS"));
+    await act( () => userEvent.click(screen.getByRole("button", {name:"Upload"})));
 
     expect(mockDS.saveMedia.mock.calls[0][0]).toBe('f');
     expect(mockDS.saveMedia.mock.calls[0][1]).toBe('newNS');
@@ -215,8 +218,8 @@ test('upload', async() => {
     expect(queryByAttribute("id", component.container, "mediaFileUpload").value).toBe("");
 
 
-    await fireEvent.change(queryByAttribute("id", component.container, "mediaFileUpload"), { target: {files: 'f'}});
-    await userEvent.click(screen.getByRole("button", {name:"Upload"}));
+    await act( () => fireEvent.change(queryByAttribute("id", component.container, "mediaFileUpload"), { target: {files: 'f'}}));
+    await act( () => userEvent.click(screen.getByRole("button", {name:"Upload"})));
     await waitFor( () => uploadPromiseRejectHook({message: "Uplaod failed"}));
     await waitFor(() => {});
     expect(screen.getByText("Uplaod failed")).toBeInTheDocument();
@@ -234,7 +237,7 @@ test('filter',  async () => {
   render(<MediaFrame doClose={doClose}/>);
   await waitFor(() => {});
   
-  await userEvent.keyboard("big");
+  await act( () => userEvent.keyboard("big"));
 
   expect(screen.getByText("NsTree")).toBeInTheDocument();
   expect(getByStartText('file.png - 1000 bytes -  10x10 - uploaded by Bob')).toBeFalsy();
