@@ -13,7 +13,7 @@ div.toolbar div.mediaFrame {
 div.editToolbar div.mediaFrame {
   position:absolute;
   width:900px;
-  height:600px;
+  height:625px;
   left: 60px;
   top: 50px;
   background:white;
@@ -31,13 +31,13 @@ div.mediaFrame button.close {
 
 div.mediaList  {
   width:650px;
-  height:470px;
+  height:440px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 div.editToolbar div.mediaList {
-  height:250px;
+  height:225px;
 }
 
 div.mediaBox {

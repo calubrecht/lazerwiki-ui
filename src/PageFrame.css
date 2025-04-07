@@ -51,7 +51,7 @@ div.pageSelector {
 div.pageList  {
   overflow-y: auto;
   overflow-x: hidden;
-  height:350px;
+  height:330px;
   width: 275px;
   margin-left: 1em;
   padding-left: 1em;
