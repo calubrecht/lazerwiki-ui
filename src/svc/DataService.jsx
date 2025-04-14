@@ -228,7 +228,7 @@ export default class DataService
   savePage(pageName, pageData)
   {
     return fetch(
-      this.baseRequest + 'page/' + pageName + '/savePage',
+      this.baseRequest + ('page/' + pageName + '/savePage').replace("//","/"),
        {method: 'post', body: JSON.stringify({pageName: pageName, text: pageData.text, tags:pageData.tags, revision:pageData.revision, force:pageData.force}), credentials: 'include',
          headers: this.getPostHeaders() })
          .then(this.handleErrors)
