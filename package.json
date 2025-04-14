@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run prebuild; vite",
     "build": "vite build",
+    "build-sa": "vite build --mode sa",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "node scripts/test.js --watchAll=false --testResultsProcessor ./node_modules/jest-junit",

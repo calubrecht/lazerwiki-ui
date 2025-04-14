@@ -6,3 +6,11 @@ mkdir -p  $(dirname $0)/dist
 cd $(dirname $0)/build
 
 jar cf ../dist/lazerwiki-ui.war *
+
+rm -rf $(dirname $0)/build
+
+npm run build-sa
+
+cd $(dirname $0)/build
+
+jar cf ../dist/lazerwiki-ui-sa.war *
