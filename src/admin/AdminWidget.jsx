@@ -29,7 +29,7 @@ function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings
   const className = visible ? "settingsBody" : "settingsBody hidden";
   return <div className={className} aria-label="SettingSiteBody"><h1>Global Settings</h1>
       <SiteSetup activeSites={sites} setSites={setSites}/>
-      <UserSetup/>
+      <UserSetup sites={sites}/>
       <div className='clear'></div>
       <div className='enableSelfReg'><SliderInput label="Enable Self Registration" id="globalEnableSelfReg" value={enableSelfReg} setter={setEnableSelfReg}/></div>
   </div>;

@@ -19,8 +19,16 @@ select#roleList {
   width:250px;
 }
 
+dialog.addRoleDialog  {
+  height:120px;
+  width:200px;
+}
+
+
 dialog.addRoleDialog div.addRoleButtons {
   display: inline-flex;
+  position: absolute;
+  bottom:10px;
 }
 
 dialog.addRoleDialog div.addRoleButtons button.cancel {

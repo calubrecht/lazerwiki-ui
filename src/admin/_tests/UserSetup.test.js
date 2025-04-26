@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import {render, screen, act, waitFor, queryByAttribute, fireEvent} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import UserSetup from '../UserSetup';
 
@@ -16,8 +16,12 @@ jest.mock("../../svc/DataService", () => {
 
 });
 
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 test('render', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 
@@ -32,7 +36,7 @@ test('render', async () => {
 
 
 test('select User', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 
@@ -48,7 +52,7 @@ test('select User', async () => {
 });
 
 test('remove Role', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 
@@ -66,7 +70,7 @@ test('remove Role', async () => {
 });
 
 test('add Role', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}]}/>);
 
   await waitFor(() => {});
 
@@ -105,8 +109,49 @@ test('add Role', async () => {
 
 });
 
+test('add Admin Role', async () => {
+  render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}, {name: "site2", siteName: "Site 2"}]}/>);
+
+  await waitFor(() => {});
+
+  expect(screen.queryByRole("button", {name: "Add Admin Role"})).not.toBeInTheDocument();
+
+  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
+  await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN'));
+  await act( () => userEvent.click(screen.getByRole("button", {name: "Add Admin Role"})));
+  let dlg= document.getElementsByClassName("addRoleDialog")[0];
+  dlg.open = true;
+
+  let globalInput = screen.getByLabelText("Global Admin");
+  expect(globalInput).not.toBeChecked();
+
+  let dropdown = screen.getByLabelText("Site for admin role:");
+  expect(dropdown).toHaveTextContent("Site 1");
+  await act(() => fireEvent.change(dropdown, { target: { value: "site2" } }));
+  expect(dropdown).toHaveTextContent("Site 2");
+  await act( () => userEvent.click(screen.getByRole("button", {name: "Submit New Role"})));
+  expect(mockDS.addRole.mock.calls[0][0]).toBe("User 1");
+  expect(mockDS.addRole.mock.calls[0][1]).toBe("ROLE_ADMIN:site2");
+  expect(dropdown).toHaveTextContent("Site 1");
+
+  await waitFor(() => {});
+
+  await act(() => globalInput.click());
+  expect(globalInput).toBeChecked();
+  expect(screen.queryByLabelText("Site for admin role:")).not.toBeInTheDocument();
+  await act( () => userEvent.click(screen.getByRole("button", {name: "Submit New Role"})));
+  expect(mockDS.addRole.mock.calls[1][0]).toBe("User 1");
+  expect(mockDS.addRole.mock.calls[1][1]).toBe("ROLE_ADMIN");
+  expect(globalInput).not.toBeChecked();
+
+  await act(() => fireEvent.change(dropdown, { target: { value: "site2" } }));
+  await act( () => userEvent.click(screen.getByRole("button", {name: "Cancel"})));
+  await waitFor(() => {});
+  expect(dropdown).toHaveTextContent("Site 1");
+});
+
 test('add User', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 
@@ -140,7 +185,7 @@ test('add User', async () => {
 });
 
 test('reset Password', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 
@@ -166,7 +211,7 @@ test('reset Password', async () => {
 });
 
 test('delete User', async () => {
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 
@@ -189,7 +234,7 @@ test('net Fail', async () => {
   mockDS.setUserPassword = jest.fn(() => Promise.reject("setUserPassword Failed"));
   console.log = jest.fn(() => {});
 
-  render(<UserSetup />);
+  render(<UserSetup sites={[]}/>);
 
   await waitFor(() => {});
 

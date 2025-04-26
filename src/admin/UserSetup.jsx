@@ -1,6 +1,7 @@
 import {useEffect, useState, useRef} from 'react';
 import {instance as DS_instance} from '../svc/DataService';
 import './UserSetup.css';
+import {PropTypes} from "prop-types";
 
 const DEF_ROLE='ROLE_';
   
@@ -14,14 +15,14 @@ function handleKeyDown(ev, submit, data,dlgRef)
     }
 }
 
-function submitAddRole(data, dlgRef) {
+function submitAddRole(data, close) {
         data.setDisabled(true);
         DS_instance().addRole(data.selectedUser, data.newRole).then((changedUser) => {
           data.setDisabled(false);
           data.setNewRole(DEF_ROLE);
           data.userMap[changedUser.userName] = changedUser;
           data.setUserMap(data.userMap);
-          dlgRef?.current?.close?.();
+          close?.();
         }).catch((ev) => {console.log(ev); data.setDisabled(false)});
 }
 
@@ -61,22 +62,85 @@ function submitResetPassword(data, dlgRef) {
   }).catch((ev) => {console.log(ev); data.setDisabled(false); data.setErrMsg('Set Password Failed');});
 }
 
-function renderAddRole(selectedUser, userMap, setUserMap, dlgRef) {
+function AddRoleDlg(props) {
+    const selectedUser = props.user;
+    const userMap = props.userMap.userMap;
+    const setUserMap = props.userMap.setUserMap;
+    const dlgRef = props.addRoleDlgRef;
+    const addRoleMode = props.addRoleMode;
     const [newRole, setNewRole] = useState(DEF_ROLE);
     const [disabled, setDisabled] = useState(false);
-    return (<dialog className="addRoleDialog" ref={dlgRef} >
-      <div><label htmlFor="roleName" >New Role:</label><input type="text" placeholder="New Role" id="roleName" name="roleName" value={newRole}  onChange={evt => setNewRole(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitAddRole, {selectedUser, newRole, userMap, setUserMap, setDisabled, setNewRole}, dlgRef)} disabled= {disabled} autoFocus ></input></div>
-    <div className="addRoleButtons">
-      <button className="cancel"  onClick={() => {
-        dlgRef?.current?.close?.();
-        setNewRole(DEF_ROLE);
-      }} disabled={disabled} >Cancel</button>
-      <button className="add" onClick={() => {
-        submitAddRole({selectedUser, newRole, userMap, setUserMap, setDisabled, setNewRole}, dlgRef);
-      }} disabled={disabled} >Submit New Role</button>
+    const [globalAdmin, setGlobalAdmin] = useState(false);
+    const [selectedSite, setSelectedSite] = useState(props.sites.length> 0 ? props.sites[0].name : "");
+    const close = props.close;
+    if (addRoleMode === "admin") {
+      const adminRole = globalAdmin ? "ROLE_ADMIN": "ROLE_ADMIN:" + selectedSite;
+      return (<dialog className="addRoleDialog" ref={dlgRef}>
+        <div><input type="checkbox" id="globalAdmin"  onClick={ () => setGlobalAdmin(!globalAdmin)} checked={globalAdmin}></input>
+          <label htmlFor="globalAdmin">Global Admin</label>
+        </div>
+        {!globalAdmin &&
+        <div>
+          <div> <label htmlFor="adminSiteSelect">Site for admin role:</label></div>
+          <select id="adminSiteSelect" onChange={(ev) =>
+              setSelectedSite(ev.target.value)} value={selectedSite}>
+            {props.sites.map( site => <option value={site.name} key={site.name}>{site.siteName}</option>)}
+        </select>
+        </div>}
+        <div className="addRoleButtons">
+          <button className="cancel" onClick={() => {
+            close?.();
+            setGlobalAdmin(false);
+            setSelectedSite(props.sites[0].name);
+          }} disabled={disabled}>Cancel
+          </button>
+          <button className="add" onClick={() => {
+            submitAddRole({selectedUser, newRole:adminRole, userMap, setUserMap, setDisabled, setNewRole}, close);
+            setGlobalAdmin(false);
+            setSelectedSite(props.sites[0].name);
+          }} disabled={disabled}>Submit New Role
+          </button>
+        </div>
+      </dialog>)
+    }
+    return (<dialog className="addRoleDialog" ref={dlgRef}>
+      <input type="text" style={{display: "none"}}></input>
+      <input type="password" style={{display: "none"}}></input>
+      <div><label htmlFor="roleName">New Role:</label>
+      <input type="text" placeholder="New Role" id="roleName"
+          name="roleName" value={newRole}
+          onChange={evt => setNewRole(evt.target.value)}
+          onKeyDown={evt => handleKeyDown(evt, submitAddRole, {
+            selectedUser,
+            newRole,
+            userMap,
+            setUserMap,
+            setDisabled,
+            setNewRole
+          }, close)} disabled={disabled} autoComplete="off"
+          autoFocus></input></div>
+      <div className="addRoleButtons">
+        <button className="cancel" onClick={() => {
+          close?.();
+          setNewRole(DEF_ROLE);
+        }} disabled={disabled}>Cancel
+        </button>
+        <button className="add" onClick={() => {
+          submitAddRole({selectedUser, newRole, userMap, setUserMap, setDisabled, setNewRole}, close);
+          setNewRole(DEF_ROLE);
+        }} disabled={disabled}>Submit New Role
+        </button>
       </div>
     </dialog>);
-  }
+}
+
+AddRoleDlg.propTypes = {
+  user: PropTypes.string,
+  userMap: PropTypes.object,
+  sites: PropTypes.array,
+  close: PropTypes.func,
+  addRoleDlgRef: PropTypes.object,
+  addRoleMode: PropTypes.string};
 
   function renderAddUser(currentUser, userMap, setUserMap, activeUsers, setActiveUsers, dlgRef, isResetPassword) {
     const [newUserName, setNewUserName] = useState('');
@@ -134,12 +198,13 @@ function renderDeleteConfirm(userName, activeUsers, setActiveUsers, dlgRef) {
 </dialog>);
 }
 
-function UserSetup() {
+function UserSetup(props) {
   const [activeUsers, setActiveUsers] = useState([]);
   const [userMap, setUserMap] = useState({});
   const [selectedUser, setSelectedUser] = useState(undefined);
   const [selectedRole, setSelectedRole] = useState(undefined);
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const [addRoleMode, setAddRoleMode] = useState("free");
   const addRoleDlgRef = useRef(); 
   const addUserDlgRef = useRef(); 
   const confirmDelDlgRef = useRef();
@@ -156,7 +221,10 @@ function UserSetup() {
   return <div className="userSetup">
     <div className="selectWidget">
       <label htmlFor="userList" >Users</label>
-      {renderAddRole(selectedUser, userMap, setUserMap, addRoleDlgRef)}
+      <AddRoleDlg user={selectedUser} userMap={{userMap, setUserMap}} addRoleMode={addRoleMode} addRoleDlgRef={addRoleDlgRef} close= {() => {
+        addRoleDlgRef?.current?.close?.();
+        setUserMap({...userMap});
+      }} sites={props.sites} ></AddRoleDlg>
       {renderAddUser(selectedUser, userMap, setUserMap, activeUsers, setActiveUsers, addUserDlgRef, isResetPassword)}
       {renderDeleteConfirm(selectedUser, activeUsers, setActiveUsers, confirmDelDlgRef)}
       <div>
@@ -179,21 +247,30 @@ function UserSetup() {
         {userMap[selectedUser].userRoles.map( role => <option value={role} key={role}>{role}</option>)}
         </select>
         <div className="roleButtons">
-          <button onClick={() => {addRoleDlgRef?.current?.showModal?.()}} >Add Role</button>
+          <button onClick={() => {
+            setAddRoleMode("free");
+            addRoleDlgRef?.current?.showModal?.();
+          }}>Add Role
+          </button>
+          <button onClick={() => {
+            setAddRoleMode("admin");
+            addRoleDlgRef?.current?.showModal?.();
+          }}>Add Admin Role
+          </button>
           <button onClick={(ev) =>
-            DS_instance().deleteRole(selectedUser, selectedRole).
-            then(changedUser => {
-              let newMap= {...userMap};
-              newMap[changedUser.userName] = changedUser;
-              setUserMap(newMap);
-            }).
-            catch(ev => console.log(ev))
-          }>Remove Role</button>
+              DS_instance().deleteRole(selectedUser, selectedRole).then(changedUser => {
+                let newMap = {...userMap};
+                newMap[changedUser.userName] = changedUser;
+                setUserMap(newMap);
+              }).catch(ev => console.log(ev))
+          }>Remove Role
+          </button>
         </div>
       </div>
-      </div>)}
-    </div>;
+    </div>)}
+  </div>;
 }
 
+UserSetup.propTypes = {sites: PropTypes.array}
 
 export default UserSetup;
