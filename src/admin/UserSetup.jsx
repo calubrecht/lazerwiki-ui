@@ -76,7 +76,7 @@ function AddRoleDlg(props) {
     if (addRoleMode === "admin") {
       const adminRole = globalAdmin ? "ROLE_ADMIN": "ROLE_ADMIN:" + selectedSite;
       return (<dialog className="addRoleDialog" ref={dlgRef}>
-        <div><input type="checkbox" id="globalAdmin"  onClick={ () => setGlobalAdmin(!globalAdmin)} checked={globalAdmin}></input>
+        <div><input type="checkbox" id="globalAdmin"  onChange={ () => setGlobalAdmin(!globalAdmin)} checked={globalAdmin}></input>
           <label htmlFor="globalAdmin">Global Admin</label>
         </div>
         {!globalAdmin &&
@@ -143,7 +143,6 @@ AddRoleDlg.propTypes = {
   addRoleMode: PropTypes.string};
 
 function AddUserDlg(props) {
-  //function renderAddUser(currentUser, userMap, setUserMap, activeUsers, setActiveUsers, dlgRef, isResetPassword) {
     const [newUserName, setNewUserName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -176,30 +175,33 @@ function AddUserDlg(props) {
     </dialog>);
   }
 
-AddUserDlg.propTypes = {currentUser: PropTypes.string, userMap: PropTypes.object, activeUsers: PropTypes.object, dlgRef: PropTypes.object, close:PropTypes.function, isResetPassword:PropTypes.boolean};
+AddUserDlg.propTypes = {currentUser: PropTypes.string, userMap: PropTypes.object, activeUsers: PropTypes.object, dlgRef: PropTypes.object, close:PropTypes.func, isResetPassword:PropTypes.bool};
 
-function renderDeleteConfirm(userName, activeUsers, setActiveUsers, dlgRef) {
+function DeleteConfirmDlg(props) {
   const [disabled, setDisabled] = useState(false);
-  const title = "Really delete user: " + userName;
-  return (<dialog className="confirmDeleteDialog" ref={dlgRef} >
+  const title = "Really delete user: " + props.userName;
+  return (<dialog className="confirmDeleteDialog" ref={props.dlgRef} >
   <h3 className="title">{title}</h3>
 <div className="confirmDeleteButtons">
 <button className="cancel"  onClick={() => {
-    dlgRef?.current?.close?.();
+    props.close();
     setDisabled(false);
   }} disabled={disabled} >Cancel</button>
 <button className="delete" onClick={() => {
   setDisabled(true);
-  DS_instance().deleteUser(userName).then(() => {
+  DS_instance().deleteUser(props.userName).then(() => {
    setDisabled(false);
-   const index = activeUsers.indexOf(userName);
-   activeUsers.splice(index, 1);
-   setActiveUsers(activeUsers);
-   dlgRef?.current?.close?.();
+   const index = props.activeUsers.activeUsers.indexOf(props.userName);
+   props.activeUsers.activeUsers.splice(index, 1);
+   props.activeUsers.setActiveUsers(props.activeUsers.activeUsers);
+   props.setSelectedUser(undefined);
+   props.close();
   })}} disabled={disabled} >Delete</button>
   </div>
 </dialog>);
 }
+
+DeleteConfirmDlg.propTypes = {userName: PropTypes.string, activeUsers: PropTypes.object, setSelectedUser: PropTypes.func, dlgRef: PropTypes.object, close:PropTypes.func};
 
 function UserSetup(props) {
   const [activeUsers, setActiveUsers] = useState([]);
@@ -232,7 +234,10 @@ function UserSetup(props) {
         addUserDlgRef?.current?.close?.();
         setUserMap({...userMap});
       }} sites={props.sites}></AddUserDlg>
-      {renderDeleteConfirm(selectedUser, activeUsers, setActiveUsers, confirmDelDlgRef)}
+      <DeleteConfirmDlg userName = {selectedUser} activeUsers={{activeUsers, setActiveUsers}} setSelectedUser={setSelectedUser} dlgRef={confirmDelDlgRef} close= {() => {
+        confirmDelDlgRef?.current?.close?.();
+        setUserMap({...userMap});
+      }}></DeleteConfirmDlg>
       <div>
         <select name="userList" id="userList" data-testid="userList" size="5" onChange={(ev) => {
           setSelectedUser(ev.target.value);
