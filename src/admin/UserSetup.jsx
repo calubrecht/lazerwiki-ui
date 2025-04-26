@@ -5,13 +5,13 @@ import {PropTypes} from "prop-types";
 
 const DEF_ROLE='ROLE_';
   
-function handleKeyDown(ev, submit, data,dlgRef)
+function handleKeyDown(ev, submit, data,close)
 {
     if (ev.key === "Enter")
     {
       ev.stopPropagation();
       ev.preventDefault();
-      submit(data, dlgRef);
+      submit(data, close);
     }
 }
 
@@ -26,7 +26,7 @@ function submitAddRole(data, close) {
         }).catch((ev) => {console.log(ev); data.setDisabled(false)});
 }
 
-function submitAddUser(data, dlgRef) {
+function submitAddUser(data, close) {
   if (data.password !== data.confirmPassword) {
     data.setErrMsg("Password confirmation does not match. Please correct");
     return;
@@ -42,11 +42,11 @@ function submitAddUser(data, dlgRef) {
     data.setUserMap(data.userMap);
     data.activeUsers.push(newUser.userName);
     data.setActiveUsers(data.activeUsers);
-    dlgRef?.current?.close?.();
+    close();
   }).catch((ev) => {console.log(ev); data.setDisabled(false); data.setErrMsg('Add User Failed');});
 }
 
-function submitResetPassword(data, dlgRef) {
+function submitResetPassword(data, close) {
   if (data.password !== data.confirmPassword) {
     data.setErrMsg("Password confirmation does not match. Please correct");
     return;
@@ -58,7 +58,7 @@ function submitResetPassword(data, dlgRef) {
     data.setNewUserName('');
     data.setPassword('');
     data.setConfirmPassword('');
-    dlgRef?.current?.close?.();
+    close();
   }).catch((ev) => {console.log(ev); data.setDisabled(false); data.setErrMsg('Set Password Failed');});
 }
 
@@ -142,29 +142,30 @@ AddRoleDlg.propTypes = {
   addRoleDlgRef: PropTypes.object,
   addRoleMode: PropTypes.string};
 
-  function renderAddUser(currentUser, userMap, setUserMap, activeUsers, setActiveUsers, dlgRef, isResetPassword) {
+function AddUserDlg(props) {
+  //function renderAddUser(currentUser, userMap, setUserMap, activeUsers, setActiveUsers, dlgRef, isResetPassword) {
     const [newUserName, setNewUserName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [disabled, setDisabled] = useState(false);
     const [errMsg, setErrMsg] = useState('');
-    const submitFnc = isResetPassword ? submitResetPassword : submitAddUser;
-    const title = isResetPassword ? "Reset Password for " + currentUser : "Add New User";
-    const submitBtnText = isResetPassword ? "Set Password" : "Submit New User";
-    let userName = isResetPassword ? currentUser : newUserName;
-    const submitData = {userName, password, confirmPassword, userMap, activeUsers, setUserMap, setDisabled, setNewUserName, setPassword, setConfirmPassword, setErrMsg, setActiveUsers};
-    return (<dialog className="addUserDialog" ref={dlgRef} >
+    const submitFnc = props.isResetPassword ? submitResetPassword : submitAddUser;
+    const title = props.isResetPassword ? "Reset Password for " + props.currentUser : "Add New User";
+    const submitBtnText = props.isResetPassword ? "Set Password" : "Submit New User";
+    let userName = props.isResetPassword ? props.currentUser : newUserName;
+    const submitData = {userName, password, confirmPassword, userMap:props.userMap.userMap, activeUsers:props.activeUsers.activeUsers, setUserMap:props.userMap.setUserMap, setDisabled, setNewUserName, setPassword, setConfirmPassword, setErrMsg, setActiveUsers:props.activeUsers.setActiveUsers};
+    return (<dialog className="addUserDialog" ref={props.dlgRef} >
       <h3 className="title">{title}</h3>
-      {isResetPassword || <div><label htmlFor="username" >New User:</label><input type="text" placeholder="Username" id="username" name="username" value={newUserName}  onChange={evt => setNewUserName(evt.target.value)} disabled= {disabled} autoFocus autoComplete="new-password" ></input></div>}
-      {isResetPassword || <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)}  autoComplete="new-password" disabled= {disabled}  ></input></div>}
-      {isResetPassword && <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)}  autoComplete="new-password" autoFocus disabled= {disabled}  ></input></div>}
-      <div><label htmlFor="confirmPassword" >Confirm Password:</label><input type="password" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" value={confirmPassword}  onChange={evt => setConfirmPassword(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitFnc, submitData, dlgRef)} autoComplete="new-password" disabled= {disabled} ></input></div>
+      {props.isResetPassword || <div><label htmlFor="username" >New User:</label><input type="text" placeholder="Username" id="username" name="username" value={newUserName}  onChange={evt => setNewUserName(evt.target.value)} disabled= {disabled} autoFocus autoComplete="new-password" ></input></div>}
+      {props.isResetPassword || <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)}  autoComplete="new-password" disabled= {disabled}  ></input></div>}
+      {props.isResetPassword && <div><label htmlFor="password" >Password:</label><input type="password" placeholder="Password" id="password" name="password" value={password}  onChange={evt => setPassword(evt.target.value)}  autoComplete="new-password" autoFocus disabled= {disabled}  ></input></div>}
+      <div><label htmlFor="confirmPassword" >Confirm Password:</label><input type="password" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" value={confirmPassword}  onChange={evt => setConfirmPassword(evt.target.value)} onKeyDown={evt => handleKeyDown(evt, submitFnc, submitData, props.close)} autoComplete="new-password" disabled= {disabled} ></input></div>
     <div className="addUserButtons">
     <button className="add" onClick={() => {
-        submitFnc(submitData, dlgRef);
+        submitFnc(submitData, props.close);
       }} disabled={disabled} >{submitBtnText}</button>
       <button className="cancel"  onClick={() => {
-        dlgRef?.current?.close?.();
+        props.close();
         setNewUserName('');
         setPassword('');
         setConfirmPassword('');
@@ -173,7 +174,9 @@ AddRoleDlg.propTypes = {
       </div>
       <div className="AddUserError">{errMsg}</div>
     </dialog>);
-  }  
+  }
+
+AddUserDlg.propTypes = {currentUser: PropTypes.string, userMap: PropTypes.object, activeUsers: PropTypes.object, dlgRef: PropTypes.object, close:PropTypes.function, isResetPassword:PropTypes.boolean};
 
 function renderDeleteConfirm(userName, activeUsers, setActiveUsers, dlgRef) {
   const [disabled, setDisabled] = useState(false);
@@ -225,7 +228,10 @@ function UserSetup(props) {
         addRoleDlgRef?.current?.close?.();
         setUserMap({...userMap});
       }} sites={props.sites} ></AddRoleDlg>
-      {renderAddUser(selectedUser, userMap, setUserMap, activeUsers, setActiveUsers, addUserDlgRef, isResetPassword)}
+      <AddUserDlg currentUser= {selectedUser} userMap={{userMap: userMap, setUserMap: setUserMap}} activeUsers= {{activeUsers, setActiveUsers}} dlgRef={addUserDlgRef} isResetPassword={isResetPassword}  close= {() => {
+        addUserDlgRef?.current?.close?.();
+        setUserMap({...userMap});
+      }} sites={props.sites}></AddUserDlg>
       {renderDeleteConfirm(selectedUser, activeUsers, setActiveUsers, confirmDelDlgRef)}
       <div>
         <select name="userList" id="userList" data-testid="userList" size="5" onChange={(ev) => {
