@@ -2,6 +2,11 @@ import { render, screen, act, waitFor, queryByAttribute } from '@testing-library
 import userEvent from '@testing-library/user-event';
 import SiteSettings from '../SiteSettings';
 
+jest.mock("../ACLWidget", () => (props) => {
+  return <div>ACLWidget</div>;
+
+});
+
 
 test('render', () => {
   render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite"/>);
@@ -36,18 +41,12 @@ test('enterField', async () => {
 
 
 var saveSettingsPromise =  null;
-var fetchNSPromise =  null;
-let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise),
-      fetchNamespaces: jest.fn(() => fetchNSPromise)};
+let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise)};
 
 jest.mock("../../svc/DataService", () => {
   return {instance: () => mockDS};
 
 });
-
-beforeEach(() => {
-  fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", children:[]}});
-})
 
 test('button', async () => {
   render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}/>);

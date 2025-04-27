@@ -50,7 +50,6 @@ export default function ACLWidget(props) {
     }, []);
 
     const nsAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].restriction_type : "OPEN";
-    console.log("Site = " + props.site + " ns= [" + selectedNs + "] nsAccessType= " + nsAccessType + " checked=" + (nsAccessType === "OPEN"));
 
   return <div className="aclWidget">
       <h2>Access Control</h2>
