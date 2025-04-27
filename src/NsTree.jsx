@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {PropTypes} from "prop-types";
 
 
 export default class NsTree extends Component
@@ -32,4 +33,6 @@ export default class NsTree extends Component
     evt.stopPropagation();
     this.props.selectNS(ns);
   }
+
+  static propTypes = {nsTree:PropTypes.object, selectNS:PropTypes.func.isRequired};
 }

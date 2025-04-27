@@ -36,12 +36,18 @@ test('enterField', async () => {
 
 
 var saveSettingsPromise =  null;
-let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise)};
+var fetchNSPromise =  null;
+let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise),
+      fetchNamespaces: jest.fn(() => fetchNSPromise)};
 
 jest.mock("../../svc/DataService", () => {
   return {instance: () => mockDS};
 
 });
+
+beforeEach(() => {
+  fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", children:[]}});
+})
 
 test('button', async () => {
   render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}/>);

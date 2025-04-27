@@ -94,6 +94,11 @@ export default class DataService
     return fetch(
       this.baseRequest + 'page/listPages').then(this.handleErrors).then(response => response.json());
   }
+
+  fetchNamespaces(site) {
+    return fetch(
+        this.baseRequest + 'page/listNamespaces/' + site).then(this.handleErrors).then(response => response.json());
+  }
   
   doPageSearch(searchTerm) {
     return fetch(
@@ -387,6 +392,16 @@ export default class DataService
         this.baseRequest + 'admin/globalSettings',
         {method: 'post', credentials: 'include',
           body: JSON.stringify(settings),
+          headers: this.getPostHeaders()})
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
+  setNamespaceRestriction(site, namespace, restrictionType) {
+    return fetch(
+        this.baseRequest + 'admin/namespace/restrictionType',
+        {method: 'post', credentials: 'include',
+          body: JSON.stringify({site, namespace, restrictionType}),
           headers: this.getPostHeaders()})
         .then(this.handleErrors)
         .then(res => res.json());
