@@ -50,6 +50,7 @@ export default function ACLWidget(props) {
     }, []);
 
     const nsAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].restriction_type : "OPEN";
+    const inheritAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].inherited_restriction_type : "OPEN";
 
   return <div className="aclWidget">
       <h2>Access Control</h2>
@@ -58,6 +59,8 @@ export default function ACLWidget(props) {
       <div className="aclPanel">
           <label>Set Controls for : {selectedNs}</label>
           <div className="controlRadios">
+              <div><input type="radio" name={"controlType_" + props.site} value="INHERIT" id={"accessInherit_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "INHERIT" }/><label htmlFor={"accessInherit_" + props.site}>
+                  Inherit ({inheritAccessType})</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="OPEN" id={"accessOpen_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "OPEN" }/><label htmlFor={"accessOpen_" + props.site}>Open
                   Access</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="WRITE_RESTRICTED" id={"writeRestrict_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "WRITE_RESTRICTED" }/><label

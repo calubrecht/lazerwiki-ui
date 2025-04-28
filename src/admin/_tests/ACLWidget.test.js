@@ -98,10 +98,20 @@ test('changeRestrictionTypes', async () => {
     expect(screen.getByLabelText("Read Restricted")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[2][2]).toBe("READ_RESTRICTED");
     await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "READ_RESTRICTED",children:[]},
+                {"fullNamespace": "ro", restriction_type: "READ_RESTRICTED",children:[], inherited_restriction_type:"OPEN"},
                 {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Read Restricted")).toBeChecked();
+
+    updateNSPromise = new Promise((resolve,) => resolveCall = resolve);
+    await act(() => screen.getByLabelText("Inherit (OPEN)").click());
+    expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
+    expect(mockDS.setNamespaceRestriction.mock.calls[2][2]).toBe("READ_RESTRICTED");
+    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
+                {"fullNamespace": "ro", restriction_type: "INHERIT",children:[], inherited_restriction_type:"OPEN"},
+                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+            ]}}));
+    expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
 
     // Obey response
     updateNSPromise = new Promise((resolve,) => resolveCall = resolve);
