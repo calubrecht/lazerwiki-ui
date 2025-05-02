@@ -6,9 +6,13 @@ import SiteSettings from "../SiteSettings.jsx";
 
 var fetchNSPromise =  null;
 var updateNSPromise = null;
+var updateUserPromise = null;
 let mockDS = {fetchNamespaces: jest.fn(() => fetchNSPromise),
     setNamespaceRestriction: jest.fn((site, ns, restrictionType) => {
         return updateNSPromise;
+    }),
+    setRoles: jest.fn((selectedUser, site, siteRoles) => {
+            return updateUserPromise;
     })};
 
 jest.mock("../../svc/DataService", () => {
@@ -162,10 +166,37 @@ test("nsRoles", async () => {
     expect(screen.getByText("Allow Upload").selected).toBe(false);
     expect(screen.getByText("Allow Delete").selected).toBe(false);
 
+
+    let resolveCall = null;
+    let rejectCall = null;
+    updateUserPromise = new Promise((resolve,reject) => {
+        resolveCall = resolve;
+        rejectCall = reject;
+    });
+
     await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'UPLOAD'));
     let newUserMap = setUserMap.mock.calls[0][0];
     expect(newUserMap["Frank"]).toStrictEqual({"userName": "Frank", "userRoles": []});
     expect(newUserMap["Bob"]).toStrictEqual({"userName": "Bob",
         "userRoles":[ "ROLE_WRITE:site1:ro", "ROLE_UPLOAD:site1:ro", "ROLE_ADMIN", "ROLE_READ:bunk:ro", "ROLE_READ:site1:rw"]});
 
+    expect(screen.getByText("Allow Read")).not.toBeEnabled();
+    expect(mockDS.setRoles.mock.calls[0][2]).toStrictEqual(["ROLE_WRITE:site1:ro", "ROLE_UPLOAD:site1:ro", "ROLE_READ:site1:rw"]);
+
+    await act( async() => await resolveCall({"userName": "Bob",
+        "userRoles":[ "ROLE_WRITE:site1:ro", "ROLE_DELETE:site1:ro", "ROLE_ADMIN", "ROLE_READ:bunk:ro", "ROLE_READ:site1:rw"]}));
+    expect(screen.getByText("Allow Read").selected).toBe(false);
+    expect(screen.getByText("Allow Write").selected).toBe(true);
+    expect(screen.getByText("Allow Upload").selected).toBe(false);
+    expect(screen.getByText("Allow Delete").selected).toBe(true);
+    expect(screen.getByText("Allow Read")).toBeEnabled();
+
+    updateUserPromise = new Promise((resolve,reject) => {
+        resolveCall = resolve;
+        rejectCall = reject;
+    });
+
+    await act( () => userEvent.deselectOptions(screen.getByTestId('roleList'), 'WRITE'));
+    await act( async() => await rejectCall("Something happened"));
+    expect(screen.getByText("Allow Read")).toBeEnabled();
 });

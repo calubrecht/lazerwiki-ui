@@ -315,6 +315,17 @@ export default class DataService
 
   }
 
+  setRoles(userName, site, userRoles) {
+    return fetch(
+        this.baseRequest + "admin/roles/" + userName + "/site/" + site,
+        {method: 'put', credentials: 'include',
+          body: JSON.stringify(userRoles),
+          headers: this.getPostHeaders() })
+        .then(this.handleErrors)
+        .then(res => res.json());
+
+  }
+
   addUser(userName, password) {
     return fetch(
       this.baseRequest + "admin/user/" + userName,

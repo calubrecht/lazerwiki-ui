@@ -1,4 +1,4 @@
-import {useEffect, useState, useRef} from 'react';
+import {useEffect, useState} from 'react';
 import {instance as DS_instance} from '../svc/DataService';
 import './ACLWidget.css';
 import NsTree from '../NsTree';
@@ -37,25 +37,19 @@ function setNSaccess(site, namespace, setNamespaces, parsedNamespaces, setParsed
 }
 
 function getSiteRoles(site, namespace, user) {
-   let roles = user.userRoles.filter(userRole => {
+    return user.userRoles.filter(userRole => {
        let parts = userRole.split(":");
-       if (parts.length != 3) {
+       if (parts.length !== 3) {
            return false;
        }
-       if (parts[1] != site || parts[2] != namespace) {
-           return false;
-       }
-       return true;
-   }).
-       map(userRole => {
-         let parts = userRole.split(":");
-         let roleType = userRole.split(":")[0].split("_")[1];
-         return roleType;
-       });
-   return roles;
+       return !(parts[1] !== site || parts[2] !== namespace);
+
+   }).map(userRole => {
+       return userRole.split(":")[0].split("_")[1];
+   });
 }
 
-function setSelectedRoles(site, selectedNs, selectedUser, target, userMap, setUserMap) {
+function setSelectedRoles(site, selectedNs, selectedUser, target, userMap, setUserMap, setEnabled) {
     let user = userMap[selectedUser];
     let selectedRoles = [];
     for (let i = 0 ; i < target.selectedOptions.length; i++) {
@@ -65,20 +59,32 @@ function setSelectedRoles(site, selectedNs, selectedUser, target, userMap, setUs
     // get userRoles not related to this site and ns
     user.userRoles.filter(userRole => {
         let parts = userRole.split(":");
-        if (parts.length != 3) {
+        if (parts.length !== 3) {
             return true;
         }
-        if (parts[1] != site || parts[2] != selectedNs) {
-            return true;
-        }
-        return false;
+        return parts[1] !== site || parts[2] !== selectedNs;
+
     }).forEach( userRole => {
           selectedRoles.push(userRole);
         }
     );
     user.userRoles = selectedRoles;
+    let siteRoles = selectedRoles.filter(userRole => {
+        let parts = userRole.split(":");
+        if (parts.length !== 3) {
+            return false;
+        }
+        return parts[1] === site;
+
+    })
     setUserMap({...userMap});
+    setEnabled(false);
     // Do network stuff
+    DS_instance().setRoles(selectedUser, site, siteRoles).then((changedUser) => {
+        userMap[changedUser.userName] = changedUser;
+        setUserMap({...userMap});
+        setEnabled(true);
+    }).catch((ev) => {console.log(ev); setEnabled(true)});
 }
 
 export default function ACLWidget(props) {
@@ -97,7 +103,7 @@ export default function ACLWidget(props) {
 
     const nsAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].restriction_type : "OPEN";
     const inheritAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].inherited_restriction_type : "OPEN";
-    let roleEnable = !(nsAccessType === "OPEN" || nsAccessType === "INHERIT" && inheritAccessType === "OPEN");
+    let roleEnable = enabled &&  !(nsAccessType === "OPEN" || nsAccessType === "INHERIT" && inheritAccessType === "OPEN");
 
   return <div className="aclWidget">
       <h2>Access Control</h2>
@@ -109,22 +115,22 @@ export default function ACLWidget(props) {
               <div><input type="radio" name={"controlType_" + props.site} value="INHERIT"
                           id={"accessInherit_" + props.site} onChange={ev => {
                   setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-              }} checked={nsAccessType === "INHERIT"}/><label htmlFor={"accessInherit_" + props.site}>
+              }} checked={nsAccessType === "INHERIT"} disabled={!enabled}/><label htmlFor={"accessInherit_" + props.site}>
                   Inherit ({inheritAccessType})</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="OPEN" id={"accessOpen_" + props.site}
                           onChange={ev => {
                               setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-                          }} checked={nsAccessType === "OPEN"}/><label htmlFor={"accessOpen_" + props.site}>Open
+                          }} checked={nsAccessType === "OPEN"}  disabled={!enabled}/><label htmlFor={"accessOpen_" + props.site}>Open
                   Access</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="WRITE_RESTRICTED"
                           id={"writeRestrict_" + props.site} onChange={ev => {
                   setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-              }} checked={nsAccessType === "WRITE_RESTRICTED"}/><label
+              }} checked={nsAccessType === "WRITE_RESTRICTED"} disabled={!enabled}/><label
                   htmlFor={"writeRestrict_" + props.site}>Write Restricted</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="READ_RESTRICTED"
                           id={"readRestrict_" + props.site} onChange={ev => {
                   setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-              }} checked={nsAccessType === "READ_RESTRICTED"}/><label
+              }} checked={nsAccessType === "READ_RESTRICTED"}  disabled={!enabled}/><label
                   htmlFor={"readRestrict_" + props.site}>Read Restricted</label></div>
           </div>
           <select name="userList" className="userList" data-testid="userList" size="5" onChange={(ev) => {
@@ -134,8 +140,8 @@ export default function ACLWidget(props) {
               {props.users.map(user => <option value={user} key={user}>{user}</option>)}
           </select>
           <select name="roleList" className="roleList" data-testid="roleList" size="5" onChange={(ev) => {
-              setSelectedRoles(props.site, selectedNs, selectedUser, ev.target, props.userMap, props.setUserMap);
-          }} disabled={!roleEnable} multiple={true} value={userRoles}>
+              setSelectedRoles(props.site, selectedNs, selectedUser, ev.target, props.userMap, props.setUserMap, setEnabled);
+          }} disabled={!roleEnable} multiple={true} value={userRoles} >
               <option value={"READ"}>Allow Read</option>
               <option value={"WRITE"}>Allow Write</option>
               <option value={"UPLOAD"}>Allow Upload</option>
