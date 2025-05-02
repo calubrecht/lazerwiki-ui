@@ -3,7 +3,6 @@ import {instance as DS_instance} from '../svc/DataService';
 import './ACLWidget.css';
 import NsTree from '../NsTree';
 import {PropTypes} from "prop-types";
-import {instance as SS_instance} from "../svc/SettingsService.jsx";
 
 function parseNamespaces(namespaces, parsedNamespaces) {
     parsedNamespaces[namespaces.fullNamespace] = namespaces;
@@ -59,11 +58,8 @@ function getSiteRoles(site, namespace, user) {
 function setSelectedRoles(site, selectedNs, selectedUser, target, userMap, setUserMap) {
     let user = userMap[selectedUser];
     let selectedRoles = [];
-    for (let i = 0 ; i < target.options.length; i++) {
-        let option = target.options[i];
-        if (!option.selected) {
-            continue;
-        }
+    for (let i = 0 ; i < target.selectedOptions.length; i++) {
+        let option = target.selectedOptions[i];
         selectedRoles.push("ROLE_" + option.value + ":" + site +":" + selectedNs);
     }
     // get userRoles not related to this site and ns

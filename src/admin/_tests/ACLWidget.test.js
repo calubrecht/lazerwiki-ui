@@ -124,3 +124,48 @@ test('changeRestrictionTypes', async () => {
             ]}}));
     expect(screen.getByLabelText("Open Access")).toBeChecked();
 });
+
+test("nsRoles", async () => {
+    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
+                {"fullNamespace": "ro", restriction_type: "WRITE_RESTRICTED",children:[]},
+                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+            ]}});
+
+    let setUserMap = jest.fn(() => {});
+    let userMap = {Bob: {"userName": "Bob", "userRoles": ["ROLE_ADMIN", "ROLE_READ:bunk:ro", "ROLE_READ:site1:rw", "ROLE_WRITE:site1:ro"]},
+        "Frank": {"userName": "Frank", "userRoles": []}};
+
+    await act(async() => await render(<ACLWidget site="site1" users={["Bob", "Frank"]} userMap={userMap} setUserMap={setUserMap} />));
+
+    expect(screen.getByText("Access Control"));
+    expect(screen.getByText("NSTree - loaded"));
+
+    expect(screen.getByTestId("userList")).not.toBeEnabled();
+    expect(screen.getByTestId("roleList")).not.toBeEnabled();
+
+    await act(() => selectNS("ro"));
+    expect(screen.getByLabelText("Write Restricted")).toBeChecked();
+
+    expect(screen.getByTestId("userList")).toBeEnabled();
+    expect(screen.getByTestId("roleList")).toBeEnabled();
+
+    await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'Frank'));
+
+    expect(screen.getByText("Allow Read").selected).toBe(false);
+    expect(screen.getByText("Allow Write").selected).toBe(false);
+    expect(screen.getByText("Allow Upload").selected).toBe(false);
+    expect(screen.getByText("Allow Delete").selected).toBe(false);
+
+    await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'Bob'));
+    expect(screen.getByText("Allow Read").selected).toBe(false);
+    expect(screen.getByText("Allow Write").selected).toBe(true);
+    expect(screen.getByText("Allow Upload").selected).toBe(false);
+    expect(screen.getByText("Allow Delete").selected).toBe(false);
+
+    await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'UPLOAD'));
+    let newUserMap = setUserMap.mock.calls[0][0];
+    expect(newUserMap["Frank"]).toStrictEqual({"userName": "Frank", "userRoles": []});
+    expect(newUserMap["Bob"]).toStrictEqual({"userName": "Bob",
+        "userRoles":[ "ROLE_WRITE:site1:ro", "ROLE_UPLOAD:site1:ro", "ROLE_ADMIN", "ROLE_READ:bunk:ro", "ROLE_READ:site1:rw"]});
+
+});
