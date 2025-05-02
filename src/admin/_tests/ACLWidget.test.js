@@ -31,7 +31,7 @@ beforeEach(() => {
 
 
 test('render', async () => {
-    await act(async() => await render(<ACLWidget site="site1"/>));
+    await act(async() => await render(<ACLWidget site="site1" userData={{"users": ["Bob", "Frank"]}}/>));
 
     expect(screen.getByText("Access Control"));
     expect(screen.getByText("NSTree - loaded"));
@@ -44,7 +44,7 @@ test('loadRestrictionTypes', async () => {
         {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
             ]}});
 
-    await act(async() => await render(<ACLWidget site="site1"/>));
+    await act(async() => await render(<ACLWidget site="site1" userData={{"users": ["Bob", "Frank"]}}/>));
 
     expect(screen.getByText("Access Control"));
     expect(screen.getByText("NSTree - loaded"));
@@ -64,7 +64,7 @@ test('changeRestrictionTypes', async () => {
                 {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
             ]}});
 
-    await act(async() => await render(<ACLWidget site="site1"/>));
+    await act(async() => await render(<ACLWidget site="site1" userData={{"users": ["Bob", "Frank"]}}/>));
 
     expect(screen.getByText("Access Control"));
     expect(screen.getByText("NSTree - loaded"));

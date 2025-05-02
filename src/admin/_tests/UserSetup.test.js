@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 test('render', async () => {
-  render(<UserSetup sites={[]}/>);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}}}/>);
 
   await waitFor(() => {});
 
@@ -36,7 +36,7 @@ test('render', async () => {
 
 
 test('select User', async () => {
-  render(<UserSetup sites={[]}/>);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}}}/>);
 
   await waitFor(() => {});
 
@@ -52,7 +52,8 @@ test('select User', async () => {
 });
 
 test('remove Role', async () => {
-  render(<UserSetup sites={[]}/>);
+  let setUserMap = jest.fn(() => {});
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
 
   await waitFor(() => {});
 
@@ -66,11 +67,15 @@ test('remove Role', async () => {
   expect(mockDS.deleteRole.mock.calls[0][0]).toBe("User 1");
   expect(mockDS.deleteRole.mock.calls[0][1]).toBe("ROLE_ADMIN");
 
+  let updatedUserMap = {"User 1": {userName:"User 1", userRoles:["ROLE_USER"]}, "User 2":{userName:"User 2"}};
+  expect(setUserMap.mock.calls[0][0]).toStrictEqual(updatedUserMap);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:updatedUserMap, setUserMap}}/>, component);
   expect(screen.queryByRole("option", {name: "ROLE_ADMIN"})).not.toBeInTheDocument();
 });
 
 test('add Role', async () => {
-  render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}]}/>);
+  let setUserMap = jest.fn(() => {});
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
 
   await waitFor(() => {});
 
@@ -91,6 +96,10 @@ test('add Role', async () => {
   expect(mockDS.addRole.mock.calls[0][1]).toBe("ROLE_ONE");
   
   await waitFor(() => {});
+  let updatedUserMap = {"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER", "ROLE_NEW"]}, "User 2":{userName:"User 2"}};
+  expect(setUserMap.mock.calls[0][0]).toStrictEqual(updatedUserMap);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:updatedUserMap, setUserMap}}/>, component);
+
   expect(screen.getByRole("option", {name: "ROLE_NEW"}));
 
   expect(roleInput.value).toBe("ROLE_");
@@ -110,7 +119,9 @@ test('add Role', async () => {
 });
 
 test('add Admin Role', async () => {
-  render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}, {name: "site2", siteName: "Site 2"}]}/>);
+  let setUserMap = jest.fn(() => {});
+  let component= render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}, {name: "site2", siteName: "Site 2"}]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+
 
   await waitFor(() => {});
 
@@ -151,7 +162,10 @@ test('add Admin Role', async () => {
 });
 
 test('add User', async () => {
-  render(<UserSetup sites={[]}/>);
+  let setUserMap = jest.fn(() => {});
+  let setUsers = jest.fn(() => {});
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+
 
   await waitFor(() => {});
 
@@ -173,6 +187,8 @@ test('add User', async () => {
   expect(mockDS.addUser.mock.calls[0][1]).toBe("PASS");
   
   await waitFor(() => {});
+  expect(setUsers.mock.calls[0][0]).toStrictEqual(["User 1", "User 2", "USER1"]);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2", "USER1"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>, component);
   expect(screen.getByRole("option", {name: "USER1"}));
 
 
@@ -185,7 +201,8 @@ test('add User', async () => {
 });
 
 test('reset Password', async () => {
-  render(<UserSetup sites={[]}/>);
+  let setUserMap = jest.fn(() => {});
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
 
   await waitFor(() => {});
 
@@ -211,7 +228,9 @@ test('reset Password', async () => {
 });
 
 test('delete User', async () => {
-  render(<UserSetup sites={[]}/>);
+  let setUserMap = jest.fn(() => {});
+  let setUsers = jest.fn(() => {});
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
 
   await waitFor(() => {});
 
@@ -234,7 +253,8 @@ test('net Fail', async () => {
   mockDS.setUserPassword = jest.fn(() => Promise.reject("setUserPassword Failed"));
   console.log = jest.fn(() => {});
 
-  render(<UserSetup sites={[]}/>);
+  let setUserMap = jest.fn(() => {});
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
 
   await waitFor(() => {});
 

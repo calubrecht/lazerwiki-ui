@@ -19,7 +19,7 @@ function userHasGlobalAdmin(roles) {
   return roles.filter(r => r === "ROLE_ADMIN").length > 0;
 }
 
-function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, visible) {
+function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, userData, visible) {
     let enableSelfReg = !!globalSettings.enableSelfReg;
     let setEnableSelfReg = (t) => {
         let newSettings = {...globalSettings, enableSelfReg: t};
@@ -29,22 +29,25 @@ function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings
   const className = visible ? "settingsBody" : "settingsBody hidden";
   return <div className={className} aria-label="SettingSiteBody"><h1>Global Settings</h1>
       <SiteSetup activeSites={sites} setSites={setSites}/>
-      <UserSetup sites={sites}/>
+      <UserSetup sites={sites} userData={userData}/>
       <div className='clear'></div>
       <div className='enableSelfReg'><SliderInput label="Enable Self Registration" id="globalEnableSelfReg" value={enableSelfReg} setter={setEnableSelfReg}/></div>
   </div>;
 }
 
-function renderDlgBody(tab, sites, setSites, globalSettings, setGlobalSettings) {
+function renderDlgBody(tab, sites, setSites, globalSettings, setGlobalSettings, userData) {
     return <div>
-        {renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, tab === 'Global Settings')}
-    {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} siteSettings={site.settings} siteHostname={site.hostname} visible={site.siteName === tab}/>)}</div>
+        {renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, userData, tab === 'Global Settings')}
+    {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} siteSettings={site.settings} siteHostname={site.hostname} userData ={userData} visible={site.siteName === tab}/>)}</div>
 }
 
 function AdminDialog(props) {
  const [selectedTab, setSelectedTab] = useState(props.initData.selectedTab);
  let showSelectedTab = selectedTab;
  const [sites, setSites] = useState([]);
+ const [users, setUsers] = useState([]);
+ const [userMap, setUserMap] = useState({});
+ let userData = {users, setUsers, userMap, setUserMap};
  const [globalSettings, setGlobalSettings] = useState({});
  const siteNames = sites.map(site => site.siteName);
  let tabList =  userHasGlobalAdmin(props.initData.roles) ? ["Global Settings", ...siteNames] : siteNames;
@@ -58,6 +61,15 @@ function AdminDialog(props) {
     setGlobalSettings(SS_instance().getSettings());
     SS_instance().addListener({setSettings: setGlobalSettings })
  }, []);
+ useEffect( () => {
+    DS_instance().getUsers().then(users => {
+        setUsers(users.map(user => user.userName));
+        let newUserMap = {};
+        for (let user of users) {
+            newUserMap[user.userName] = user;
+        }
+        setUserMap(newUserMap);
+    });}, []);
  const dlgRef = useRef();
  useEffect(() => {
   dlgRef.current?.showModal?.();
@@ -72,7 +84,7 @@ function AdminDialog(props) {
             return <button key={tab} className={className} onClick={() => setSelectedTab(tab)}>{tab}</button>
           })}
        </div>
-         {renderDlgBody(showSelectedTab, sites, setSites, globalSettings, setGlobalSettings)}
+         {renderDlgBody(showSelectedTab, sites, setSites, globalSettings, setGlobalSettings, userData)}
     </dialog>
     </div>);
 }

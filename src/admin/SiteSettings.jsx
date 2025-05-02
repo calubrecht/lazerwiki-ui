@@ -42,11 +42,11 @@ export default function SiteSettings(props) {
     <TextField className="SettingsField" name="SiteHostName" label="Site Hostname:" onChange={(v) => change(v, setSiteHostname)} disabled={disabled} varName="siteHostname" value={siteHostname} />
     <TextArea className="SettingsField" name="SiteSettings" label="Settings:" onChange={(v) => change(v, setsiteSettings)} disabled={disabled} varName="siteSettings" value={siteSettings} />
     <button className="SettingsSaveBtn" disabled={saveDisabled} onClick={saveSettings}>Save</button>
-    <ACLWidget site={props.siteName}></ACLWidget>
+    <ACLWidget site={props.siteName} userData={props.userData}></ACLWidget>
     <div className="error">{errorMsg}</div>
     </div>;
 }
 
 SiteSettings.propTypes = {
-  siteDisplayName: PropTypes.string, siteName: PropTypes.string, siteHostname: PropTypes.string, siteSettings: PropTypes.object, visible: PropTypes.bool
+  siteDisplayName: PropTypes.string, siteName: PropTypes.string, siteHostname: PropTypes.string, siteSettings: PropTypes.object, visible: PropTypes.bool, userData: PropTypes.object
 };

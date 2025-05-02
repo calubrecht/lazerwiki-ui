@@ -204,8 +204,8 @@ function DeleteConfirmDlg(props) {
 DeleteConfirmDlg.propTypes = {userName: PropTypes.string, activeUsers: PropTypes.object, setSelectedUser: PropTypes.func, dlgRef: PropTypes.object, close:PropTypes.func};
 
 function UserSetup(props) {
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [userMap, setUserMap] = useState({});
+  const [activeUsers, setActiveUsers] = [props.userData.users, props.userData.setUsers];
+  const [userMap, setUserMap] = [props.userData.userMap, props.userData.setUserMap];
   const [selectedUser, setSelectedUser] = useState(undefined);
   const [selectedRole, setSelectedRole] = useState(undefined);
   const [isResetPassword, setIsResetPassword] = useState(false);
@@ -213,16 +213,6 @@ function UserSetup(props) {
   const addRoleDlgRef = useRef(); 
   const addUserDlgRef = useRef(); 
   const confirmDelDlgRef = useRef();
-  useEffect( () => {
-    DS_instance().getUsers().then(users => {
-      setActiveUsers(users.map(user => user.userName));
-      let newUserMap = {};
-      for (let user of users) {
-        newUserMap[user.userName] = user;
-      }
-      setUserMap(newUserMap);
-    });
-  }, []);
   return <div className="userSetup">
     <div className="selectWidget">
       <label htmlFor="userList" >Users</label>

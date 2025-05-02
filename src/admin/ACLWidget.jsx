@@ -43,6 +43,7 @@ export default function ACLWidget(props) {
     const [parsedNamespaces, setParsedNamespaces] = useState({});
     const [selectedNs, setSelectedNs] = useState("");
     const [enabled, setEnabled] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect( () => {
         fetchNamespaces(props.site, setNamespaces, setParsedNamespaces, setEnabled);
@@ -59,17 +60,35 @@ export default function ACLWidget(props) {
       <div className="aclPanel">
           <label>Set Controls for : {selectedNs}</label>
           <div className="controlRadios">
-              <div><input type="radio" name={"controlType_" + props.site} value="INHERIT" id={"accessInherit_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "INHERIT" }/><label htmlFor={"accessInherit_" + props.site}>
+              <div><input type="radio" name={"controlType_" + props.site} value="INHERIT"
+                          id={"accessInherit_" + props.site} onChange={ev => {
+                  setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
+              }} checked={nsAccessType === "INHERIT"}/><label htmlFor={"accessInherit_" + props.site}>
                   Inherit ({inheritAccessType})</label></div>
-              <div><input type="radio" name={"controlType_" + props.site} value="OPEN" id={"accessOpen_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "OPEN" }/><label htmlFor={"accessOpen_" + props.site}>Open
+              <div><input type="radio" name={"controlType_" + props.site} value="OPEN" id={"accessOpen_" + props.site}
+                          onChange={ev => {
+                              setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
+                          }} checked={nsAccessType === "OPEN"}/><label htmlFor={"accessOpen_" + props.site}>Open
                   Access</label></div>
-              <div><input type="radio" name={"controlType_" + props.site} value="WRITE_RESTRICTED" id={"writeRestrict_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "WRITE_RESTRICTED" }/><label
+              <div><input type="radio" name={"controlType_" + props.site} value="WRITE_RESTRICTED"
+                          id={"writeRestrict_" + props.site} onChange={ev => {
+                  setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
+              }} checked={nsAccessType === "WRITE_RESTRICTED"}/><label
                   htmlFor={"writeRestrict_" + props.site}>Write Restricted</label></div>
-              <div><input type="radio" name={"controlType_" + props.site} value="READ_RESTRICTED" id={"readRestrict_" + props.site} onChange={ev => {setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)}} checked={nsAccessType === "READ_RESTRICTED" }/><label
+              <div><input type="radio" name={"controlType_" + props.site} value="READ_RESTRICTED"
+                          id={"readRestrict_" + props.site} onChange={ev => {
+                  setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
+              }} checked={nsAccessType === "READ_RESTRICTED"}/><label
                   htmlFor={"readRestrict_" + props.site}>Read Restricted</label></div>
+          </div>
+          <select name="userList" id="userList" data-testid="userList" size="5" onChange={(ev) => {
+              setSelectedUser(ev.target.value);
+          }}
+                  value={selectedUser}>
+              {props.userData.users.map(user => <option value={user} key={user}>{user}</option>)}
+          </select>
+      </div>
   </div>
-</div>
-</div>
 }
 
-ACLWidget.propTypes = {site: PropTypes.string.isRequired};
+ACLWidget.propTypes = {site: PropTypes.string.isRequired, userData: PropTypes.object};

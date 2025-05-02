@@ -9,7 +9,8 @@ let dUser = {userName: 'joe', userRoles:[]};
 let mockDS = {
     getSites: () => Promise.resolve([{siteName:"Site 1", name:"site1"}, {siteName:"Site 2", name:"site2"}, {siteName:"Site 3", name:"site3"}]),
     getGlobalSettings: () => Promise.resolve({settings: {enableSelfReg: true}}),
-    setGlobalSettings: jest.fn(() => {})
+    setGlobalSettings: jest.fn(() => {}),
+    getUsers: () => Promise.resolve([{userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, {userName:"User 2"}])
 };
 
 jest.mock("../../svc/DataService", () => {
