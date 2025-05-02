@@ -37,13 +37,62 @@ function setNSaccess(site, namespace, setNamespaces, parsedNamespaces, setParsed
     });
 }
 
+function getSiteRoles(site, namespace, user) {
+   let roles = user.userRoles.filter(userRole => {
+       let parts = userRole.split(":");
+       if (parts.length != 3) {
+           return false;
+       }
+       if (parts[1] != site || parts[2] != namespace) {
+           return false;
+       }
+       return true;
+   }).
+       map(userRole => {
+         let parts = userRole.split(":");
+         let roleType = userRole.split(":")[0].split("_")[1];
+         return roleType;
+       });
+   return roles;
+}
+
+function setSelectedRoles(site, selectedNs, selectedUser, target, userMap, setUserMap) {
+    let user = userMap[selectedUser];
+    let selectedRoles = [];
+    for (let i = 0 ; i < target.options.length; i++) {
+        let option = target.options[i];
+        if (!option.selected) {
+            continue;
+        }
+        selectedRoles.push("ROLE_" + option.value + ":" + site +":" + selectedNs);
+    }
+    // get userRoles not related to this site and ns
+    user.userRoles.filter(userRole => {
+        let parts = userRole.split(":");
+        if (parts.length != 3) {
+            return true;
+        }
+        if (parts[1] != site || parts[2] != selectedNs) {
+            return true;
+        }
+        return false;
+    }).forEach( userRole => {
+          selectedRoles.push(userRole);
+        }
+    );
+    user.userRoles = selectedRoles;
+    setUserMap({...userMap});
+    // Do network stuff
+}
 
 export default function ACLWidget(props) {
     const [namespaces, setNamespaces] = useState({});
     const [parsedNamespaces, setParsedNamespaces] = useState({});
     const [selectedNs, setSelectedNs] = useState("");
     const [enabled, setEnabled] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUser, setSelectedUser] = useState("");
+
+    let userRoles = !selectedUser ? [] :  getSiteRoles(props.site, selectedNs, props.userMap[selectedUser]);
 
     useEffect( () => {
         fetchNamespaces(props.site, setNamespaces, setParsedNamespaces, setEnabled);
@@ -52,6 +101,7 @@ export default function ACLWidget(props) {
 
     const nsAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].restriction_type : "OPEN";
     const inheritAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].inherited_restriction_type : "OPEN";
+    let roleEnable = !(nsAccessType === "OPEN" || nsAccessType === "INHERIT" && inheritAccessType === "OPEN");
 
   return <div className="aclWidget">
       <h2>Access Control</h2>
@@ -81,14 +131,22 @@ export default function ACLWidget(props) {
               }} checked={nsAccessType === "READ_RESTRICTED"}/><label
                   htmlFor={"readRestrict_" + props.site}>Read Restricted</label></div>
           </div>
-          <select name="userList" id="userList" data-testid="userList" size="5" onChange={(ev) => {
+          <select name="userList" className="userList" data-testid="userList" size="5" onChange={(ev) => {
               setSelectedUser(ev.target.value);
           }}
-                  value={selectedUser}>
-              {props.userData.users.map(user => <option value={user} key={user}>{user}</option>)}
+                  value={selectedUser} disabled={!roleEnable}>
+              {props.users.map(user => <option value={user} key={user}>{user}</option>)}
+          </select>
+          <select name="roleList" className="roleList" data-testid="roleList" size="5" onChange={(ev) => {
+              setSelectedRoles(props.site, selectedNs, selectedUser, ev.target, props.userMap, props.setUserMap);
+          }} disabled={!roleEnable} multiple={true} value={userRoles}>
+              <option value={"READ"}>Allow Read</option>
+              <option value={"WRITE"}>Allow Write</option>
+              <option value={"UPLOAD"}>Allow Upload</option>
+              <option value={"DELETE"}>Allow Delete</option>
           </select>
       </div>
   </div>
 }
 
-ACLWidget.propTypes = {site: PropTypes.string.isRequired, userData: PropTypes.object};
+ACLWidget.propTypes = {site: PropTypes.string.isRequired, users:PropTypes.array, userMap:PropTypes.object, setUserMap:PropTypes.func};

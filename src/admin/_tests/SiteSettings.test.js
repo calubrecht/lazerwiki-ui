@@ -9,7 +9,7 @@ jest.mock("../ACLWidget", () => (props) => {
 
 
 test('render', () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite"/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" userData={{users: [], userMap:{}}}/>);
 
   expect(screen.getByText("Settings for - Test Site"));
   expect(screen.getByRole("group", {name: "SettingSiteBody"}));
@@ -18,7 +18,7 @@ test('render', () => {
 });
 
 test('render novisible', () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible={false} siteName="testSite"/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={false} siteName="testSite"  userData={{users: [], userMap:{}}}/>);
 
   expect(screen.getByText("Settings for - Test Site"));
   expect(screen.getByRole("group", {name: "SettingSiteBodyHidden"}));
@@ -27,7 +27,7 @@ test('render novisible', () => {
 });
 
 test('enterField', async () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}  userData={{users: [], userMap:{}}}/>);
     
   await waitFor( () => {});
   expect(screen.getByLabelText('Site Name:').value).toBe("testSite");
@@ -49,7 +49,7 @@ jest.mock("../../svc/DataService", () => {
 });
 
 test('button', async () => {
-  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}/>);
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}  userData={{users: [], userMap:{}}}/>);
     
   await waitFor( () => {});
   screen.getByLabelText("Site Hostname:").focus();
