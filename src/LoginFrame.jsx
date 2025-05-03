@@ -1,9 +1,10 @@
-import {Component} from 'react';
+  import {Component} from 'react';
 import {instance as DS_instance} from './svc/DataService';
 import {instance as US_instance} from './svc/UserService';
 import {instance as SS_instance} from './svc/SettingsService';
 import DrawerLink from './DrawerLink';
 import SelfRegisterFrame from './SelfRegisterFrame';
+import ForgotPasswordFrame from './ForgotPasswordFrame';
 
 import TextField from './TextField';
 
@@ -31,11 +32,12 @@ export default class LoginFrame extends Component
         <TextField name="Username" label="Username:" onChange={(v,f) => this.onChangeField(v,f)} disabled={this.state.disabled} varName="username" autofocus={true} value={this.state.username}/>
         <TextField name="Password" label="Password:" onChange={(v,f) => this.onChangeField(v,f)} disabled={this.state.disabled} varName="password" isPassword={true} value={this.state.password}/>
         {this.state.enableSelfReg ? <DrawerLink title="Register New Account" component={SelfRegisterFrame}/> : "" }
-        <div className='errorText'>{this.state.error}</div>
+        <div className='errorText'>{this.state.error}</div><div className="forgot">
+        {this.state.showForgot ? <DrawerLink title="Forgot?" component={ForgotPasswordFrame} initData={{username:this.state.username}}/> : "" }</div>
       </div>
       </div>)
   }
-  
+
   attemptLogin()
   {
     this.setState({error:'', disabled: true});
@@ -58,7 +60,7 @@ export default class LoginFrame extends Component
 
   handleError()
   {
-    this.setState({error:'Invalid username or password', disabled: false});
+    this.setState({error:'Invalid username or password', disabled: false, showForgot:true});
   }
 
   onChangeField(val, field) {
