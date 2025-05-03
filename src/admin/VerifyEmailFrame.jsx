@@ -18,7 +18,7 @@ function doVerify(token, onSuccess, setMessage) {
 }
 
 function VerifyEmailFrame(props) {
-  let email = "something@what.com";
+  let email = props.email;
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
   let disabled = false;
@@ -38,7 +38,7 @@ function VerifyEmailFrame(props) {
   </div>;
 }
 
-VerifyEmailFrame.propTypes = {doClose: PropTypes.func, onSuccess: PropTypes.func};
+VerifyEmailFrame.propTypes = {doClose: PropTypes.func, onSuccess: PropTypes.func, email: PropTypes.string};
 
 
 export default VerifyEmailFrame;

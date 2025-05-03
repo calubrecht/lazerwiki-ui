@@ -115,7 +115,7 @@ function UserAdminDialog(props) {
             })}
         </div>
         {renderDlgBody(showSelectedTab, {newPassword, setNewPassword, confirmPassword, setConfirmPassword, error, setError, email, setEmail, savedEmail, setSavedEmail, setDisplayVerifyEmail})}
-        {displayVerifyEmail && <VerifyEmailFrame doClose={() => setDisplayVerifyEmail(false)} onSuccess={() => {
+        {displayVerifyEmail && <VerifyEmailFrame email={email} doClose={() => setDisplayVerifyEmail(false)} onSuccess={() => {
             setDisplayVerifyEmail(false);
             setSavedEmail(email);
         }}/>}
