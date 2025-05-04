@@ -7,3 +7,11 @@ div.loginForm button.drawerPull.open::after {
     content: ' \25B2';
     color: #aa0000;
 }
+
+div.loginForm div.errorText {
+    color: red;
+}
+
+div.loginForm div.forgotPassword button.drawerPull {
+    color: #880000;
+}

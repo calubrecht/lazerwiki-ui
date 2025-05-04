@@ -16,7 +16,7 @@ jest.mock("../../svc/DataService", () => {
 
 let doVerifyClose = null;
 let doVerifySuccess = null;
-jest.mock("../VerifyEmailFrame", () => (props) =>  {
+jest.mock("../VerifyTokenFrame.jsx", () => (props) =>  {
     doVerifyClose = props.doClose;
     doVerifySuccess = props.onSuccess;
     return "Verify Email";

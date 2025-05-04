@@ -33,7 +33,7 @@ export default class LoginFrame extends Component
         <TextField name="Password" label="Password:" onChange={(v,f) => this.onChangeField(v,f)} disabled={this.state.disabled} varName="password" isPassword={true} value={this.state.password}/>
         {this.state.enableSelfReg ? <DrawerLink title="Register New Account" component={SelfRegisterFrame}/> : "" }
         <div className='errorText'>{this.state.error}</div><div className="forgot">
-        {this.state.showForgot ? <DrawerLink title="Forgot?" component={ForgotPasswordFrame} initData={{username:this.state.username}}/> : "" }</div>
+        {this.state.showForgot ? <DrawerLink title="Forgot?" component={ForgotPasswordFrame} initData={{username:this.state.username}} extraClasses="forgotPassword"/> : "" }</div>
       </div>
       </div>)
   }

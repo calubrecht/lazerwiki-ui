@@ -177,6 +177,15 @@ export default class DataService
         .then(res => res.json());
   }
 
+  resetForgottenPassword(userName, email, password) {
+    return fetch(
+        this.baseRequest + "users/resetForgottenPassword",
+        {method: 'post', body: JSON.stringify({userName, email, password}), credentials: 'include',
+          headers: this.getPostHeaders()})
+        .then(this.handleErrors);
+
+  }
+
   saveEmail(username, email) {
     return fetch(
         this.baseRequest + 'users/saveEmail',
@@ -190,6 +199,15 @@ export default class DataService
     return fetch(
         this.baseRequest + 'users/verifyEmailToken',
         {method: 'post', body: token, credentials: 'include',
+          headers: this.getPostHeaders() })
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
+  verifyPasswordToken(token, username) {
+    return fetch(
+        this.baseRequest + 'users/verifyPasswordToken',
+        {method: 'post', body: JSON.stringify({username, token}), credentials: 'include',
           headers: this.getPostHeaders() })
         .then(this.handleErrors)
         .then(res => res.json());

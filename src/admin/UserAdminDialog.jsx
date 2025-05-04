@@ -1,7 +1,7 @@
 import {useEffect, useState, useRef} from 'react';
 import './AdminWidget.css';
 import TextField from "../TextField.jsx";
-import VerifyEmailFrame from "./VerifyEmailFrame.jsx";
+import VerifyTokenFrame from "./VerifyTokenFrame.jsx";
 import {instance as DS_instance} from '../svc/DataService';
 import {instance as US_instance} from '../svc/UserService';
 import {PropTypes} from "prop-types";
@@ -115,7 +115,7 @@ function UserAdminDialog(props) {
             })}
         </div>
         {renderDlgBody(showSelectedTab, {newPassword, setNewPassword, confirmPassword, setConfirmPassword, error, setError, email, setEmail, savedEmail, setSavedEmail, setDisplayVerifyEmail})}
-        {displayVerifyEmail && <VerifyEmailFrame email={email} doClose={() => setDisplayVerifyEmail(false)} onSuccess={() => {
+        {displayVerifyEmail && <VerifyTokenFrame email={email} tokenType="email" doClose={() => setDisplayVerifyEmail(false)} onSuccess={() => {
             setDisplayVerifyEmail(false);
             setSavedEmail(email);
         }}/>}

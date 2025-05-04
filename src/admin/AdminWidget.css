@@ -92,7 +92,7 @@ div.enableSelfReg {
     margin-top:1em;
 }
 
-div.VerifyEmailBackdrop {
+div.VerifyTokenBackdrop {
     position:fixed;
     left:0px;
     top:0px;
@@ -104,7 +104,7 @@ div.VerifyEmailBackdrop {
     align-items: center;
 }
 
-div.VerifyEmailFrame {
+div.VerifyTokenFrame {
     padding: 1em;
     border: 3px solid black;
     height:10em;
@@ -112,11 +112,11 @@ div.VerifyEmailFrame {
     background:white;
 }
 
-div.VerifyEmailFrame > div {
+div.VerifyTokenFrame > div {
     margin-bottom: 1em;
 }
 
-div.VerifyEmailFrame button.close{
+div.VerifyTokenFrame button.close{
     float:right;
     margin:-1em -.5em;
     color: red;
