@@ -69,6 +69,7 @@ function MoveImageFrame(props) {
 MoveImageFrame.propTypes = {
     imageName: PropTypes.string,
     ns: PropTypes.string,
-    nsTree: PropTypes.object, doClose:PropTypes.func, doRefresh:PropTypes.func};
+    nsTree: PropTypes.object, doClose:PropTypes.func, doRefresh:PropTypes.func
+};
 
 export default MoveImageFrame;

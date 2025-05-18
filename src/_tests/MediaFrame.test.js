@@ -28,6 +28,12 @@ jest.mock("../ImageSettings", () => (props) => {
     return <div>ImageSettings</div>;
 });
 
+var doCloseMove= null;
+jest.mock("../MoveImageFrame", () => (props) => {
+    doCloseMove = props.doClose;
+    return <div>Move Image</div>;
+});
+
 let NsTreeSelectNS=null;
 
 jest.mock("../NsTree", ()  => (props) => {
@@ -137,6 +143,13 @@ test('basicButtons', async () => {
     expect (screen.queryByText("File Deleted")).not.toBeInTheDocument();
     expect (screen.queryByText("Bad")).toBeInTheDocument();
     expect(mockDS.deleteFile.mock.calls).toHaveLength(2);
+
+    await act( () => userEvent.click(screen.getByAltText("Move file.png")));
+
+    expect (screen.getByText("Move Image")).toBeInTheDocument();
+    // Just close
+    await act( () => doCloseMove());
+    expect (screen.queryByText("Move Image")).not.toBeInTheDocument();
 
 });
 
