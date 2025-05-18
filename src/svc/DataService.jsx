@@ -313,6 +313,16 @@ export default class DataService
         .then(res => res.json());
   }
 
+  moveImage(oldNS, oldFile, newNS, newFile) {
+    return fetch(
+        this.baseMediaRequest  + 'moveFile',
+        {method: 'post', credentials: 'include',
+          body: JSON.stringify({oldNS, oldFile, newNS, newFile}),
+          headers: this.getPostHeaders()})
+        .then(this.handleErrors)
+        .then(res => res.json());
+  }
+
   deleteRole(userName, userRole) {
     return fetch(
       this.baseRequest + "admin/role/" + userName + "/" + userRole,

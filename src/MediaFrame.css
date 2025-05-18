@@ -118,3 +118,40 @@ input#mediaFileUploadNS {
 dialog.deleteDialog {
   z-index:10;
 }
+
+dialog.moveImageDialog {
+  z-index:10;
+  height:400px;
+  width: 550px;
+}
+
+dialog.moveImageDialog div.dialogHeader {
+  clear: both;
+  margin-bottom: 1em;
+}
+
+dialog.moveImageDialog div.TextField {
+  margin-top:3em;
+}
+
+dialog.moveImageDialog div.nsTreeContainer {
+  float: left;
+  margin-right: 2em;
+  width: 240px;
+}
+
+dialog.moveImageDialog button.close {
+  float:right;
+  margin-top:-12px;
+  margin-right:-8px;
+  color: red;
+  font-weight: bold;
+}
+
+dialog.moveImageDialog div.moveDesc {
+  margin: 1em 0 1em 0;
+}
+
+dialog.moveImageDialog div.buttonRow {
+
+}

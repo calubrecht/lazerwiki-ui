@@ -4,6 +4,7 @@ import {instance as US_instance} from './svc/UserService';
 import NsTree from './NsTree';
 import TextField from './TextField';
 import ImageSettings from './ImageSettings';
+import MoveImageFrame from './MoveImageFrame.jsx';
 
 import './MediaFrame.css';
 import {PropTypes} from "prop-types";
@@ -23,12 +24,15 @@ export default class MediaFrame extends Component {
       message: "",
       errorMessage: false,
       displayDeleteDlg: false,
+      displayMoveDlg: false,
       namespace: initialNS,
       nsTree: {children: []},
       uploadNS: initialNS,
       alignment: "Flow",
       filter: ''
     };
+    this.closeMoveDlg = this.closeMoveDlg.bind(this);
+    this.fetchImageList = this.fetchImageList.bind(this);
   }
 
   static propTypes = {namespace: PropTypes.string, doClose: PropTypes.func, selectItem: PropTypes.func, width: PropTypes.number, height: PropTypes.number};
@@ -75,6 +79,7 @@ export default class MediaFrame extends Component {
                      varName="filter" autofocus={true} value={this.state.filter}/>
           <div id="message" className={messageClass}>{this.state.message}</div>
           {this.state.displayDeleteDlg && this.renderDeleteDialog()}
+          {this.state.displayMoveDlg && <MoveImageFrame imageName={this.state.moveImage} ns={this.state.namespace} nsTree={this.state.nsTree} doClose={this.closeMoveDlg} doRefresh={this.fetchImageList}/>}
           {this.renderList()}
         </div>
       </div>
@@ -129,7 +134,7 @@ export default class MediaFrame extends Component {
             counter++;
             return <div className="mediaListItem" key={"media" + counter}>
               <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName, "/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} -
-                uploaded by {img.uploadedBy} {this.state.user && <button className="delete button-unstyled"
+                uploaded by {img.uploadedBy} {this.state.user && this.renderMoveLink(img.fileName, "")} {this.state.user && <button className="delete button-unstyled"
                                                                          onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}</div>
               <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
             </div>;
@@ -151,7 +156,11 @@ export default class MediaFrame extends Component {
   }
 
   renderDownloadLink(fileName, filePath) {
-    return <a download={fileName} href={filePath}><img src="/_resources/download.png"/></a>;
+    return <a download={fileName} href={filePath}><img src="/_resources/download.png"  alt={"Download "+ fileName} title={"Download " + fileName}/></a>;
+  }
+
+  renderMoveLink(fileName) {
+    return <img src="/_resources/moveImage.png"  alt={"Move "+ fileName} title={"Move " + fileName} onClick={() => this.doMove(fileName)}/>;
   }
 
   enableUpload() {
@@ -226,6 +235,13 @@ export default class MediaFrame extends Component {
     return this.dataService.deleteFile(fileName);
   }
 
+  doMove(fileName) {
+    this.setState({displayMoveDlg: true, moveImage: fileName});
+  }
+
+  closeMoveDlg() {
+    this.setState({displayMoveDlg:false, moveImage:''})
+  }
 
   setUser(user) {
     this.setState({user: user});
