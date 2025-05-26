@@ -168,9 +168,10 @@ export default class EditToolbar extends Component
     this.clearFrame();
     let alignmentPre = (alignment === "Center" || alignment === "Right") ? " " : "";
     let alignmentPost = (alignment === "Center" || alignment === "Left") ? " " : "";
-    let size = (!width && !height) ? "" :
+    let size = (!width && !height || alignment === "Link Only") ? "" :
         (!height ? ("?" + width.toString()) : !width ? ("?0x" + height.toString()) : "?" + width.toString() + "x" + height.toString());
-    this.replaceSelectionText('{{' + alignmentPre + i + alignmentPost + size + '|', '}}', '');
+    let linkOnly = (alignment === "Link Only") ? "?linkonly" : "";
+    this.replaceSelectionText('{{' + alignmentPre + i + alignmentPost + size + linkOnly + '|', '}}', '');
   }
 
   clearFrame() {

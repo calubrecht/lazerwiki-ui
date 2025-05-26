@@ -11,6 +11,7 @@ test('alignment', async () => {
     expect(screen.getByText("Left")).not.toHaveClass("selected");
     expect(screen.getByText("Right")).not.toHaveClass("selected");
     expect(screen.getByText("Center")).not.toHaveClass("selected");
+    expect(screen.getByText("Link Only")).not.toHaveClass("selected");
 
     await act(() => screen.getByText("Left").click());
 
@@ -41,6 +42,11 @@ test('alignment', async () => {
     expect(chooseAlignment.mock.calls[1][0]).toBe("Right");
     expect(chooseAlignment.mock.calls[2][0]).toBe("Center");
     expect(chooseAlignment.mock.calls[3][0]).toBe("Flow");
+
+    await act(() => screen.getByText("Link Only").click());
+    expect(chooseAlignment.mock.calls[4][0]).toBe("Link Only");
+    expect(screen.getByLabelText("Width:")).toBeDisabled();
+    expect(screen.getByLabelText("Height:")).toBeDisabled();
 });
 
 test('size', async () => {

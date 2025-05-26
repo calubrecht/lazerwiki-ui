@@ -318,6 +318,9 @@ test('mediaFrame', async () => {
   await act( () => callSelectItem("newImageCenter", "Flow", null, 20));
   expect(text).toBe("{{newImageCenter?0x20|}}");
 
+  await act( () => callSelectItem("newImageNoShow", "Link Only", null, 20));
+  expect(text).toBe("{{newImageNoShow?linkonly|}}");
+
   await act( () => userEvent.click(btn));
   await act(() => doFrameClose());
   expect(screen.queryByText("MediaFrame")).not.toBeInTheDocument();
