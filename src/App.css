@@ -394,12 +394,12 @@ div#lw_TOC {
   position:fixed;
   overflow-y: scroll;
   background-color: white;
-  left:895px;
+  left:1220px;
 }
 
 div.previewFrameContent div#lw_TOC {
   left: revert;
-  right: 190px;
+  right: 1175px;
 }
 
 @media only screen and (max-height: 440px) {
@@ -454,5 +454,12 @@ div.previewFrameContent div#lw_TOC {
 
   div#lw_TOC {
     display: none;
+  }
+}
+
+
+@media only screen and (max-width: 1570px) {
+  div#lw_TOC {
+     top:450px;
   }
 }
