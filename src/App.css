@@ -387,6 +387,21 @@ div.clear {clear:both}
 
 div.UserAdminWidget {display:inline}
 
+div#lw_TOC {
+  border: black 1px solid;
+  width: 300px;
+  max-height:500px;
+  position:fixed;
+  overflow-y: scroll;
+  background-color: white;
+  left:895px;
+}
+
+div.previewFrameContent div#lw_TOC {
+  left: revert;
+  right: 190px;
+}
+
 @media only screen and (max-height: 440px) {
   div#toolbar {
     top: 50px;
@@ -417,6 +432,10 @@ div.UserAdminWidget {display:inline}
   div.toolbar button.drawerPull::after {
     content: '';
   }
+
+  div#lw_TOC {
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 440px) {
@@ -429,6 +448,11 @@ div.UserAdminWidget {display:inline}
   }
 
   div.RootMenu {
+    display: none;
+  }
+
+
+  div#lw_TOC {
     display: none;
   }
 }
