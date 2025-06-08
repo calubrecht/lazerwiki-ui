@@ -387,7 +387,7 @@ div.clear {clear:both}
 
 div.UserAdminWidget {display:inline}
 
-div#lw_TOC {
+div.TOC {
   border: black 1px solid;
   width: 300px;
   max-height:500px;
@@ -397,9 +397,14 @@ div#lw_TOC {
   left:1220px;
 }
 
-div.previewFrameContent div#lw_TOC {
+div.previewFrameContent div#lw_TOC_previewPage {
   left: revert;
   right: 1175px;
+}
+
+div.historicalPage div#lw_TOC_historyView {
+  left: revert;
+  right: 1125px;
 }
 
 @media only screen and (max-height: 440px) {
