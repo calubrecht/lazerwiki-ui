@@ -15,6 +15,7 @@ export default function SiteSettings(props) {
   const [origHostName, setOrigHostName] = useState(props.siteHostname);
   const [origSettings, setOrigSettings] = useState(JSON.stringify(props.siteSettings));
   const [errorMsg, setErrorMsg] = useState("");
+  const [message, setMessage] = useState("");
   const className = props.visible ? "settingsBody" : "settingsBody hidden";
   const label = props.visible ? "SettingSiteBody" : "SettingSiteBodyHidden";
   function change(v, setter) {
@@ -23,9 +24,12 @@ export default function SiteSettings(props) {
   const saveDisabled = saveInProgress || siteHostname ===  origHostName && siteSettings === origSettings;
   function saveSettings() {
     setSaveInProgress(true);
+    setMessage("");
+    setErrorMsg("");
     DS_instance().saveSiteSettings(props.siteName, siteHostname, siteSettings).then( res => {
             if (!res.success) {
               setErrorMsg(res.msg);
+              setMessage("Settings Saved");
             }
             else
             {
@@ -38,13 +42,36 @@ export default function SiteSettings(props) {
   }
   return <div className={className} aria-label={label} role="group">
     <h1>Settings for - {props.siteDisplayName}</h1>
-    <TextField className="SettingsField" name="SiteName" label="Site Name:"  disabled={true} varName="siteName" value={props.siteName} />
-    <TextField className="SettingsField" name="SiteHostName" label="Site Hostname:" onChange={(v) => change(v, setSiteHostname)} disabled={disabled} varName="siteHostname" value={siteHostname} />
-    <TextArea className="SettingsField" name="SiteSettings" label="Settings:" onChange={(v) => change(v, setsiteSettings)} disabled={disabled} varName="siteSettings" value={siteSettings} />
+    <TextField className="SettingsField" name="SiteName" label="Site Name:" disabled={true} varName="siteName"
+               value={props.siteName}/>
+    <TextField className="SettingsField" name="SiteHostName" label="Site Hostname:"
+               onChange={(v) => change(v, setSiteHostname)} disabled={disabled} varName="siteHostname"
+               value={siteHostname}/>
+    <TextArea className="SettingsField" name="SiteSettings" label="Settings:"
+              onChange={(v) => change(v, setsiteSettings)} disabled={disabled} varName="siteSettings"
+              value={siteSettings}/>
     <button className="SettingsSaveBtn" disabled={saveDisabled} onClick={saveSettings}>Save</button>
-    <ACLWidget site={props.siteName} users={props.userData.users} userMap={props.userData.userMap} setUserMap={props.userData.setUserMap}></ACLWidget>
+    <ACLWidget site={props.siteName} users={props.userData.users} userMap={props.userData.userMap}
+               setUserMap={props.userData.setUserMap}></ACLWidget>
+    <div className="MaintenanceTasks">
+      <button disabled={saveInProgress} onClick={() =>{
+        setMessage("");
+        setErrorMsg("");
+        setSaveInProgress(true);
+        DS_instance().regenCacheTable(props.siteName).then(() => {setMessage("Cache Table Regenerated"); setSaveInProgress(false);}).
+        catch((err) => {setErrorMsg("Regen failed"); setSaveInProgress(false);});
+      }}>Regen Caches</button>
+      <button disabled={saveInProgress} onClick={() =>{
+        setMessage("");
+        setErrorMsg("");
+        setSaveInProgress(true);
+        DS_instance().regenLinkTable(props.siteName).then(() => {setMessage("Link Table Regenerated"); setSaveInProgress(false);}).
+        catch(() => {setErrorMsg("Regen failed"); setSaveInProgress(false);});
+      }}>Regen Link Table</button>
+    </div>
     <div className="error">{errorMsg}</div>
-    </div>;
+    <div className="message">{message}</div>
+  </div>;
 }
 
 SiteSettings.propTypes = {

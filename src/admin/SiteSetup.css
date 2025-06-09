@@ -11,6 +11,10 @@ div.siteSetup div.siteButtons button {
   margin:.25em;
 }
 
+div.settingsBody div.MaintenanceTasks button {
+  margin: .1em .25em .1em .25em;
+}
+
 dialog.addSiteDialog div.addSiteButtons {
   display: inline-flex;
 }

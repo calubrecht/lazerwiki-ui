@@ -446,6 +446,22 @@ export default class DataService
         .then(res => res.json());
   }
 
+  regenCacheTable(site) {
+    return fetch(
+        this.baseRequest + 'admin/regenCacheTable/' + site,
+        {method: 'post', credentials: 'include',
+          headers: {'x-xsrf-token': this.getTokenCookie() }})
+        .then(this.handleErrors);
+  }
+
+  regenLinkTable(site) {
+    return fetch(
+        this.baseRequest + 'admin/regenLinkTable/'  + site,
+        {method: 'post', credentials: 'include',
+          headers: {'x-xsrf-token': this.getTokenCookie() }})
+        .then(this.handleErrors);
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

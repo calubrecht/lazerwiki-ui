@@ -1,7 +1,28 @@
-div.aclWidget div.nsTree {
-    float:left;
+div.aclWidget {
+    max-height:325px;
+    overflow-y: scroll;
+    background-color: #d0d0d0;
+    margin:.5em;
 }
 
+div.aclWidget div.nsTree {
+    float:left;
+    min-height:150px;
+    min-width: 200px;
+    margin-right: .5em;
+}
+
+div.aclWidget div.aclPanel {
+    margin-bottom:.5em;
+}
+
+div.aclWidget div.aclPanel select.userList{
+    margin-bottom:.5em;
+}
+
+div.aclWidget div.aclPanel select.roleList{
+    margin-bottom:.5em;
+}
 
 select.userList {
     width:10em;
