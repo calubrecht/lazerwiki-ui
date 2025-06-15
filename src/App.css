@@ -331,6 +331,18 @@ table.lazerTable tr:hover {
  background: #ffe0a0;
 }
 
+table.lazerTable td.tableLeft, table.lazerTable th.tableLeft {
+  text-align: left;
+}
+
+table.lazerTable td.tableRight, table.lazerTable th.tableRight {
+  text-align: right;
+}
+
+table.lazerTable td.tableCenter, table.lazerTable th.tableCenter {
+  text-align: center;
+}
+
 dialog.dlgOverlay {
   display: block;
   position: fixed;
