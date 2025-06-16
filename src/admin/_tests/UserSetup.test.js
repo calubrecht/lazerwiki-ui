@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 test('render', async () => {
-  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}}}/>);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -36,7 +36,7 @@ test('render', async () => {
 
 
 test('select User', async () => {
-  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}}}/>);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2", userRoles:[]}}}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -49,11 +49,18 @@ test('select User', async () => {
   expect(screen.getByRole("button", {name: "Remove Role"})).toBeInTheDocument();
   expect(screen.getByRole("option", {name: "ROLE_ADMIN"}));
   expect(screen.getByRole("option", {name: "ROLE_USER"}));
+  let items = await screen.findAllByRole('option')
+  expect(items).toHaveLength(4); // User 1, User2, ROLE_ADMION, ROLE_USER
+
+  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 2'));
+  expect(screen.getByText("User 2 Roles")).toBeInTheDocument();
+  items = await screen.findAllByRole('option')
+  expect(items).toHaveLength(2); // User 1, User2
 });
 
 test('remove Role', async () => {
   let setUserMap = jest.fn(() => {});
-  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -69,13 +76,13 @@ test('remove Role', async () => {
 
   let updatedUserMap = {"User 1": {userName:"User 1", userRoles:["ROLE_USER"]}, "User 2":{userName:"User 2"}};
   expect(setUserMap.mock.calls[0][0]).toStrictEqual(updatedUserMap);
-  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:updatedUserMap, setUserMap}}/>, component);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:updatedUserMap, setUserMap}}  hasGlobal={true}/>, component);
   expect(screen.queryByRole("option", {name: "ROLE_ADMIN"})).not.toBeInTheDocument();
 });
 
 test('add Role', async () => {
   let setUserMap = jest.fn(() => {});
-  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -98,7 +105,7 @@ test('add Role', async () => {
   await waitFor(() => {});
   let updatedUserMap = {"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER", "ROLE_NEW"]}, "User 2":{userName:"User 2"}};
   expect(setUserMap.mock.calls[0][0]).toStrictEqual(updatedUserMap);
-  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:updatedUserMap, setUserMap}}/>, component);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:updatedUserMap, setUserMap}}  hasGlobal={true}/>, component);
 
   expect(screen.getByRole("option", {name: "ROLE_NEW"}));
 
@@ -120,7 +127,7 @@ test('add Role', async () => {
 
 test('add Admin Role', async () => {
   let setUserMap = jest.fn(() => {});
-  let component= render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}, {name: "site2", siteName: "Site 2"}]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[{name: "site1", siteName: "Site 1"}, {name: "site2", siteName: "Site 2"}]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
 
   await waitFor(() => {});
@@ -164,7 +171,7 @@ test('add Admin Role', async () => {
 test('add User', async () => {
   let setUserMap = jest.fn(() => {});
   let setUsers = jest.fn(() => {});
-  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
 
   await waitFor(() => {});
@@ -188,7 +195,7 @@ test('add User', async () => {
   
   await waitFor(() => {});
   expect(setUsers.mock.calls[0][0]).toStrictEqual(["User 1", "User 2", "USER1"]);
-  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2", "USER1"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>, component);
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2", "USER1"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}  hasGlobal={true}/>, component);
   expect(screen.getByRole("option", {name: "USER1"}));
 
 
@@ -202,7 +209,7 @@ test('add User', async () => {
 
 test('reset Password', async () => {
   let setUserMap = jest.fn(() => {});
-  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -230,7 +237,7 @@ test('reset Password', async () => {
 test('delete User', async () => {
   let setUserMap = jest.fn(() => {});
   let setUsers = jest.fn(() => {});
-  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], setUsers: setUsers, userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -254,7 +261,7 @@ test('net Fail', async () => {
   console.log = jest.fn(() => {});
 
   let setUserMap = jest.fn(() => {});
-  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}}/>);
+  let component= render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}, setUserMap}} hasGlobal={true}/>);
 
   await waitFor(() => {});
 
@@ -297,4 +304,17 @@ test('net Fail', async () => {
   expect(console.log.mock.calls[3][0]).toBe("setUserPassword Failed");
   expect(screen.getByText("Set Password Failed"));
 
+});
+
+test('render nonGlobal', async () => {
+  render(<UserSetup sites={[]} userData={{users:["User 1", "User 2"], userMap:{"User 1": {userName:"User 1", userRoles:["ROLE_ADMIN", "ROLE_USER"]}, "User 2":{userName:"User 2"}}}} hasGlobal={false}/>);
+
+  await waitFor(() => {});
+
+  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
+  expect(screen.queryByText("User 1 Roles")).not.toBeInTheDocument();
+
+  expect(screen.getByRole("button", {name: "Create User"}));
+  expect(screen.getByRole("button", {name: "Reset User Password"}));
+  expect(screen.queryByRole("button", {name: "Delete User"})).not.toBeInTheDocument();
 });

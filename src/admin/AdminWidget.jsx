@@ -12,32 +12,44 @@ import {PropTypes} from "prop-types";
 
 
 function userHasAdmin(siteName, roles) {
-    return roles.filter(r => r === "ROLE_ADMIN" || r === "ROLE_ADMIN:" + siteName).length > 0;
+    return roles.filter(r => r === "ROLE_ADMIN" || r === "ROLE_ADMIN:" + siteName || r === "ROLE_USERADMIN").length > 0;
 }
 
 function userHasGlobalAdmin(roles) {
   return roles.filter(r => r === "ROLE_ADMIN").length > 0;
 }
 
-function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, userData, visible) {
+function userHasUserAdmin(roles) {
+    return roles.filter(r => r === "ROLE_USERADMIN").length > 0;
+}
+
+function userHasSiteAdmin(roles, site) {
+    if (userHasGlobalAdmin(roles)) {
+        return true;
+    }
+    return roles.filter(r => r === "ROLE_ADMIN:" + site.name).length > 0;
+}
+
+function renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, userData, visible, roles) {
     let enableSelfReg = !!globalSettings.enableSelfReg;
     let setEnableSelfReg = (t) => {
         let newSettings = {...globalSettings, enableSelfReg: t};
         setGlobalSettings(newSettings);
         SS_instance().updateSettings(newSettings);
     };
+  let hasGlobalAdmin = userHasGlobalAdmin(roles);
   const className = visible ? "settingsBody" : "settingsBody hidden";
   return <div className={className} aria-label="SettingSiteBody"><h1>Global Settings</h1>
-      <SiteSetup activeSites={sites} setSites={setSites}/>
-      <UserSetup sites={sites} userData={userData}/>
+      {hasGlobalAdmin && <SiteSetup activeSites={sites} setSites={setSites}/>}
+      <UserSetup sites={sites} userData={userData} hasGlobal={hasGlobalAdmin}/>
       <div className='clear'></div>
-      <div className='enableSelfReg'><SliderInput label="Enable Self Registration" id="globalEnableSelfReg" value={enableSelfReg} setter={setEnableSelfReg}/></div>
+      {hasGlobalAdmin && <div className='enableSelfReg'><SliderInput label="Enable Self Registration" id="globalEnableSelfReg" value={enableSelfReg} setter={setEnableSelfReg}/></div>}
   </div>;
 }
 
-function renderDlgBody(tab, sites, setSites, globalSettings, setGlobalSettings, userData) {
+function renderDlgBody(tab, sites, setSites, globalSettings, setGlobalSettings, userData, roles) {
     return <div>
-        {renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, userData, tab === 'Global Settings')}
+        {renderGlobalSettings(sites, setSites, globalSettings, setGlobalSettings, userData, tab === 'Global Settings', roles)}
     {sites.map(site => <SiteSettings key={site.name} siteDisplayName={site.siteName} siteName={site.name} siteSettings={site.settings} siteHostname={site.hostname} userData ={userData} visible={site.siteName === tab}/>)}</div>
 }
 
@@ -49,8 +61,9 @@ function AdminDialog(props) {
  const [userMap, setUserMap] = useState({});
  let userData = {users, setUsers, userMap, setUserMap};
  const [globalSettings, setGlobalSettings] = useState({});
- const siteNames = sites.map(site => site.siteName);
- let tabList =  userHasGlobalAdmin(props.initData.roles) ? ["Global Settings", ...siteNames] : siteNames;
+ let roles = props.initData.roles;
+ const siteNames = sites.filter(site => userHasSiteAdmin(roles, site)).map(site => site.siteName);
+ let tabList =  userHasGlobalAdmin(roles) || userHasUserAdmin(roles) ? ["Global Settings", ...siteNames] : siteNames;
  if (! tabList.includes(selectedTab) && tabList.length > 0) {
   showSelectedTab = tabList[0];
  }
@@ -84,7 +97,7 @@ function AdminDialog(props) {
             return <button key={tab} className={className} onClick={() => setSelectedTab(tab)}>{tab}</button>
           })}
        </div>
-         {renderDlgBody(showSelectedTab, sites, setSites, globalSettings, setGlobalSettings, userData)}
+         {renderDlgBody(showSelectedTab, sites, setSites, globalSettings, setGlobalSettings, userData, roles)}
     </dialog>
     </div>);
 }

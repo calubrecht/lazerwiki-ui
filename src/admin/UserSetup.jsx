@@ -231,17 +231,17 @@ function UserSetup(props) {
       <div>
         <select name="userList" id="userList" data-testid="userList" size="5" onChange={(ev) => {
           setSelectedUser(ev.target.value);
-          setSelectedRole(userMap[ev.target.value].userRoles);}}
+          setSelectedRole(userMap[ev.target.value].userRoles.length > 0 ? userMap[ev.target.value].userRoles[0] : undefined);}}
           value={selectedUser}>
           {activeUsers.map( user => <option value={user} key={user}>{user}</option>)}
         </select>
       <div className="userButtons">
         <button onClick={() => {setIsResetPassword(false); addUserDlgRef?.current?.showModal?.()}}>Create User</button>
         <button onClick={() => {setIsResetPassword(true); addUserDlgRef?.current?.showModal?.()}}>Reset User Password</button>
-        <button onClick={() => {confirmDelDlgRef?.current?.showModal?.()}}>Delete User</button>
+        {props.hasGlobal && <button onClick={() => {confirmDelDlgRef?.current?.showModal?.()}}>Delete User</button>}
       </div>
     </div></div>
-    { selectedUser && (<div className="selectWidget">
+    { selectedUser && props.hasGlobal && (<div className="selectWidget">
       <label htmlFor="roleList">{selectedUser + " Roles"}</label>
       <div>
         <select name="roleList" id="roleList" data-testid="roleList" size="5" onChange={(ev) => setSelectedRole(ev.target.value)} value={selectedRole}>
@@ -272,6 +272,6 @@ function UserSetup(props) {
   </div>;
 }
 
-UserSetup.propTypes = {sites: PropTypes.array}
+UserSetup.propTypes = {sites: PropTypes.array, hasGlobal: PropTypes.bool.isRequired}
 
 export default UserSetup;

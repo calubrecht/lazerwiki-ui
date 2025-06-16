@@ -57,6 +57,13 @@ test('renderAsUser, site admin', () => {
     expect(screen.queryByText('admin')).toBeInTheDocument();
 });
 
+test('renderAsUser, user admin', () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_USERADMIN"]});
+    render(<AdminWidget/>);
+
+    expect(screen.queryByText('admin')).toBeInTheDocument();
+});
+
 test('render userChangesafter render', async () => {
     US_instance().setUser(null);
     render(<AdminWidget/>);
@@ -91,13 +98,16 @@ test('render sidebar', async () => {
     expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toHaveClass("selectedTab");
 
+    expect(screen.getByText("SiteSetup-Sites=Site 1,Site 2,Site 3")).toBeInTheDocument();
+    expect(screen.getByText("Slider")).toBeInTheDocument();
+
     await act( () => userEvent.click(screen.getByRole("button", {name: "X"})));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
 test('render sidebar as site Admin', async () => {
-    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN:test"]});
+    US_instance().setUser({userName: "bob", siteName:"site1",userRoles:["ROLE_USER", "ROLE_ADMIN:site1"]});
     let component = render(<AdminWidget/>);
 
     await act( () => userEvent.click(screen.getByRole("button", {name: "admin"})));
@@ -107,13 +117,31 @@ test('render sidebar as site Admin', async () => {
     let sidebar = screen.getByLabelText("SettingSiteTabs");
     expect(within(sidebar).queryByRole("button", {name: "Global Settings"})).not.toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Site 1"})).toBeInTheDocument();
-    expect(within(sidebar).getByRole("button", {name: "Site 2"})).toBeInTheDocument();
+    expect(within(sidebar).queryByRole("button", {name: "Site 2"})).not.toBeInTheDocument();
     expect(within(sidebar).getByRole("button", {name: "Site 1"})).toHaveClass("selectedTab");
 
     await act( () => userEvent.click(screen.getByRole("button", {name: "X"})));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 }, 300000);
+
+test('render sidebar as USerAdmin', async () => {
+    US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_USERADMIN"]});
+    let component = render(<AdminWidget/>);
+
+    await act ( () => userEvent.click(screen.getByRole("button", {name: "admin"})));
+    let d = document.getElementsByClassName("AdminDialog")[0];
+    document.getElementsByClassName("AdminDialog")[0].open = true;
+
+    let sidebar = screen.getByLabelText("SettingSiteTabs");
+    expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toBeInTheDocument();
+    expect(within(sidebar).queryByRole("button", {name: "Site 1"})).not.toBeInTheDocument();
+    expect(within(sidebar).queryByRole("button", {name: "Site 2"})).not.toBeInTheDocument();
+    expect(within(sidebar).getByRole("button", {name: "Global Settings"})).toHaveClass("selectedTab");
+
+    expect(screen.queryByText("SiteSetup-Sites=Site 1,Site 2,Site 3")).not.toBeInTheDocument();
+    expect(screen.queryByText("Slider")).not.toBeInTheDocument();
+});
 
 test('selectTab', async () => {
     US_instance().setUser({userName: "bob", siteName:"test",userRoles:["ROLE_USER", "ROLE_ADMIN"]});
