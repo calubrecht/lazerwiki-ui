@@ -59,7 +59,7 @@ function MoveImageFrame(props) {
                    varName="filter" autofocus={true} value={newNS}/>
         <TextField name="New Name" label="New Name:" onChange={(v,) => setNewName(v)} disabled={false}
                    varName="filter" autofocus={true} value={newName}/>
-        <div className="moveDesc">{combineNSName(props.ns,props.imageName)} -> {combineNSName(newNS,newName)}</div>
+        <div className="moveDesc">{combineNSName(props.ns,props.imageName)} -&gt; {combineNSName(newNS,newName)}</div>
         <div className="buttonRow"><button onClick={() => doMove(newNS, newName, setError, setShowConfirmDlg, props)} disabled={!enableMove}>Move</button> <button onClick={props.doClose}>Cancel</button></div>
         <div className="error">{error}</div>
 </dialog>)
