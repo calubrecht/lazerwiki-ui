@@ -26,3 +26,4 @@ const adminWidget = ReactDOM.createRoot(document.getElementById('adminWidget'));
 adminWidget.render(
     <AdminWidget />
 );
+window.onload= () => document.getElementsByTagName("body")[0].style.display = 'revert';
