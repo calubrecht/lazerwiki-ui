@@ -9,6 +9,10 @@ export default class RenderEnhancerService{
 }
 
 function handleToggle(ev) {
+    if (ev.target.attributes["data-named"]?.value === "true") {
+        ev.handled = true;
+        return;
+    }
     if (ev.target.classList.contains('hdn-toggle') && !ev.handled) {
         if (ev.target.innerHTML === 'Hidden') {
             ev.target.innerHTML = 'Hide';

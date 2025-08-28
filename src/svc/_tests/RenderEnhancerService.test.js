@@ -8,8 +8,11 @@ function ElementWithHidden(props) {
     useEffect( () => {
         RES_instance().enhanceRenderedCode(elRef.current);
       }, []);
+
+    let named = props.name ? "true" : "";
+    let name = props.name ? props.name : "Hidden";
   
-    return <div ref={elRef}><div className="hdn-toggle">Hidden</div><div>Not a button</div></div>
+    return <div ref={elRef}><div className="hdn-toggle" data-named={named}>{name}</div><div>Not a button</div></div>
  }
 
  function NestedElementWithHidden(props) {
@@ -51,4 +54,15 @@ test('clickNotAButtondoesnothing', async () => {
     expect(screen.getByText('Hidden')).toBeInTheDocument();
     screen.getByText("Not a button").click();
     expect(screen.getByText('Hidden')).toBeInTheDocument();
+});
+
+
+test('clickToHideNamed', async () => {
+    render(<ElementWithHidden name="bro"/>);
+
+    expect(screen.getByText('bro')).toBeInTheDocument();
+    screen.getByText("bro").click();
+    expect(screen.getByText('bro')).toBeInTheDocument();
+    screen.getByText("bro").click();
+    expect(screen.getByText('bro')).toBeInTheDocument();
 });
