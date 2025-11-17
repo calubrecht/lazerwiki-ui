@@ -83,10 +83,6 @@ export default class RootFrame extends Component
     this.fetchPageData();
   }
 
-  loggedIn() {
-    return this.state.user != null;
-  }
-
   fetchPageData() {
     this.setState({pageData: {rendered: 'Loading', flags:{exists:false}, tags:[]}, stage:'viewing', loaded:false});
     this.data.fetchPage(this.pageName).then((pageData) => this.setPageData(pageData)).catch(e => this.handleError(e));
@@ -120,7 +116,7 @@ export default class RootFrame extends Component
         if ( !this.state.loaded) {
           return <div className="RootMenu"></div>;
         }
-        if (! this.loggedIn() || !this.state.pageData.flags.userCanWrite ){
+        if (!this.state.pageData.flags.userCanWrite ){
           return <div className="RootMenu"><button className="rootMenuButton button-unstyled" onClick={() => this.viewSource()}>View Source</button><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
         }
         return <div className="RootMenu">

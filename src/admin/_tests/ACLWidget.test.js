@@ -45,7 +45,8 @@ test('render', async () => {
 test('loadRestrictionTypes', async () => {
     fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
         {"fullNamespace": "ro", restriction_type: "WRITE_RESTRICTED",children:[]},
-        {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+        {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]},
+        {"fullNamespace": "guestWritable", restriction_type: "GUEST_WRITABLE",children:[]},
             ]}});
 
     await act(async() => await render(<ACLWidget site="site1" users={["Bob", "Frank"]}/>));
@@ -60,6 +61,9 @@ test('loadRestrictionTypes', async () => {
 
     await act(() => selectNS("hidden"));
     expect(screen.getByLabelText("Read Restricted")).toBeChecked();
+
+    await act(() => selectNS("guestWritable"));
+    expect(screen.getByLabelText("Guest Writable")).toBeChecked();
 });
 
 test('changeRestrictionTypes', async () => {
@@ -110,7 +114,17 @@ test('changeRestrictionTypes', async () => {
     updateNSPromise = new Promise((resolve,) => resolveCall = resolve);
     await act(() => screen.getByLabelText("Inherit (OPEN)").click());
     expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
-    expect(mockDS.setNamespaceRestriction.mock.calls[2][2]).toBe("READ_RESTRICTED");
+    expect(mockDS.setNamespaceRestriction.mock.calls[3][2]).toBe("INHERIT");
+    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
+                {"fullNamespace": "ro", restriction_type: "INHERIT",children:[], inherited_restriction_type:"OPEN"},
+                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+            ]}}));
+    expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
+
+    updateNSPromise = new Promise((resolve,) => resolveCall = resolve);
+    await act(() => screen.getByLabelText("Guest Writable").click());
+    expect(screen.getByLabelText("Guest Writable")).toBeChecked();
+    expect(mockDS.setNamespaceRestriction.mock.calls[4][2]).toBe("GUEST_WRITABLE");
     await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
                 {"fullNamespace": "ro", restriction_type: "INHERIT",children:[], inherited_restriction_type:"OPEN"},
                 {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}

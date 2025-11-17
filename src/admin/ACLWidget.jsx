@@ -115,12 +115,14 @@ export default function ACLWidget(props) {
               <div><input type="radio" name={"controlType_" + props.site} value="INHERIT"
                           id={"accessInherit_" + props.site} onChange={ev => {
                   setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-              }} checked={nsAccessType === "INHERIT"} disabled={!enabled}/><label htmlFor={"accessInherit_" + props.site}>
+              }} checked={nsAccessType === "INHERIT"} disabled={!enabled}/><label
+                  htmlFor={"accessInherit_" + props.site}>
                   Inherit ({inheritAccessType})</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="OPEN" id={"accessOpen_" + props.site}
                           onChange={ev => {
                               setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-                          }} checked={nsAccessType === "OPEN"}  disabled={!enabled}/><label htmlFor={"accessOpen_" + props.site}>Open
+                          }} checked={nsAccessType === "OPEN"} disabled={!enabled}/><label
+                  htmlFor={"accessOpen_" + props.site}>Open
                   Access</label></div>
               <div><input type="radio" name={"controlType_" + props.site} value="WRITE_RESTRICTED"
                           id={"writeRestrict_" + props.site} onChange={ev => {
@@ -130,8 +132,13 @@ export default function ACLWidget(props) {
               <div><input type="radio" name={"controlType_" + props.site} value="READ_RESTRICTED"
                           id={"readRestrict_" + props.site} onChange={ev => {
                   setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
-              }} checked={nsAccessType === "READ_RESTRICTED"}  disabled={!enabled}/><label
+              }} checked={nsAccessType === "READ_RESTRICTED"} disabled={!enabled}/><label
                   htmlFor={"readRestrict_" + props.site}>Read Restricted</label></div>
+              <div><input type="radio" name={"controlType_" + props.site} value="GUEST_WRITABLE"
+                          id={"guestWritable_" + props.site} onChange={ev => {
+                  setNSaccess(props.site, selectedNs, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev)
+              }} checked={nsAccessType === "GUEST_WRITABLE"} disabled={!enabled}/><label
+                  htmlFor={"guestWritable_" + props.site}>Guest Writable</label></div>
           </div>
           <select name="userList" className="userList" data-testid="userList" size="5" onChange={(ev) => {
               setSelectedUser(ev.target.value);
