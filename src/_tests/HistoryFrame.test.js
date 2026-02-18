@@ -31,11 +31,12 @@ test('render empty Pages', async () => {
     expect(screen.getByText('Loading')).toBeInTheDocument();
 
     act( ()=>resolveHistoryHook([]));
-    await waitFor( () => {});
+    await waitFor( () => {
+      expect(screen.getByText('History - ROOT')).toBeInTheDocument();
 
-    expect(screen.getByText('History - ROOT')).toBeInTheDocument();
+      expect(screen.getByText('Could not find history for this page')).toBeInTheDocument();
+    });
 
-    expect(screen.getByText('Could not find history for this page')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", {"name": "X"}));
 
@@ -68,43 +69,40 @@ test('render Diff', async () => {
         {first:-1, second: "This line <span>was new</span>"},
         {first:3, second: "This is in both again"}
     ];
-    mockDS.fetchPageDiff = jest.fn(() => Promise.resolve(diffInfo));
+    mockDS.fetchPageDiff = jest.fn(() =>  Promise.resolve(diffInfo));
     render(<HistoryFrame doClose={doClose} initData="page1"/> );
     await waitFor( () => {});
     act( () => resolveHistoryHook(mockHistory));
-    await waitFor( () => {});
+    await waitFor( () => {
+      expect(screen.getByText('Current - Modified 2024-01-27 - by Bob')).toBeInTheDocument();
+      expect(screen.getByText('Revision 2 - Deleted 2024-01-26 - by Bob')).toBeInTheDocument();
+      expect(screen.getByText('Revision 1 - Modified 2024-01-25 - by Bob')).toBeInTheDocument();
+      expect(screen.getByText('History - page1')).toBeInTheDocument();
+    });
 
-    expect(screen.getByText('Current - Modified 2024-01-27 - by Bob')).toBeInTheDocument();
-    expect(screen.getByText('Revision 2 - Deleted 2024-01-26 - by Bob')).toBeInTheDocument();
-    expect(screen.getByText('Revision 1 - Modified 2024-01-25 - by Bob')).toBeInTheDocument();
-    expect(screen.getByText('History - page1')).toBeInTheDocument();
-    
     let diffSelectors = screen.getAllByRole("button", {name:"diffSelect"});
     expect(diffSelectors).toHaveLength(3);
 
     // Diffing between rev 3 and 1
-    await act(() => userEvent.click(diffSelectors[0]));
-    await act(() => userEvent.click(diffSelectors[2]));
-    await act(() => userEvent.click(screen.getByRole("button", {name: "View Diff"})));
-    await waitFor( () => {});
+    userEvent.click(diffSelectors[0]);
+    userEvent.click(diffSelectors[2]);
+    userEvent.click(screen.getByRole("button", {name: "View Diff"}));
+    await waitFor( () => {
+      expect(screen.getByText("Diff - page1 - 1 -> 3"));
 
-    expect(screen.getByText("Diff - page1 - 1 -> 3"));
+      expect(getByTextContent("Line: 1 - This is the first line")).toBeInTheDocument();
+      expect(getByTextContent("Line: 2 - This is the second line")).toBeInTheDocument();
+      expect(getByTextContent("- This line was new")).toBeInTheDocument();
+      // diffInfo was rendered as html, and "was new" is now in its own element
+      expect(screen.getByText("was new")).toBeInTheDocument();
+      expect(getByTextContent("Line: 3 - This is in both again")).toBeInTheDocument();
+    });
 
-    expect(getByTextContent("Line: 1 - This is the first line")).toBeInTheDocument();
-    expect(getByTextContent("Line: 2 - This is the second line")).toBeInTheDocument();
-    expect(getByTextContent("- This line was new")).toBeInTheDocument();
-    // diffInfo was rendered as html, and "was new" is now in its own element
-    expect(screen.getByText("was new")).toBeInTheDocument();
-    expect(getByTextContent("Line: 3 - This is in both again")).toBeInTheDocument();
-
-
-
-
-    await act(() => userEvent.click(screen.getByRole("button", {name: "Back"})));
-    expect(screen.getByText('History - page1')).toBeInTheDocument();
-
+    userEvent.click(screen.getByRole("button", {name: "Back"}));
+    await waitFor( () => {
+      expect(screen.getByText('History - page1')).toBeInTheDocument();
+    });
 });
-
 
 test('setUser', async () => {
     jest.clearAllMocks();
@@ -133,8 +131,8 @@ test('doSelect', async () => {
     render(<HistoryFrame doClose={doClose} initData="page1"/> );
     await waitFor( () => {});
     act( () => resolveHistoryHook(mockHistory));
-    await waitFor( () => {});
 
+    await screen.findAllByRole("button", {name:"diffSelect"});
     let diffSelectors = screen.getAllByRole("button", {name:"diffSelect"});
     await act(() => userEvent.click(diffSelectors[0]));
     // selecting maxRevision first, sets it as endSelect, with no start select
@@ -184,16 +182,23 @@ test('render show historical page', async () => {
     let pageData =  "This is a page <div>That is rendered</div>";
     mockDS.fetchHistoricalPage = jest.fn(() => Promise.resolve({rendered: pageData}));
     render(<HistoryFrame doClose={doClose} initData="page1"/> );
-    await waitFor( () => {});
-    act( () => resolveHistoryHook(mockHistory));
-    await waitFor( () => {});
+    await waitFor( () => {
+      act( () => resolveHistoryHook(mockHistory));
+    });
+    await waitFor( () => {
+      userEvent.click(screen.getByText('Revision 1 - Modified 2024-01-25 - by Bob'));
+    });
+    
+    await waitFor( () => {
+      expect(screen.getByText("page1 - 1")).toBeInTheDocument();
+      expect(screen.getByText("That is rendered")).toBeInTheDocument();
+    });
 
-    await act(() =>  userEvent.click(screen.getByText('Revision 1 - Modified 2024-01-25 - by Bob')));
 
-    expect(screen.getByText("page1 - 1")).toBeInTheDocument();
-    expect(screen.getByText("That is rendered")).toBeInTheDocument();
 
-    await act(() => userEvent.click(screen.getByRole("button", {name: "Back"})));
-    expect(screen.getByText('History - page1')).toBeInTheDocument();
+    userEvent.click(screen.getByRole("button", {name: "Back"}));
+    await waitFor( () => {
+      expect(screen.getByText('History - page1')).toBeInTheDocument();
+    });
 
-}, 300000);
+});

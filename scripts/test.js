@@ -1,6 +1,6 @@
 'use strict';
 
-import jest from 'jest';
+import jest;
 import child_process from 'child_process';
 const execSync = child_process.execSync;
 

@@ -26,16 +26,16 @@ beforeEach(() => {
 test('render empty Pages', async () => {
     let doClose = jest.fn(() => {});
     render(<PageFrame doClose={doClose} /> );
-    await waitFor( () => {});
     act( ()=>resolvePageListHook(mockRes([])));
-    await waitFor( () => {});    
-
-    expect(screen.getByText('NSTREE')).toBeInTheDocument();
-    expect(screen.getByText("Pages - []")).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('NSTREE')).toBeInTheDocument();
+      expect(screen.getByText("Pages - []")).toBeInTheDocument();
+    });
 
     act( () => selectNS("Green"));
-    await waitFor( () => {});
-    expect(screen.getByText("Pages - [Green]")).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText("Pages - [Green]")).toBeInTheDocument();
+    });
 
     await userEvent.click(screen.getByRole("button", {"name": "X"}));
 
@@ -44,56 +44,52 @@ test('render empty Pages', async () => {
 
 test('render with inital NS', async () => {
     render(<PageFrame namespace="ns1"/> );
-    await waitFor( () => {});
 
     act( ()=>resolvePageListHook(mockRes([])));
-    await waitFor( () => {});      
-
-    expect(screen.getByText('NSTREE')).toBeInTheDocument();
-    expect(screen.getByText("Pages - [ns1]")).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('NSTREE')).toBeInTheDocument();
+      expect(screen.getByText("Pages - [ns1]")).toBeInTheDocument();
+    });
 });
 
 
 test('render links', async () => {
     let mockPages = {"": [{pagename:"page1", namespace:"", title: "Page 1"}, {pagename:"page2", namespace:"ns"}, {pagename:'', namespace:'', title:"ROOT"}]};
     render(<PageFrame /> );
-    await waitFor( () => {});
 
     act( ()=>resolvePageListHook(mockRes(mockPages)));
-    await waitFor( () => {});    
-
-    expect(screen.getByText('NSTREE')).toBeInTheDocument();
-    expect(screen.getByText("Pages - []")).toBeInTheDocument();
-    expect(screen.getByRole('link', {name: "page1 - Page 1"})).toHaveAttribute('href', '/page/page1');
-    expect(screen.getByRole('link', {name: "page2"})).toHaveAttribute('href', '/page/ns:page2');
-    expect(screen.getByRole('link', {name: "<ROOT> - ROOT"})).toHaveAttribute('href', '/');
+    await waitFor( () => {
+      expect(screen.getByText('NSTREE')).toBeInTheDocument();
+      expect(screen.getByText("Pages - []")).toBeInTheDocument();
+      expect(screen.getByRole('link', {name: "page1 - Page 1"})).toHaveAttribute('href', '/page/page1');
+      expect(screen.getByRole('link', {name: "page2"})).toHaveAttribute('href', '/page/ns:page2');
+      expect(screen.getByRole('link', {name: "<ROOT> - ROOT"})).toHaveAttribute('href', '/');
+    });
 });
 
 test('render empty links', async () => {
     let mockPages = {"": []};
     render(<PageFrame /> );
-    await waitFor( () => {});
 
     act( ()=>resolvePageListHook(mockRes(mockPages)));
-    await waitFor( () => {});
-
-    expect(screen.getByText('NSTREE')).toBeInTheDocument();
-    expect(screen.getByText("Pages - []")).toBeInTheDocument();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('NSTREE')).toBeInTheDocument();
+      expect(screen.getByText("Pages - []")).toBeInTheDocument();
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
 });
 
 test('render action', async () => {
     let mockPages = {"": [{pagename:"page1", namespace:"", title: "Page 1"}, {pagename:"page2", namespace:"ns"}]};
     let selectItem = jest.fn(()=>{});
     render(<PageFrame selectItem={selectItem}/> );
-    await waitFor( () => {});
 
     act( ()=>resolvePageListHook(mockRes(mockPages)));
-    await waitFor( () => {});    
-
-    expect(screen.getByText('NSTREE')).toBeInTheDocument();
-    expect(screen.getByText("Pages - []")).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: "page1 - Page 1"})).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('NSTREE')).toBeInTheDocument();
+      expect(screen.getByText("Pages - []")).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: "page1 - Page 1"})).toBeInTheDocument();
+    });
 
     await userEvent.click(screen.getByRole('button', {name: "page1 - Page 1"}));
     await userEvent.click(screen.getByRole('button', {name: "page2"}));

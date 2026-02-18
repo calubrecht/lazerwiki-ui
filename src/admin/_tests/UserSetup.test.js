@@ -43,7 +43,7 @@ test('select User', async () => {
   expect(screen.queryByRole("button", {name: "Add Role"})).not.toBeInTheDocument();
   expect(screen.queryByRole("label", {name: "User 1 Roles"})).not.toBeInTheDocument();
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
   expect(screen.getByText("User 1 Roles")).toBeInTheDocument()
   expect(screen.getByRole("button", {name: "Add Role"})).toBeInTheDocument();
   expect(screen.getByRole("button", {name: "Remove Role"})).toBeInTheDocument();
@@ -52,7 +52,7 @@ test('select User', async () => {
   let items = await screen.findAllByRole('option')
   expect(items).toHaveLength(4); // User 1, User2, ROLE_ADMION, ROLE_USER
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 2'));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 2');
   expect(screen.getByText("User 2 Roles")).toBeInTheDocument();
   items = await screen.findAllByRole('option')
   expect(items).toHaveLength(2); // User 1, User2
@@ -67,9 +67,9 @@ test('remove Role', async () => {
   expect(screen.queryByRole("button", {name: "Add Role"})).not.toBeInTheDocument();
   expect(screen.queryByRole("label", {name: "User 1 Roles"})).not.toBeInTheDocument();
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
-  await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN'));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Remove Role"})));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN');
+  await userEvent.click(screen.getByRole("button", {name: "Remove Role"}));
 
   expect(mockDS.deleteRole.mock.calls[0][0]).toBe("User 1");
   expect(mockDS.deleteRole.mock.calls[0][1]).toBe("ROLE_ADMIN");
@@ -89,16 +89,16 @@ test('add Role', async () => {
   expect(screen.queryByRole("button", {name: "Add Role"})).not.toBeInTheDocument();
   expect(screen.queryByRole("label", {name: "User 1 Roles"})).not.toBeInTheDocument();
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
-  await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN'));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Add Role"})));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN');
+  await userEvent.click(screen.getByRole("button", {name: "Add Role"}));
   let dlg= document.getElementsByClassName("addRoleDialog")[0];
   dlg.open = true;
 
   let roleInput = screen.getByLabelText("New Role:");
   await(roleInput.focus());
   expect(roleInput.value).toBe("ROLE_");
-  await act( () => userEvent.keyboard("ONE[ENTER]"));
+  await userEvent.keyboard("ONE[ENTER]");
   expect(mockDS.addRole.mock.calls[0][0]).toBe("User 1");
   expect(mockDS.addRole.mock.calls[0][1]).toBe("ROLE_ONE");
   
@@ -110,16 +110,16 @@ test('add Role', async () => {
   expect(screen.getByRole("option", {name: "ROLE_NEW"}));
 
   expect(roleInput.value).toBe("ROLE_");
-  await act( () => userEvent.keyboard("TWO"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Submit New Role"})));
+  await userEvent.keyboard("TWO");
+  await userEvent.click(screen.getByRole("button", {name: "Submit New Role"}));
   expect(mockDS.addRole.mock.calls[1][0]).toBe("User 1");
   expect(mockDS.addRole.mock.calls[1][1]).toBe("ROLE_TWO");
 
   await waitFor(() => {});
 
   expect(roleInput.value).toBe("ROLE_");
-  await act( () => userEvent.keyboard("THREE"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Cancel"})));
+  await userEvent.keyboard("THREE");
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
   await waitFor(() => {});
   expect(roleInput.value).toBe("ROLE_");
 
@@ -134,9 +134,9 @@ test('add Admin Role', async () => {
 
   expect(screen.queryByRole("button", {name: "Add Admin Role"})).not.toBeInTheDocument();
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
-  await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN'));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Add Admin Role"})));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN');
+  await userEvent.click(screen.getByRole("button", {name: "Add Admin Role"}));
   let dlg= document.getElementsByClassName("addRoleDialog")[0];
   dlg.open = true;
 
@@ -147,7 +147,7 @@ test('add Admin Role', async () => {
   expect(dropdown).toHaveTextContent("Site 1");
   await act(() => fireEvent.change(dropdown, { target: { value: "site2" } }));
   expect(dropdown).toHaveTextContent("Site 2");
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Submit New Role"})));
+  await userEvent.click(screen.getByRole("button", {name: "Submit New Role"}));
   expect(mockDS.addRole.mock.calls[0][0]).toBe("User 1");
   expect(mockDS.addRole.mock.calls[0][1]).toBe("ROLE_ADMIN:site2");
   expect(dropdown).toHaveTextContent("Site 1");
@@ -157,13 +157,13 @@ test('add Admin Role', async () => {
   await act(() => globalInput.click());
   expect(globalInput).toBeChecked();
   expect(screen.queryByLabelText("Site for admin role:")).not.toBeInTheDocument();
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Submit New Role"})));
+  await userEvent.click(screen.getByRole("button", {name: "Submit New Role"}));
   expect(mockDS.addRole.mock.calls[1][0]).toBe("User 1");
   expect(mockDS.addRole.mock.calls[1][1]).toBe("ROLE_ADMIN");
   expect(globalInput).not.toBeChecked();
 
   await act(() => fireEvent.change(dropdown, { target: { value: "site2" } }));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Cancel"})));
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
   await waitFor(() => {});
   expect(dropdown).toHaveTextContent("Site 1");
 });
@@ -176,20 +176,20 @@ test('add User', async () => {
 
   await waitFor(() => {});
 
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Create User"})));
+  await userEvent.click(screen.getByRole("button", {name: "Create User"}));
   let dlg= document.getElementsByClassName("addUserDialog")[0];
   dlg.open = true;
 
   expect(screen.getByText("Add New User")).toBeInTheDocument();
   let userInput = screen.getByLabelText("New User:");
   await(userInput.focus());
-  await act( () => userEvent.keyboard("USER1[TAB]PASS[TAB]PAS[ENTER]"));
+  await userEvent.keyboard("USER1[TAB]PASS[TAB]PAS[ENTER]");
   expect(mockDS.addUser.mock.calls).toHaveLength(0);
 
   expect(screen.getByText("Password confirmation does not match. Please correct")).toBeInTheDocument();
   await screen.getByLabelText("Confirm Password:").focus();
-  await act( () => userEvent.keyboard("S"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Submit New User"})));
+  await userEvent.keyboard("S");
+  await userEvent.click(screen.getByRole("button", {name: "Submit New User"}));
   expect(mockDS.addUser.mock.calls[0][0]).toBe("USER1");
   expect(mockDS.addUser.mock.calls[0][1]).toBe("PASS");
   
@@ -201,8 +201,8 @@ test('add User', async () => {
 
   expect(userInput.value).toBe("");
   await(userInput.focus());
-  await act( () => userEvent.keyboard("USER2"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Cancel"})));
+  await userEvent.keyboard("USER2");
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
   expect(userInput.value).toBe("");
 
 });
@@ -213,8 +213,8 @@ test('reset Password', async () => {
 
   await waitFor(() => {});
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Reset User Password"})));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.click(screen.getByRole("button", {name: "Reset User Password"}));
   let dlg= document.getElementsByClassName("addUserDialog")[0];
   dlg.open = true;
 
@@ -222,13 +222,13 @@ test('reset Password', async () => {
   expect(screen.queryByLabelText("New User:")).not.toBeInTheDocument();
   let passwordInput = screen.getByLabelText("Password:");
   await(passwordInput.focus());
-  await act( () => userEvent.keyboard("PASS[TAB]PAS[ENTER]"));
+  await userEvent.keyboard("PASS[TAB]PAS[ENTER]");
   expect(mockDS.setUserPassword.mock.calls).toHaveLength(0);
 
   expect(screen.getByText("Password confirmation does not match. Please correct")).toBeInTheDocument();
   await screen.getByLabelText("Confirm Password:").focus();
-  await act( () => userEvent.keyboard("S"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Set Password"})));
+  await userEvent.keyboard("S");
+  await userEvent.click(screen.getByRole("button", {name: "Set Password"}));
   expect(mockDS.setUserPassword.mock.calls[0][0]).toBe("User 1");
   expect(mockDS.setUserPassword.mock.calls[0][1]).toBe("PASS");
 
@@ -241,15 +241,15 @@ test('delete User', async () => {
 
   await waitFor(() => {});
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Delete User"})));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.click(screen.getByRole("button", {name: "Delete User"}));
   let dlg= document.getElementsByClassName("confirmDeleteDialog")[0];
   dlg.open = true;
 
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Cancel"})));
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
   expect(mockDS.deleteUser.mock.calls).toHaveLength(0);
 
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Delete"})));
+  await userEvent.click(screen.getByRole("button", {name: "Delete"}));
   expect(mockDS.deleteUser.mock.calls[0][0]).toBe("User 1");
 });
 
@@ -268,39 +268,39 @@ test('net Fail', async () => {
   expect(screen.queryByRole("button", {name: "Add Role"})).not.toBeInTheDocument();
   expect(screen.queryByRole("label", {name: "User 1 Roles"})).not.toBeInTheDocument();
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
-  await act( () => userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN'));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
+  await userEvent.selectOptions(screen.getByTestId('roleList'), 'ROLE_ADMIN');
 
   console.log.mockClear();
 
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Remove Role"})));
+  await userEvent.click(screen.getByRole("button", {name: "Remove Role"}));
   expect(console.log.mock.calls[0][0]).toBe("Failed");
 
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Add Role"})));
+  await userEvent.click(screen.getByRole("button", {name: "Add Role"}));
   let dlg= document.getElementsByClassName("addRoleDialog")[0];
   dlg.open = true;
 
   let roleInput = screen.getByLabelText("New Role:");
   roleInput.focus();
   expect(roleInput.value).toBe("ROLE_");
-  await act( () => userEvent.keyboard("ONE[ENTER]"));
+  await userEvent.keyboard("ONE[ENTER]");
   expect(console.log.mock.calls[1][0]).toBe("Add Failed");
   dlg.open = false;
 
   dlg= document.getElementsByClassName("addUserDialog")[0];
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Create User"})));
+  await userEvent.click(screen.getByRole("button", {name: "Create User"}));
   dlg.open = true;
   let userInput = screen.getByLabelText("New User:");
   userInput.focus();
-  await act( () => userEvent.keyboard("USER1[TAB]PASS[TAB]PASS[ENTER]"));
+  await userEvent.keyboard("USER1[TAB]PASS[TAB]PASS[ENTER]");
   expect(console.log.mock.calls[2][0]).toBe("addUser Failed");
   expect(screen.getByText("Add User Failed"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Cancel"})));
+  await userEvent.click(screen.getByRole("button", {name: "Cancel"}));
 
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Reset User Password"})));
+  await userEvent.click(screen.getByRole("button", {name: "Reset User Password"}));
   let passwordInput = screen.getByLabelText("Password:");
   passwordInput.focus();
-  await act( () => userEvent.keyboard("PASS2[TAB]PASS2[ENTER]"));
+  await userEvent.keyboard("PASS2[TAB]PASS2[ENTER]");
   expect(console.log.mock.calls[3][0]).toBe("setUserPassword Failed");
   expect(screen.getByText("Set Password Failed"));
 
@@ -311,7 +311,7 @@ test('render nonGlobal', async () => {
 
   await waitFor(() => {});
 
-  await act( () => userEvent.selectOptions(screen.getByTestId('userList'), 'User 1'));
+  await userEvent.selectOptions(screen.getByTestId('userList'), 'User 1');
   expect(screen.queryByText("User 1 Roles")).not.toBeInTheDocument();
 
   expect(screen.getByRole("button", {name: "Create User"}));

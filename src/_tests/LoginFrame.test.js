@@ -21,17 +21,20 @@ test('attemptLogin', async () => {
     render(<LoginFrame  /> );
     await waitFor( () => {});
 
-    await act( () => userEvent.keyboard("myUser[Tab]myPass[Enter]"));
+    userEvent.keyboard("myUser[Tab]myPass[Enter]");
 
-    expect(US_instance().getUser()).toBe("myUser-loggedIn");
+    await waitFor( () => {
+      expect(US_instance().getUser()).toBe("myUser-loggedIn");
+    });
     let rejectCall = null
     mockDS.login = jest.fn((u, p) => new Promise((resolve, reject) => {rejectCall=reject}));
     
     await US_instance().setUser(null);
     await act( () => userEvent.keyboard("[Enter]"));
     await rejectCall("Login Failed");
-    await waitFor( () => {});
-    expect(US_instance().getUser()).toBe(null);
+    await waitFor( () => {
+      expect(US_instance().getUser()).toBe(null);
 
-    expect(screen.getByText("Invalid username or password")).toBeInTheDocument();
+      expect(screen.getByText("Invalid username or password")).toBeInTheDocument();
+    });
 });

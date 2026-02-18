@@ -1,6 +1,7 @@
-import { render, screen, act, waitFor, queryByAttribute } from '@testing-library/react';
+import { render, screen, act, waitFor, waitForElementToBeRemoved, queryByAttribute } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RootFrame from '../rootFrame';
+import {setRootWindow} from '../rootFrame';
 import UserService, {instance as US_instance} from '../svc/UserService';
 
 let FETCH_PAGE_PROMISE = new Promise(() => {});
@@ -47,7 +48,7 @@ beforeEach(() => {
     savePageData = {flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[], success:true};
     US_instance().setUser(null);
     console.log = jest.fn(() => {});
-
+    setRootWindow({location: {pathname: '', hash:''}});
   });
 
 
@@ -78,25 +79,28 @@ test('render', async () => {
     await waitFor( () => {US_instance().setUser({userName: "Bob"})});
     await waitFor( () => {});
     resolveHook({flags: {exists:true, userCanWrite: true}, rendered: "Rendered Text for Bob", tags:[]});
-    await waitFor( () => {});
-    expect(screen.getByText('Rendered Text for Bob')).toBeInTheDocument();
-    expect(screen.getByText('Edit Page')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('Rendered Text for Bob')).toBeInTheDocument();
+      expect(screen.getByText('Edit Page')).toBeInTheDocument();
+    });
 
     FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
     await waitFor( () => {US_instance().setUser({userName: "Framl"})});
     await waitFor( () => {});
     resolveHook({flags: {exists:true, userCanWrite: false}, rendered: "Rendered Text for Frank", tags:[]});
-    await waitFor( () => {});
-    expect(screen.getByText('Rendered Text for Frank')).toBeInTheDocument();
-    expect(screen.getByText('View Source')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('Rendered Text for Frank')).toBeInTheDocument();
+      expect(screen.getByText('View Source')).toBeInTheDocument();
+    });
 
     FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
     await waitFor( () => {US_instance().setUser({userName: "Bob"})});
     await waitFor( () => {});
     resolveHook({flags: {exists:false, userCanWrite: true}, rendered: "This Page doesn't exist", tags:[]});
-    await waitFor( () => {});
-    expect(screen.getByText('This Page doesn\'t exist')).toBeInTheDocument();
-    expect(screen.getByText('Create Page')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('This Page doesn\'t exist')).toBeInTheDocument();
+      expect(screen.getByText('Create Page')).toBeInTheDocument();
+    });
 });
 
 
@@ -117,9 +121,10 @@ test('render edit', async () => {
     FETCH_PAGE_PROMISE = new Promise((resolve, ) => {resolveHook=resolve;});
     render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: true}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
-    await waitFor( () => {});
+    await waitFor( () => {
+      expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+    });
  
-    expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
     mock_edittedText = 'saveThis';
     
     expect(screen.getByRole('button', {name:"Save Page"})).toBeInTheDocument();
@@ -127,14 +132,20 @@ test('render edit', async () => {
     expect(screen.getByText('DrawerLink-Show Preview')).toBeInTheDocument();
     expect(previewDrawerInit()).toBe("Previewed");
 
-    await act(async () => await userEvent.click(screen.getByRole('button', {name:"Cancel"})));
- 
-    expect(mockCancel.mock.calls).toHaveLength(1);
-    expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
-    await act(async() => await userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
-    await act(async() => await userEvent.click(screen.getByRole('button', {name:"Save Page"})));
-
-    expect(mockDS.savePage.mock.calls).toHaveLength(1);
+    userEvent.click(screen.getByRole('button', {name:"Cancel"}));
+    await waitFor( () => {
+      expect(mockCancel.mock.calls).toHaveLength(1);
+      expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
+    });
+    await waitFor( () => {
+      userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
+    });
+    await waitFor( () => {
+      userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    });
+    await waitFor( () => {
+      expect(mockDS.savePage.mock.calls).toHaveLength(1);
+    });
     expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
     expect(mockDS.savePage.mock.calls[0][1]).toBe("saveThis");
     await waitFor( () => {});
@@ -154,7 +165,6 @@ test('render edit', async () => {
     expect(mockDS.savePage.mock.calls[1][1]).toBe("saveThis");
 
     expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
-
 });
 
 test('saveConfirmOverwrite', async () => {
@@ -165,22 +175,24 @@ test('saveConfirmOverwrite', async () => {
     FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
     render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: true}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
-    await waitFor( () => {});
+    await waitFor( () => {
+      expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+    });
  
-    expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
     mock_edittedText = {source:'saveThis'};
     
-    await act( async() => await userEvent.click(screen.getByRole('button', {name:"Save Page"})));
+    userEvent.click(screen.getByRole('button', {name:"Save Page"}));
 
-    expect(mockDS.savePage.mock.calls).toHaveLength(1);
-    expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
-    expect(mockDS.savePage.mock.calls[0][1]).toStrictEqual({source: "saveThis"});
-    await waitFor( () => {});
+    await waitFor( () => {
+      expect(mockDS.savePage.mock.calls).toHaveLength(1);
+      expect(mockDS.savePage.mock.calls[0][0]).toBe(""); // pageName
+      expect(mockDS.savePage.mock.calls[0][1]).toStrictEqual({source: "saveThis"});
+    });
 
     let dlg= document.getElementsByClassName("confirmRevOverrideDialog")[0];
     dlg.open = true;
 
-    await act( async() => await userEvent.click(screen.getByRole('button', {name:"Return to Edit"})));
+    userEvent.click(screen.getByRole('button', {name:"Return to Edit"}));
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Return to Edit"})).not.toBeInTheDocument();
@@ -188,71 +200,83 @@ test('saveConfirmOverwrite', async () => {
     expect(mockCleanup.mock.calls).toHaveLength(0);
 
     dlg.open = true;
-    await act( async ()=> await userEvent.click(screen.getByRole('button', {name:"Cancel Edit"})));
+    userEvent.click(screen.getByRole('button', {name:"Cancel Edit"}));
     dlg.open = false;
     expect(mockDS.savePage.mock.calls).toHaveLength(1);
-    expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
+    });
     expect(mockCleanup.mock.calls).toHaveLength(1);
 
-    await act (async() => await userEvent.click(screen.getByRole('button', {name:"Edit Page"})));
-    await act( async() => await userEvent.click(screen.getByRole('button', {name:"Save Page"})));
+    await waitFor( () => {
+      userEvent.click(screen.getByRole('button', {name:"Edit Page"}));
+    });
+    await waitFor( () => {
+      userEvent.click(screen.getByRole('button', {name:"Save Page"}));
+    });
     dlg.open = true;
 
+    await waitFor( () => {
+      expect(mockDS.savePage.mock.calls).toHaveLength(2);
+      expect(mockDS.savePage.mock.calls[1][0]).toBe(""); // pageName
+      expect(mockDS.savePage.mock.calls[1][1]).toStrictEqual({source: "saveThis"});
+    });
     savePageData = {flags: {exists:true, userCanWrite:true}, rendered:"New render", tags:[], success:true};
-    await act( async() => userEvent.click(screen.getByRole('button', {name:"Overwrite Page"})));
+    userEvent.click(screen.getByRole('button', {name:"Overwrite Page"}));
     dlg.open = false;
-    expect(mockDS.savePage.mock.calls).toHaveLength(3);
-    expect(mockDS.savePage.mock.calls[2][0]).toBe(""); // pageName
-    expect(mockDS.savePage.mock.calls[2][1]).toStrictEqual({source: "saveThis", force:true});
-
+    await waitFor( () => {
+      expect(mockDS.savePage.mock.calls).toHaveLength(3);
+      expect(mockDS.savePage.mock.calls[2][0]).toBe(""); // pageName
+      expect(mockDS.savePage.mock.calls[2][1]).toStrictEqual({source: "saveThis", force:true});
+    });
 
 
     expect(screen.getByText('New render')).toBeInTheDocument();
 });
 
 test('do delete', async () => {
-    delete global.window.location;
-    global.window = Object.create(window);
-    global.window.location= {pathname: '/page/page1', hash:''};
+    setRootWindow({location: {pathname: '/page/page1', hash:''}});
     US_instance().setUser({userName:"Bob"});
     let resolveHook = null
     FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
     render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: true, userCanDelete: true}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
-    await waitFor( () => {});
+    await waitFor( () => {
+      userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
+    });
  
 
-    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete Page"})));
     expect(screen.getByText('Are you sure you want to delete this page?')).toBeInTheDocument();
     let dlg= document.getElementsByClassName("deletePageDialog")[0];
     dlg.open = true;
 
 
-    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Cancel"})));
+    userEvent.click(screen.getByRole('button', {name:"Cancel"}));
     expect(mockDS.deletePage.mock.calls).toHaveLength(0);
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
 
-    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete Page"})));
+    userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
     dlg.open = true;
-    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete"})));
-    expect(mockDS.deletePage.mock.calls).toHaveLength(1);
-    expect(mockDS.deletePage.mock.calls[0][0]).toBe("page1"); // pageName
+    userEvent.click(screen.getByRole('button', {name:"Delete"}));
+    await waitFor( () => {
+      expect(mockDS.deletePage.mock.calls).toHaveLength(1);
+      expect(mockDS.deletePage.mock.calls[0][0]).toBe("page1"); // pageName
+    });
     dlg.open = false;
     expect(screen.queryByRole('button', {name:"Cancel"})).not.toBeInTheDocument();
+    console.log.mockClear();
 
-    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete Page"})));
+    userEvent.click(screen.getByRole('button', {name:"Delete Page"}));
     dlg.open = true;
     console.log.mockClear();
     mockDS.deletePage = jest.fn(() => Promise.reject("Failure"));
-    await act(async() =>userEvent.click(screen.getByRole('button', {name:"Delete"})));
+    await userEvent.click(screen.getByRole('button', {name:"Delete"}));
     expect(console.log.mock.calls[0][0]).toBe("Failure");
 });
 
 test('bad start url', async () => {
-    delete global.window.location;
-    global.window = Object.create(window);
-    global.window.location= {pathname: '/wrongpath', hash:''};
+    setRootWindow({location: {pathname: '/wrongpath', hash:''}});
     let resolveHook = null
     FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
     render(<RootFrame/>);
@@ -260,7 +284,7 @@ test('bad start url', async () => {
 
     expect(global.window.location.pathname).toBe('/');
 
-    global.window.location= {pathname: '/page/path/tooLong', hash:''};
+    setRootWindow({location: {pathname: '/page/path/tooLong', hash:''}});
     render(<RootFrame/>);
     await waitFor( () => {});
 
@@ -324,22 +348,27 @@ test('render tags', async () => {
     US_instance().setUser({userName:"Bob"});
     FETCH_PAGE_PROMISE = Promise.resolve({flags: {exists:true}, rendered: "Page with Tags", tags:["blue", "green"]});
     render(<RootFrame/>);
-    await waitFor( () => {});
- 
+    await waitFor( () => {
+      expect(screen.getByRole('button', {name: 'blue'})).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'green'})).toBeInTheDocument();
+    });
 
-    expect(screen.getByRole('button', {name: 'blue'})).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'green'})).toBeInTheDocument();
-
-    await act(async() => userEvent.click(screen.getByRole('button', {name: 'blue'})));
-    expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
+    userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    await waitFor( () => {
+      expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
+    });
     await waitFor(() => pageSearchClose());
     expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
 
-    await act(async() => userEvent.click(screen.getByRole('button', {name: 'blue'})));
-    expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
+    userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    await waitFor( () => {
+      expect(screen.getByText('PageSearchFrame:blue')).toBeInTheDocument();
+    });
     // Clicking a tag button while the tag search window is open will close it.
-    await act(async() => userEvent.click(screen.getByRole('button', {name: 'blue'})));
-    expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
+    userEvent.click(screen.getByRole('button', {name: 'blue'}));
+    await waitFor( () => {
+      expect(screen.queryByText('PageSearchFrame:blue')).not.toBeInTheDocument();
+    });
 });
 
 test('render view source', async () => {
@@ -348,16 +377,19 @@ test('render view source', async () => {
     FETCH_PAGE_PROMISE = new Promise((resolve, ) => {resolveHook=resolve;});
     render(<RootFrame/>);
     resolveHook({flags: {exists:true, userCanWrite: false}, rendered: "Rendered Text for Bob", source:"Source for Bob", tags:[]});
-    await waitFor( () => {});
+    await waitFor( () => {
+      userEvent.click(screen.getByRole('button', {name:"View Source"}));
+    });
  
-    await act(async() => userEvent.click(screen.getByRole('button', {name:"View Source"})));
-    expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('Textbox-Source for Bob')).toBeInTheDocument();
+    });
 
-    await act(async() => userEvent.click(screen.getByRole('button', {name:"Cancel"})));
-    expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
-    expect(screen.getByText('Rendered Text for Bob')).toBeInTheDocument();
-
-
+    userEvent.click(screen.getByRole('button', {name:"Cancel"}));
+    await waitFor( () => {
+      expect(screen.queryByText('Textbox-Source for Bob')).not.toBeInTheDocument();
+      expect(screen.getByText('Rendered Text for Bob')).toBeInTheDocument();
+    });
 });
 
 test('test errors',  async () => {

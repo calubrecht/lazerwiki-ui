@@ -31,23 +31,23 @@ test('request token', async () => {
     render(<ForgotPasswordFrame  initData={{username: "Bob"}} doClose={doClose} /> );
     await waitFor( () => {});
 
-    await act(() => userEvent.click(screen.getByLabelText("Email:")));
+    await userEvent.click(screen.getByLabelText("Email:"));
 
     resetPromise = Promise.resolve();
-    await act( async() => await userEvent.keyboard("bob@bob.com[Tab]abc[Tab]abc[Enter]"));
+    await userEvent.keyboard("bob@bob.com[Tab]abc[Tab]abc[Enter]");
 
     expect(screen.getByText('Verify Email')).toBeInTheDocument();
 
     await act( () => doVerifyClose ());
 
-    await act( async() => await userEvent.click(screen.getByText("Reset Password")));
+    await userEvent.click(screen.getByText("Reset Password"));
 
     await act( () => doVerifySuccess ());
 
     expect(screen.queryByLabelText('Username:')).not.toBeInTheDocument();
     expect(screen.getByText('The password for Bob has been successfully reset. Please close this box and log in.')).toBeInTheDocument();
 
-    await act( () => userEvent.click(screen.getByText("X")));
+    await userEvent.click(screen.getByText("X"));
     expect(doClose).toHaveBeenCalled();
 });
 
@@ -57,15 +57,15 @@ test('password validations', async () => {
     await waitFor( () => {});
 
     // No email = no reset
-    await act( async() => await userEvent.click(screen.getByLabelText("Email:")));
-    await act( async() => await userEvent.keyboard("[Tab]abc[Tab]abc[Enter]"));
+    await userEvent.click(screen.getByLabelText("Email:"));
+    await userEvent.keyboard("[Tab]abc[Tab]abc[Enter]");
     expect(screen.queryByText('Verify Email')).not.toBeInTheDocument();
     expect(screen.getByText("Reset Password")).toBeDisabled();
     expect(screen.queryByText("Passwords don't match")).not.toBeInTheDocument();
 
     // Nonmatching password = no reset
-    await act( async() => await userEvent.click(screen.getByLabelText("Email:")));
-    await act( async() => await userEvent.keyboard("bob@bob.com[Tab][Tab]d[Enter]"));
+    await userEvent.click(screen.getByLabelText("Email:"));
+    await userEvent.keyboard("bob@bob.com[Tab][Tab]d[Enter]");
     expect(screen.queryByText('Verify Email')).not.toBeInTheDocument();
     expect(screen.getByText("Reset Password")).toBeDisabled();
     expect(screen.getByText("Passwords don't match")).toBeInTheDocument();
@@ -73,8 +73,8 @@ test('password validations', async () => {
     expect(screen.getByLabelText("Confirm Password:")).toHaveValue("d");
 
     // Blank password = no reset
-    await act( async() => await userEvent.click(screen.getByLabelText("Password:")));
-    await act( async() => await userEvent.keyboard("{Backspace}{Backspace}{Backspace}[Tab]{Backspace}[Enter]"));
+    await userEvent.click(screen.getByLabelText("Password:"));
+    await userEvent.keyboard("{Backspace}{Backspace}{Backspace}[Tab]{Backspace}[Enter]");
     expect(screen.queryByText('Verify Email')).not.toBeInTheDocument();
     expect(screen.getByText("Reset Password")).toBeDisabled();
     expect(screen.queryByText("Passwords don't match")).not.toBeInTheDocument();
@@ -95,7 +95,7 @@ test('failed submit', async () => {
 
     let rejectCall = null;
     resetPromise = new Promise((resolve, reject) => rejectCall = reject);
-    await act( async() => await userEvent.keyboard("bob@bob.com[Tab]abc[Tab]abc[Enter]"));
+    await userEvent.keyboard("bob@bob.com[Tab]abc[Tab]abc[Enter]");
     await act( () => rejectCall({message: "Server Error"}));
 
     expect(screen.getByText('Server Error')).toBeInTheDocument();

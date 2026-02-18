@@ -34,7 +34,7 @@ test('enterField', async () => {
   expect(screen.getByLabelText('Site Hostname:').value).toBe("host");
   screen.getByLabelText("Site Hostname:").focus();
   
-  await act( () => userEvent.keyboard("1"));
+  await userEvent.keyboard("1");
   expect(screen.getByLabelText('Site Hostname:').value).toBe("host1");
 
 });
@@ -54,18 +54,18 @@ test('button', async () => {
   await waitFor( () => {});
   screen.getByLabelText("Site Hostname:").focus();
 
-  await act( () => userEvent.keyboard("1"));
+  await userEvent.keyboard("1");
   expect(screen.getByLabelText('Site Hostname:').value).toBe("host1");
 
   saveSettingsPromise =  Promise.resolve({site: {hostName: "host1", settings: "{}"}, success: true, msg:""})
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Save"})));
+  await userEvent.click(screen.getByRole("button", {name: "Save"}));
 
   expect(mockDS.saveSiteSettings).toHaveBeenCalled();
   saveSettingsPromise =  Promise.resolve({site: {hostName: "host1", settings: "{}"}, success: false, msg:"oops"})
   screen.getByLabelText("Settings:").focus();
 
-  await act( () => userEvent.keyboard("1"));
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Save"})));
+  await userEvent.keyboard("1");
+  await userEvent.click(screen.getByRole("button", {name: "Save"}));
 
   await waitFor( () => {});
 
@@ -78,7 +78,7 @@ test("regenCache", async() => {
   await waitFor( () => {});
   let regenCachePromise =  Promise.resolve();
   mockDS.regenCacheTable = jest.fn(() => regenCachePromise);
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Regen Caches"})));
+  await userEvent.click(screen.getByRole("button", {name: "Regen Caches"}));
   expect(mockDS.regenCacheTable).toHaveBeenCalled();
   expect(screen.getByText("Cache Table Regenerated")).toBeInTheDocument();
 
@@ -86,7 +86,7 @@ test("regenCache", async() => {
   regenCachePromise = new Promise((resolve,reject) => {
     rejectCall = reject;
   });
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Regen Caches"})));
+  await userEvent.click(screen.getByRole("button", {name: "Regen Caches"}));
   await act( () => rejectCall());
   expect(mockDS.regenCacheTable).toHaveBeenCalledTimes(2);
   expect(screen.getByText("Regen failed")).toBeInTheDocument();
@@ -97,7 +97,7 @@ test("regenLinks", async() => {
   await waitFor( () => {});
   let regenLinksPromise =  Promise.resolve();
   mockDS.regenLinkTable = jest.fn(() => regenLinksPromise);
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Regen Link Table"})));
+  await userEvent.click(screen.getByRole("button", {name: "Regen Link Table"}));
   expect(mockDS.regenLinkTable).toHaveBeenCalled();
   expect(screen.getByText("Link Table Regenerated")).toBeInTheDocument();
 
@@ -105,7 +105,7 @@ test("regenLinks", async() => {
   regenLinksPromise = new Promise((resolve,reject) => {
     rejectCall = reject;
   });
-  await act( () => userEvent.click(screen.getByRole("button", {name: "Regen Link Table"})));
+  await userEvent.click(screen.getByRole("button", {name: "Regen Link Table"}));
   await act( () => rejectCall());
   expect(mockDS.regenLinkTable).toHaveBeenCalledTimes(2);
   expect(screen.getByText("Regen failed")).toBeInTheDocument();

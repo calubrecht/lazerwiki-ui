@@ -12,21 +12,27 @@ import BacklinksFrame from './BacklinksFrame'
 import HistoryFrame from './HistoryFrame'
 import MovePageFrame from './MovePageFrame'
 
+var localWindow = window;
+
+export function setRootWindow(newWindow) {
+  localWindow = newWindow;
+};
+
 export default class RootFrame extends Component
 {
   constructor(props) {
     super(props);
     this.userService = US_instance();
-    let url =  window.location.pathname;
+    let url =  localWindow.location.pathname;
     if (url != '/' && !url.startsWith("/page/")) {
-      window.location.pathname = '/';
+      localWindow.location.pathname = '/';
       this.pageName = '';
     }
     else 
     {
       let p = url.split('/');
       if (p.length > 3) {
-        window.location.pathname = '/';
+        localWindow.location.pathname = '/';
       }
       else {
         this.pageName = p.length > 2 ? p[2] : "";

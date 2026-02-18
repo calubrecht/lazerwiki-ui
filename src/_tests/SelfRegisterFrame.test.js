@@ -29,7 +29,7 @@ test('createUser', async () => {
     await waitFor(() => {
     });
 
-    await act(() => userEvent.keyboard("myUser[Tab]myPass[Tab]myPass[Enter]"));
+    await userEvent.keyboard("myUser[Tab]myPass[Tab]myPass[Enter]");
 
     expect(mockDS.addUser.mock.calls[0][0]).toBe("myUser");
     expect(mockDS.addUser.mock.calls[0][1]).toBe("myPass");
@@ -46,22 +46,22 @@ test('failEntry', async () => {
     render(<SelfRegisterFrame doClose={doClose}/>);
     await waitFor(() => {
     });
-    await act(() => userEvent.keyboard("[Tab][Tab][Enter]"));
+    await userEvent.keyboard("[Tab][Tab][Enter]");
     expect(mockDS.addUser).not.toHaveBeenCalled();
 
     await act(() => screen.getByLabelText('Username:').focus() );
-    await act(() => userEvent.keyboard("U1[Tab][Tab]"));
+    await userEvent.keyboard("U1[Tab][Tab]");
     expect(screen.getByText('Create User')).toHaveAttribute('disabled');
 
-    await act(() => userEvent.keyboard("[Enter]]"));
+    await userEvent.keyboard("[Enter]]");
     expect(mockDS.addUser).not.toHaveBeenCalled();
 
     await act(() => screen.getByLabelText('Username:').focus() );
-    await act(() => userEvent.keyboard("U1[Tab]Pass1[Tab]Pass2"));
+    await userEvent.keyboard("U1[Tab]Pass1[Tab]Pass2");
     expect(screen.getByText('Passwords don\'t match')).toBeInTheDocument();
     expect(screen.getByText('Create User')).toHaveAttribute('disabled');
 
-    await act(() => userEvent.keyboard("[Enter]]"));
+    await userEvent.keyboard("[Enter]]");
     expect(mockDS.addUser).not.toHaveBeenCalled();
 });
 
@@ -73,7 +73,7 @@ test('serverRejectUser', async () => {
     await waitFor(() => {
     });
 
-    await act(() => userEvent.keyboard("myUser[Tab]myPass[Tab]myPass"));
+    await userEvent.keyboard("myUser[Tab]myPass[Tab]myPass");
     await act(() => screen.getByText("Create User").click());
 
 

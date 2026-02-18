@@ -29,9 +29,16 @@ jest.mock("../../NsTree", () => (props) => {
 
 });
 
+let realConsoleLog = console.log
 beforeEach(() => {
     fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", children:[{"fullNamespace": "ns1", children:[]}]}});
+    console.log = jest.fn(() => {});
 })
+
+afterEach(() => {
+    console.log = realConsoleLog;
+
+  });  
 
 
 test('render', async () => {

@@ -1,0 +1,22 @@
+{
+    "testEnvironment": "jsdom",
+    "testResultsProcessor": "jest-junit",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|sass)$": "identity-obj-proxy"
+    },
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "collectCoverage": true,
+    "coverageReporters": [
+      "cobertura"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.jsx",
+      "!src/main.jsx",
+      "!src/svc/DataService.jsx"
+    ]
+}

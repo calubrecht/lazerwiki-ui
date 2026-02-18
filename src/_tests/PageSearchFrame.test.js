@@ -75,9 +75,10 @@ test('doSearch', async () => {
     expect(screen.getByText('Searching')).toBeInTheDocument();
     resolveHook({title: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}], text: [{pageName: "Page With Text Match", namespace:"", resultLine: "There is some text searched here"}]});
 
-    await waitFor( () => {});
-    expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
-    expect(screen.getByText('ns:Other Page')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+      expect(screen.getByText('ns:Other Page')).toBeInTheDocument();
+    });
     let link = screen.getByRole("link", {name:"ns:Other Page"});
     expect(screen.getByRole("link", {name:"ns:Other Page"})).toHaveAttribute("href", "/page/ns:Other Page");
     expect(screen.getByText("<ROOT>")).toBeInTheDocument();
@@ -95,20 +96,21 @@ test('doTagSearch', async () => {
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
 
     render(<PageSearchFrame /> );
-    await waitFor( () => {});
     await act( () => userEvent.selectOptions(screen.queryByRole('combobox'), 'tag'));
     screen.getByRole('textbox').focus();
     await act( () => userEvent.keyboard("aTag"));
     await act( () => userEvent.click(screen.queryByRole('button', {name: "Search"})));
 
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
-    await waitFor( () => {});
-    expect(screen.getByText('Searching')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('Searching')).toBeInTheDocument();
+    });
     resolveHook({tag: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}]});
 
-    await waitFor( () => {});
-    expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
-    expect(screen.getByText('ns:Other Page')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+      expect(screen.getByText('ns:Other Page')).toBeInTheDocument();
+    });
     let link = screen.getByRole("link", {name:"ns:Other Page"});
     expect(screen.getByRole("link", {name:"ns:Other Page"})).toHaveAttribute("href", "/page/ns:Other Page");
 });
@@ -118,38 +120,36 @@ test('doSearch empty lists', async () => {
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
 
     render(<PageSearchFrame /> );
-    await waitFor( () => {});
     screen.getByRole('textbox').focus();
-    await act( () => userEvent.keyboard("search text"));
-    await act( () => userEvent.keyboard("[Enter]"));
+    await userEvent.keyboard("search text");
+    await userEvent.keyboard("[Enter]");
 
     expect(mockDS.doPageSearch.mock.calls).toHaveLength(1);
-    await waitFor( () => {});
     expect(screen.getByText('Searching')).toBeInTheDocument();
     resolveHook({title: [{pageName: "BigPage", namespace:"", title:"Big Page"}, {pageName:"Other Page", namespace:"ns"}, {pageName:"", namespace:""}], text: []});
 
-    await waitFor( () => {});
-    expect(screen.getByText('No Matches')).toBeInTheDocument();
-    expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('No Matches')).toBeInTheDocument();
+      expect(screen.getByText('BigPage - Big Page')).toBeInTheDocument();
+    });
     
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
-    await act( () => userEvent.keyboard("[Enter]"));
-    await waitFor( () => {});
+    await userEvent.keyboard("[Enter]");
     resolveHook({title: [], text: [{pageName:"", namespace:""}]});
 
-    await waitFor( () => {});
-    expect(screen.getByText('No Matches')).toBeInTheDocument();
-    expect(screen.getByText('<ROOT>')).toBeInTheDocument();
-    expect(screen.getByTestId("emptyMatch")).toBeInTheDocument();
-
+    await waitFor( () => {
+      expect(screen.getByText('No Matches')).toBeInTheDocument();
+      expect(screen.getByText('<ROOT>')).toBeInTheDocument();
+      expect(screen.getByTestId("emptyMatch")).toBeInTheDocument();
+    });
 
     PAGE_SEARCH_PROMISE = new Promise((resolve, reject) => {resolveHook = resolve;});
-    await act( () => userEvent.keyboard("[Enter]"));
-    await waitFor( () => {});
+    await userEvent.keyboard("[Enter]");
     resolveHook({title: [], text: []});
 
-    await waitFor( () => {});
-    expect(screen.getByText('No matches found.')).toBeInTheDocument();
+    await waitFor( () => {
+      expect(screen.getByText('No matches found.')).toBeInTheDocument();
+    });
     
 });
 

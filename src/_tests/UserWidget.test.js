@@ -38,10 +38,10 @@ test('render not logged in',  async () => {
     mockDS.getUser = jest.fn(() => Promise.reject({message: '403'}));
     await render(<UserWidget  /> );
     
-    await waitFor(() => {});
-
-    expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
-    expect(screen.getByText('Login Frame')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
+      expect(screen.getByText('Login Frame')).toBeInTheDocument();
+    });
 });
 
 test('render other error',  async() => {
@@ -72,13 +72,14 @@ test('render already logged in',  async() => {
     
     await waitFor(() => {resolveHook({userName: 'Joe'})});
 
-    await expect(screen.getByText('Hi, Joe')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Hi, Joe')).toBeInTheDocument());
     expect(screen.queryByText('Login Frame')).not.toBeInTheDocument();
     expect(screen.getByRole("button", {name: "LogOut"})).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", {name: "LogOut"}));
-    await waitFor(() => {});
+    userEvent.click(screen.getByRole("button", {name: "LogOut"}));
+    await waitFor(() => {
+      expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
+    });
     
-    await expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
     expect(screen.getByText('Login Frame')).toBeInTheDocument();
 });
 
@@ -91,12 +92,16 @@ test('Logout with error',  async() => {
     await render(<UserWidget  /> );
     
     await act(async() => await resolveHook({userName: 'Joe'}));
-    await act( () => waitFor(() => {}));
 
-    await act(() =>  userEvent.click(screen.getByRole("button", {name: "LogOut"})));
-    await act( () => waitFor(() => {}));
+    await waitFor(() => {
+      userEvent.click(screen.getByRole("button", {name: "LogOut"}));
+    });
     
-    await expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Hi, Guest')).toBeInTheDocument();
+    });
     expect(screen.getByText('Login Frame')).toBeInTheDocument();
-    expect(console.error.mock.calls[0][0]).toBe("oof");
+    await waitFor(() => {
+      expect(console.error.mock.calls[0][0]).toBe("oof");
+    });
 });

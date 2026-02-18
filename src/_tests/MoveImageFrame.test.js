@@ -47,8 +47,8 @@ test('canMoveIfNameOrNSChange', async () => {
 
     render(<MoveImageFrame doClose={doClose} imageName={"img1.png"} ns={""} doRefresh={doRefresh}/>);
 
-    await act(() => userEvent.click(screen.getByLabelText("New NS:")));
-    await act(() => userEvent.keyboard("ns"));
+    await userEvent.click(screen.getByLabelText("New NS:"));
+    await userEvent.keyboard("ns");
 
     expect(screen.getByRole("button", {name: 'Move', hidden:true})).not.toBeDisabled();
 
@@ -56,8 +56,8 @@ test('canMoveIfNameOrNSChange', async () => {
     expect(screen.getByLabelText("New NS:")).toHaveValue("");
     expect(screen.getByRole("button", {name: 'Move', hidden:true})).toBeDisabled();
 
-    await act(() => userEvent.click(screen.getByLabelText("New Name:")));
-    await act(() => userEvent.keyboard("image1.jpg"));
+    await userEvent.click(screen.getByLabelText("New Name:"));
+    await userEvent.keyboard("image1.jpg");
 
     expect(screen.getByRole("button", {name: 'Move', hidden:true})).not.toBeDisabled();
 });
@@ -70,7 +70,7 @@ test('doMove', async () => {
 
     act(() => NsTreeSelectNS("ns"));
     expect(screen.getByLabelText("New NS:")).toHaveValue("ns");
-    await act( () => userEvent.click(screen.getByRole("button", {name: 'Move', hidden:true})));
+    await userEvent.click(screen.getByRole("button", {name: 'Move', hidden:true}));
 
     expect(screen.getByText("img1.png moved to ns:img1.png"))
     expect(screen.queryByRole("button", {name: 'Move', hidden:true})).not.toBeInTheDocument();
@@ -80,7 +80,7 @@ test('doMove', async () => {
     act(() => NsTreeSelectNS("ns5"));
     expect(screen.getByText("Namespace [ns5]")).toBeInTheDocument();
 
-    await act( () => userEvent.click(screen.getByRole("button", {name: 'OK', hidden:true})));
+    await userEvent.click(screen.getByRole("button", {name: 'OK', hidden:true}));
 
     expect(doRefresh).toHaveBeenCalled();
 });
@@ -95,7 +95,7 @@ test('doMoveFailure', async () => {
     expect(screen.getByLabelText("New NS:")).toHaveValue("ns");
     MOVE_IMAGE_PROMISE = Promise.resolve({success: false, message: "Out of coffee"});
 
-    await act( () => userEvent.click(screen.getByRole("button", {name: 'Move', hidden:true})));
+    await userEvent.click(screen.getByRole("button", {name: 'Move', hidden:true}));
 
     expect(screen.queryByRole("button", {name: 'Move', hidden:true})).toBeInTheDocument();
     expect(screen.queryByRole("button", {name: 'Cancel', hidden:true})).toBeInTheDocument();
@@ -117,7 +117,7 @@ test('doMoveError', async () => {
         rejectCB = reject;
     });
 
-    await act( () => userEvent.click(screen.getByRole("button", {name: 'Move', hidden:true})));
+    await userEvent.click(screen.getByRole("button", {name: 'Move', hidden:true}));
 
     await act( () => rejectCB("Oops"));
 

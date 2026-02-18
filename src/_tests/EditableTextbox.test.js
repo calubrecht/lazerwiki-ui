@@ -102,21 +102,22 @@ test('keyActions', async () => {
   let savePage = jest.fn(() => {});
   let cancelEdit = jest.fn(() => {});
   let component = render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} editable={true} setCancelCB={() => {}} savePage={savePage} cancelEdit={cancelEdit} />);
+  await waitFor(() => {});
+
   let c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
-  act(() =>fireEvent.keyDown(c, { key: 's', ctrlKey: true}));
-  
+  await fireEvent.keyDown(c, { key: 's', ctrlKey: true});
   expect(savePage.mock.calls).toHaveLength(1);
 
-  act(() => fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true}));
+  fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true});
   expect(cancelEdit.mock.calls).toHaveLength(1);
 
-  await act( () => user.keyboard('{Escape}'));
+  await user.keyboard('{Escape}');
   expect(cancelEdit.mock.calls).toHaveLength(2);
 
   component.unmount();
   render(<EditableTextbox pageName="simplePage" text="Initial Text" registerTextCB= {(textcb) => {cb = textcb;}}  setCleanupCB= {() => {}} setCancelCB={() => {}} editable={false} cancelEdit={cancelEdit} />);
   c = screen.getAllByRole("textbox").filter(el => el.name === "pageSource")[0];
-  act(() => fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true}));
+  await fireEvent.keyDown(c, { key: 'c', ctrlKey: true, altKey:true});
   expect(cancelEdit.mock.calls).toHaveLength(3);
 });
 
@@ -137,20 +138,20 @@ test('tagList', async() => {
   let tag1Span = screen.getByText("tag1").parentElement;
   let tag1Check = within(tag1Span).getByRole('checkbox');
   expect(tag1Check.checked).toBe(true);
-  await act( () => userEvent.click(tag1Check));
+  await userEvent.click(tag1Check);
   expect(tag1Check.checked).toBe(false);
-  await act( () =>userEvent.click(tag1Label));
+  await userEvent.click(tag1Label);
   expect(tag1Check.checked).toBe(true);  
   let tagEntry = screen.getAllByRole("textbox").filter(el => el.name === "tagEntry")[0];
 
   tagEntry.focus();
-  await act( () => userEvent.keyboard("AnIv@lidTag[Enter]"));
+  await userEvent.keyboard("AnIv@lidTag[Enter]");
   expect(screen.getByText("invalid tag value")).toBeInTheDocument();
   expect(screen.getAllByRole('checkbox')).toHaveLength(2);
-  await act( () => userEvent.keyboard('1'));
+  await userEvent.keyboard('1');
   expect(screen.queryByText("invalid tag value")).not.toBeInTheDocument();
-  await act( () => userEvent.clear(tagEntry));
-  await act( () => userEvent.keyboard("NewTag[Enter]"));
+  await userEvent.clear(tagEntry);
+  await userEvent.keyboard("NewTag[Enter]");
   expect(screen.getAllByRole('checkbox')).toHaveLength(3);
   let newTagLabel =  screen.getByText("NewTag");
   let newTagSpan = screen.getByText("NewTag").parentElement;

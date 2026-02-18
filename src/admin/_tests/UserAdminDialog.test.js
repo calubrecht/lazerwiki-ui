@@ -42,14 +42,14 @@ test('enter passwords', async () => {
         render(<UserAdminDialog/>);
 
     screen.queryByLabelText('New Password:').focus();
-    await act( () => userEvent.keyboard("a password"));
+    await userEvent.keyboard("a password");
     expect(screen.queryByText('Save Password')).not.toBeEnabled();
     screen.queryByLabelText('Confirm Password:').focus();
-    await act( () => userEvent.keyboard("a password"));
+    await userEvent.keyboard("a password");
     expect(screen.queryByText('Save Password')).toBeEnabled();
 
     SET_PASSWORD_PROMISE = Promise.resolve({success: false, message: "no good"});
-    await act(async () => await userEvent.click( screen.queryByText('Save Password')));
+    await userEvent.click( screen.queryByText('Save Password'));
 
     expect(screen.queryByText('no good')).toBeInTheDocument();
 
@@ -59,7 +59,7 @@ test('enter passwords', async () => {
     SET_PASSWORD_PROMISE = new Promise((resolve, ) => resolveFnc = resolve);
 
     screen.queryByLabelText('Confirm Password:').focus();
-    await act( () => userEvent.keyboard("[Enter]"));
+    await userEvent.keyboard("[Enter]");
     expect(screen.queryByText('no good')).not.toBeInTheDocument();
 
     await act( async () => await resolveFnc({success: true}));
@@ -84,15 +84,15 @@ test('enter email', async () => {
     expect(screen.queryByLabelText('Email:').value).toBe("bob@example.com");
     screen.queryByLabelText('Email:').focus();
 
-    await act(() => userEvent.tripleClick(screen.queryByLabelText('Email:')));
-    await act( () => userEvent.keyboard("jake@other.com"));
+    await userEvent.tripleClick(screen.queryByLabelText('Email:'));
+    await userEvent.keyboard("jake@other.com");
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.com");
     expect(screen.queryByText('Save Email')).toBeEnabled();
 
 
     SAVE_EMAIL_PROMISE = Promise.resolve({success: true});
 
-    await(act(async () => await screen.queryByText('Save Email').click()));
+    await act(async () => await screen.queryByText('Save Email').click());
 
     expect(mockDS.saveEmail).toHaveBeenCalled();
     expect(screen.queryByText('Verify Email')).toBeInTheDocument();
@@ -103,7 +103,7 @@ test('enter email', async () => {
     expect(screen.queryByText('Save Email')).toBeEnabled();
 
     screen.queryByLabelText('Email:').focus();
-    await act( () => userEvent.keyboard("[Enter]"));
+    await userEvent.keyboard("[Enter]");
 
     expect(screen.queryByText('Verify Email')).toBeInTheDocument();
 
@@ -121,8 +121,8 @@ test('enter email Fail', async () => {
     expect(screen.queryByLabelText('Email:').value).toBe("bob@example.com");
     screen.queryByLabelText('Email:').focus();
 
-    await act(() => userEvent.tripleClick(screen.queryByLabelText('Email:')));
-    await act( () => userEvent.keyboard("jake@other.com"));
+    await userEvent.tripleClick(screen.queryByLabelText('Email:'));
+    await userEvent.keyboard("jake@other.com");
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.com");
     expect(screen.queryByText('Save Email')).toBeEnabled();
 
@@ -143,23 +143,23 @@ test('simple verify email', async () => {
 
     screen.queryByLabelText('Email:').focus();
 
-    await act(() => userEvent.tripleClick(screen.queryByLabelText('Email:')));
+    await userEvent.tripleClick(screen.queryByLabelText('Email:'));
     // invalid email
-    await act( () => userEvent.keyboard("jake@other"));
+    await userEvent.keyboard("jake@other");
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other");
     expect(screen.queryByText('Save Email')).not.toBeEnabled();
 
-    await act( () => userEvent.keyboard(".domain.com"));
+    await userEvent.keyboard(".domain.com");
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.domain.com");
     expect(screen.queryByText('Save Email')).toBeEnabled();
-    await act( () => userEvent.keyboard("@aol.com[Enter]"));
+    await userEvent.keyboard("@aol.com[Enter]");
     expect(screen.queryByLabelText('Email:').value).toBe("jake@other.domain.com@aol.com");
     expect(screen.queryByText('Save Email')).not.toBeEnabled();
 
 
     await act(() => userEvent.tripleClick(screen.queryByLabelText('Email:')));
     // missing ueser
-    await act( () => userEvent.keyboard("other.com"));
+    await userEvent.keyboard("other.com");
     expect(screen.queryByLabelText('Email:').value).toBe("other.com");
     expect(screen.queryByText('Save Email')).not.toBeEnabled();
 });
