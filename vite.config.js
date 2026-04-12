@@ -6,9 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
+    allowedHosts: true,
     port: 3000,
-    cors: {
-      origin: 'http://merman:3000'},
     proxy: {
       '/app':
       {
