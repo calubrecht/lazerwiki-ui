@@ -7,6 +7,8 @@ import ImageSettings from './ImageSettings';
 import MoveImageFrame from './MoveImageFrame.jsx';
 
 import './MediaFrame.css';
+const hoverWidth="125";
+const hoverHeight="125";
 import {PropTypes} from "prop-types";
 
 export default class MediaFrame extends Component {
@@ -117,7 +119,7 @@ export default class MediaFrame extends Component {
                   uploaded by {img.uploadedBy} {this.state.user && <button className="delete button-unstyled"
                                                                            onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}
                 </div>
-                <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
+                <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName + "?c" + hoverWidth + "x" + hoverHeight} loading="lazy"/>
               </div>;
             })
           }
@@ -136,7 +138,7 @@ export default class MediaFrame extends Component {
               <div>{img.fileName} - {this.renderFileSize(img.fileSize)} - {this.renderDownloadLink(img.fileName, "/_media/" + nsPrefix + img.fileName)} {img.width}x{img.height} -
                 uploaded by {img.uploadedBy} {this.state.user && this.renderMoveLink(img.fileName, "")} {this.state.user && <button className="delete button-unstyled"
                                                                          onClick={() => this.doDelete(this.state.namespace, img)}>Delete</button>}</div>
-              <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName} loading="lazy"/>
+              <img className="hoverImg" src={"/_media/" + nsPrefix + img.fileName + "?c" + hoverWidth + "x" + hoverHeight} loading="lazy"/>
             </div>;
           })
         }
