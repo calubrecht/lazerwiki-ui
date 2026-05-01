@@ -22,6 +22,10 @@ export default defineConfig({
       {
           target: 'http://app-server:8080',
       },
+      '/sitemap.xml':
+      {
+          target: 'http://app-server:8080',
+      },
     }
   },
   build: {
