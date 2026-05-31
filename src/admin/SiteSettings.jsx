@@ -1,11 +1,10 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import './AdminWidget.css';
 import TextField from '../TextField';
 import TextArea from '../TextArea';
 import ACLWidget from './ACLWidget';
 import {PropTypes} from "prop-types";
 import {instance as DS_instance} from '../svc/DataService';
-
 
 export default function SiteSettings(props) {
   let disabled = false;
@@ -40,6 +39,10 @@ export default function SiteSettings(props) {
             setSaveInProgress(false)
     });
   }
+  function exportSiteLink() {
+    return DS_instance().exportSiteLink(props.siteName);
+  }
+
   return <div className={className} aria-label={label} role="group">
     <h1>Settings for - {props.siteDisplayName}</h1>
     <TextField className="SettingsField" name="SiteName" label="Site Name:" disabled={true} varName="siteName"
@@ -54,20 +57,38 @@ export default function SiteSettings(props) {
     <ACLWidget site={props.siteName} users={props.userData.users} userMap={props.userData.userMap}
                setUserMap={props.userData.setUserMap}></ACLWidget>
     <div className="MaintenanceTasks">
-      <button disabled={saveInProgress} onClick={() =>{
+      <button disabled={saveInProgress} onClick={() => {
         setMessage("");
         setErrorMsg("");
         setSaveInProgress(true);
-        DS_instance().regenCacheTable(props.siteName).then(() => {setMessage("Cache Table Regenerated"); setSaveInProgress(false);}).
-        catch((err) => {setErrorMsg("Regen failed"); setSaveInProgress(false);});
-      }}>Regen Caches</button>
-      <button disabled={saveInProgress} onClick={() =>{
+        DS_instance().regenCacheTable(props.siteName).then(() => {
+          setMessage("Cache Table Regenerated");
+          setSaveInProgress(false);
+        }).catch((err) => {
+          setErrorMsg("Regen failed");
+          setSaveInProgress(false);
+        });
+      }}>Regen Caches
+      </button>
+      <button disabled={saveInProgress} onClick={() => {
         setMessage("");
         setErrorMsg("");
         setSaveInProgress(true);
-        DS_instance().regenLinkTable(props.siteName).then(() => {setMessage("Link Table Regenerated"); setSaveInProgress(false);}).
-        catch(() => {setErrorMsg("Regen failed"); setSaveInProgress(false);});
-      }}>Regen Link Table</button>
+        DS_instance().regenLinkTable(props.siteName).then(() => {
+          setMessage("Link Table Regenerated");
+          setSaveInProgress(false);
+        }).catch(() => {
+          setErrorMsg("Regen failed");
+          setSaveInProgress(false);
+        });
+      }}>Regen Link Table
+      </button>
+      <button disabled={saveInProgress} onClick={() => {
+        setMessage("");
+        setErrorMsg("");
+        SiteSettings.location.href = exportSiteLink();
+      }}>Export Site
+      </button>
     </div>
     <div className="error">{errorMsg}</div>
     <div className="message">{message}</div>
@@ -77,3 +98,6 @@ export default function SiteSettings(props) {
 SiteSettings.propTypes = {
   siteDisplayName: PropTypes.string, siteName: PropTypes.string, siteHostname: PropTypes.string, siteSettings: PropTypes.object, visible: PropTypes.bool, userData: PropTypes.object
 };
+
+// Testing purposes;
+SiteSettings.location = window.location;

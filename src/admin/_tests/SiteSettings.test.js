@@ -41,7 +41,7 @@ test('enterField', async () => {
 
 
 var saveSettingsPromise =  null;
-let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise)};
+let mockDS = {saveSiteSettings: jest.fn(() => saveSettingsPromise), exportSiteLink: (siteName) => "api/export/" + siteName};
 
 jest.mock("../../svc/DataService", () => {
   return {instance: () => mockDS};
@@ -109,4 +109,14 @@ test("regenLinks", async() => {
   await act( () => rejectCall());
   expect(mockDS.regenLinkTable).toHaveBeenCalledTimes(2);
   expect(screen.getByText("Regen failed")).toBeInTheDocument();
+});
+
+test("exportSite", async() => {
+  SiteSettings.location = {href: "DEFAULT"};
+  render(<SiteSettings siteDisplayName="Test Site" visible={true} siteName="testSite" siteHostname="host" siteSettings={{}}  userData={{users: [], userMap:{}}}/>);
+
+  await waitFor( () => {});
+  await userEvent.click(screen.getByRole("button", {name: "Export Site"}));
+
+  expect(SiteSettings.location.href).toBe("api/export/testSite");
 });

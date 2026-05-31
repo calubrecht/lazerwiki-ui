@@ -462,6 +462,10 @@ export default class DataService
         .then(this.handleErrors);
   }
 
+  exportSiteLink(site) {
+    return this.baseRequest + 'io/export/'  + site;
+  }
+
   getTokenCookie()
   {
     let cookie = document.cookie

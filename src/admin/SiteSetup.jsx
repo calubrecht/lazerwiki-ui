@@ -86,12 +86,18 @@ function SiteSetup(props) {
       value={selectedSite}>
       {props.activeSites.map( site => <option value={site.siteName} key={site.name}>{site.siteName}</option>)}
     </select>
-    <div className="siteButtons">
-      <button onClick={() => {addSiteRef?.current?.showModal?.() }}>Add New Site</button>
-      <button onClick={() => {delSiteRef?.current?.showModal?.() }} disabled={delSiteDisabled}>Delete Site</button>
+      <div className="siteButtons">
+        <button onClick={() => {
+          addSiteRef?.current?.showModal?.()
+        }}>Add New Site
+        </button>
+        <button onClick={() => {
+          delSiteRef?.current?.showModal?.()
+        }} disabled={delSiteDisabled}>Delete Site
+        </button>
+      </div>
     </div>
-    </div>
-    </div>;
+  </div>;
 }
 
 
