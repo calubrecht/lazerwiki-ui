@@ -427,3 +427,22 @@ test('render wID', async () => {
     
     expect(screen.getByRole("group", {name: "RootBody p101"}));
 });
+
+test('toggleMenu', async () => {
+    let resolveHook = null
+    FETCH_PAGE_PROMISE = new Promise((resolve, reject) => {resolveHook=resolve;});
+    render(<RootFrame/>);
+    await waitFor( () => {US_instance().setUser(null)});
+    resolveHook({flags: {exists:true}, rendered: "Rendered Text", tags:[], id:101});
+    await waitFor( () => {});
+    expect(screen.getByRole('button', {name: ""})).toBeInTheDocument();
+    var el = screen.getByRole('button', {name: ""});
+    expect(el).toHaveClass("slideTrigger");
+    expect(el).not.toHaveClass("open");
+    var menuEl = el.parentNode;
+    expect(menuEl).not.toHaveClass("displayNarrow");
+
+    await userEvent.click(el);
+    expect(el).toHaveClass("open");
+    expect(menuEl).toHaveClass("displayNarrow");
+});

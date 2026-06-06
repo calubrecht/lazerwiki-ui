@@ -112,22 +112,36 @@ export default class RootFrame extends Component
     }
       return <div className="RootFrame" ref={this.rootRef}>
       {this.renderConfirmRevOverrideDialog()}
-      <div className="RootMenu">{this.state.stage === 'editing' && <button className="rootMenuButton button-unstyled" onClick={ev => this.savePage(ev)}>Save Page</button>}<button className="rootMenuButton button-unstyled" onClick={ev => this.cancelEdit(ev)}>Cancel</button>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
+      <div className="RootMenu">
+        {this.renderSlideTrigger()}
+        {this.state.stage === 'editing' && <button className="rootMenuButton button-unstyled" onClick={ev => this.savePage(ev)}>Save Page</button>}<button className="rootMenuButton button-unstyled" onClick={ev => this.cancelEdit(ev)}>Cancel</button>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} setCleanupCB={data => this.setCleanupCB(data)} setCancelCB={data => this.setCancelCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName} revision={this.state.pageData.revision}/> </div>
       </div>;
 
   }
 
+  renderSlideTrigger() {
+    return <button className="rootMenuButton button-unstyled slideTrigger" onClick={(ev) => {
+      document.getElementsByClassName("RootMenu")[0].classList.toggle("displayNarrow");
+      ev.target.classList.toggle("open");
+      }
+    }></button>;
+  }
+
   renderMenu(createAction) {
-        if ( !this.state.loaded) {
-          return <div className="RootMenu"></div>;
+    if (!this.state.loaded) {
+      return <div className="RootMenu"></div>;
         }
         if (!this.state.pageData.flags.userCanWrite ){
-          return <div className="RootMenu"><button className="rootMenuButton button-unstyled" onClick={() => this.viewSource()}>View Source</button><DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
+          return <div className="RootMenu">{this.renderSlideTrigger()}
+            <button className="rootMenuButton button-unstyled" onClick={() => this.viewSource()}>View Source</button>
+            <DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
         }
         return <div className="RootMenu">
+          {this.renderSlideTrigger()}
           <button className="rootMenuButton button-unstyled" onClick={() => this.editPage()}>{createAction}</button>
-      {this.pageName !== '' && <DrawerLink title="MovePage" component={MovePageFrame} initData={this.pageName} extraClasses="rootMenuButton"/>}
+          {this.pageName !== '' && <DrawerLink title="MovePage" component={MovePageFrame} initData={this.pageName}
+                                               extraClasses="rootMenuButton"/>}
           {this.state.pageData.flags.exists && this.state.pageData.flags.userCanDelete &&
               <button className="rootMenuButton button-unstyled" onClick={() => this.doDelete()}>Delete
                 Page</button>}<DrawerLink title="Backlinks" component={BacklinksFrame}

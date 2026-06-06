@@ -418,6 +418,10 @@ div.historicalPage div#lw_TOC_historyView {
   right: 1125px;
 }
 
+div.RootMenu button.slideTrigger {
+  display:none;
+}
+
 @media only screen and (max-height: 440px) {
   div#toolbar {
     top: 50px;
@@ -452,6 +456,7 @@ div.historicalPage div#lw_TOC_historyView {
   div#lw_TOC {
     display: none;
   }
+
 }
 
 @media only screen and (max-width: 440px) {
@@ -463,19 +468,51 @@ div.historicalPage div#lw_TOC_historyView {
     margin-left: 0px;
   }
 
-  div.RootMenu {
-    display: none;
-  }
-
-
   div#lw_TOC {
     display: none;
   }
+
+  div#banner {
+    display:none;
+  }
+
 }
 
 
-@media only screen and (max-width: 1570px) {
+@media only screen and (max-width: 1400px) {
   div#lw_TOC {
      top:450px;
+  }
+
+  div#banner {
+    display:none;
+  }
+
+
+  div.RootMenu {
+    right: -100px;
+  }
+
+  div.RootMenu.displayNarrow {
+    right:0px;
+  }
+  div.RootMenu button.slideTrigger {
+    right: 30px;
+    position: absolute;
+    display:block;
+  }
+  div.RootMenu button.slideTrigger.open {
+    right: unset;
+    position: unset;
+  }
+  div.RootMenu button.slideTrigger::before {
+    content: '\25C0 ';
+    color: gray;
+    right: 10px;
+  }
+
+  div.RootMenu button.slideTrigger.open::before {
+    content: '\25B6 ';
+    color: #aa0000;
   }
 }
