@@ -421,7 +421,7 @@ export default class DataService
 
   getGlobalSettings() {
     return fetch(
-        this.baseRequest + 'admin/globalSettings')
+        this.baseRequest + 'settings/globalSettings')
         .then(this.handleErrors)
         .then(res => res.json());
   }
