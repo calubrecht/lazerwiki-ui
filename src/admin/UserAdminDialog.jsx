@@ -32,6 +32,8 @@ function submitSaveEmail(setters)
         else {
             setters.setError(res.message);
         }
+    }).catch((res) => {
+        res.promise.then(text => setters.setError(text || res.message));
     });
 }
 

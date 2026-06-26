@@ -91,7 +91,7 @@ function submitPassword(user, email, password, setDisabled, setButtonDisabled, s
     ).catch((res) => {
         setDisabled(false);
         setButtonDisabled(false);
-        setMessage(res.message);
+        res.promise.then(text => setMessage(text || res.message));
     })
 }
 

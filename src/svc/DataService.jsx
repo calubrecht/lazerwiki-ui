@@ -29,7 +29,9 @@ export default class DataService
     {
       if (response.status === 403)
       {
-        throw Error(FOUR_O_THREE);
+        let e = Error(FOUR_O_THREE);
+        e.promise = Promise.resolve(FOUR_O_THREE);
+        throw e;
       }
       if (response.status === 400)
       {
@@ -37,13 +39,15 @@ export default class DataService
          e.promise = response.text();
          throw e;
       }
-      let text = response.text();
-      if (text) {
-        let e = Error(response.statusText);
-        e.promise = text;
-        throw e;
+      if (response.status === 429)
+      {
+         let e = Error();
+         e.promise = response.json().then(data => data.message);
+         throw e;
       }
-      throw Error(response.statusText);
+      let e = Error(response.statusText);
+      e.promise = Promise.resolve(response.statusText);
+      throw e;
     }
     return response;
   }
