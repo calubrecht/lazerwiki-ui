@@ -42,7 +42,3 @@ var INSTANCE = new SettingsService();
 export function instance() {
     return INSTANCE;
 }
-
-/*export function setInstance(instance) {
-    INSTANCE = instance;
-}*/

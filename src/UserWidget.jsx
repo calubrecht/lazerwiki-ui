@@ -17,9 +17,10 @@ function UserWidget() {
   const [initted, setInitted] = useState(false);
   const [userName, setUserName] = useState(null);
   useEffect( () => {
-    US_instance().addListener({setUser: (user) => {
+    const listener = {setUser: (user) => {
       setUserName(user ? user.userName : null);
-    }});
+    }};
+    US_instance().addListener(listener);
     DS_instance().getUser().then(user => {
        setInitted(true);
        setUserName(user.userName);
@@ -36,6 +37,7 @@ function UserWidget() {
       console.log("Other user error: " + e.message);
 
       });
+    return () => US_instance().removeListener(listener);
   }, []);
   return (
     <div className="UserWidget">

@@ -7,10 +7,10 @@ function ConfirmDialog(props) {
         dlgRef.current?.showModal?.();
     }, []
     );
-    return <dialog className={props.className + "Overlay, dlgOverlay"} onClick={() => props.onCancel()} ref={dlgRef}  >
-        <div  className={props.className + ", confirmDlg"} onClick={(evt) => evt.stopPropagation()}>
+    return <dialog className={props.className + "Overlay dlgOverlay"} onClick={() => props.onCancel()} ref={dlgRef}  >
+        <div  className={props.className + " confirmDlg"} onClick={(evt) => evt.stopPropagation()}>
         <div>{props.displayText}</div>
-        <div className={props.className + "Buttons, confirmDlgBtns"}>
+        <div className={props.className + "Buttons confirmDlgBtns"}>
            <button ref={btnRef} className="cancel" onClick={() => props.onCancel()} >{props.btnNames[1]}</button>
            <button className="confirm" onClick={  ()=> props.onConfirm()}>{props.btnNames[0]}</button>
         </div>

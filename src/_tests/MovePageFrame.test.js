@@ -145,7 +145,7 @@ test("moveFileFails", async() => {
     await userEvent.click(screen.getByRole("button", {name: 'Move'}));
     await waitFor(() => {});
     await act( async () => {
-        rejectCB("ERROR");
+        rejectCB(new Error("ERROR"));
     });
 
     expect(screen.getByText("ERROR")).toBeInTheDocument();

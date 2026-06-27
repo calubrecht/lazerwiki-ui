@@ -10,7 +10,7 @@ export default class RecentChangesFrame extends Component
   constructor(props) {
     super(props);
     this.pageName = this.props.initData;
-    this.state = {recentChangesList: {"changes":[]}, loading:true, selectedFilter:"All"};
+    this.state = {recentChangesList: {"changes":[], "mediaChanges":[], "merged":[]}, loading:true, selectedFilter:"All"};
     this.userService = US_instance();
     this.data = DS_instance();
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -27,7 +27,7 @@ export default class RecentChangesFrame extends Component
   }
   
   setUser(user) {
-    this.setState({user: user, recentChangesList:[], loading:true});
+    this.setState({user: user, recentChangesList:{"changes":[], "mediaChanges":[], "merged":[]}, loading:true});
     this.fetchRecentChanges();
   }
  

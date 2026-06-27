@@ -72,7 +72,9 @@ function AdminDialog(props) {
       setSites(sites);
     });
     setGlobalSettings(SS_instance().getSettings());
-    SS_instance().addListener({setSettings: setGlobalSettings })
+    const listener = {setSettings: setGlobalSettings};
+    SS_instance().addListener(listener);
+    return () => SS_instance().removeListener(listener);
  }, []);
  useEffect( () => {
     DS_instance().getUsers().then(users => {

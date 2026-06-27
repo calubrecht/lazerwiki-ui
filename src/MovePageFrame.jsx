@@ -82,7 +82,7 @@ export default class MovePageFrame extends Component
             else {
                 this.handleError(data);
             }
-        }).catch(e => this.handleError({message: e}));
+        }).catch(e => this.handleError({message: e.message}));
     }
 
 

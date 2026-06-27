@@ -23,6 +23,10 @@ export default class LoginFrame extends Component
     this.checkSelfRegSetting();
   }
 
+  componentWillUnmount() {
+    SS_instance().removeListener(this);
+  }
+
   render()
   {
     return (

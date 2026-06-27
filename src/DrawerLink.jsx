@@ -1,5 +1,5 @@
 
-import {useState} from 'react';
+import {useState, useEffect, useId} from 'react';
 
 
 const allDrawerCloseFuncs = {};
@@ -10,7 +10,11 @@ function closeAll() {
 
 export default function DrawerLink(props) {
    let [showComponent, setShowComponent] = useState(false);
-   allDrawerCloseFuncs[props.title] = () => setShowComponent(false);
+   const id = useId();
+   useEffect(() => {
+     allDrawerCloseFuncs[id] = () => setShowComponent(false);
+     return () => delete allDrawerCloseFuncs[id];
+   }, [id]);
    let className = props.extraClasses ? "drawer " + props.extraClasses : "drawer";
    let buttonClass = "drawerPull button-unstyled" + (showComponent ? " open" : "");
    return <div className={className}><button className={buttonClass} onClick={() => {closeAll(); setShowComponent(!showComponent);}}>{props.title}</button> {showComponent && <props.component doClose={() => setShowComponent(false)} initData={props.initData}/>}</div>;

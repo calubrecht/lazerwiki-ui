@@ -193,6 +193,8 @@ export default class MediaFrame extends Component {
   uploadFile(ev) {
     ev.preventDefault();
     this.setState({"message": "Uploading", "errorMessage": false, "enabled": false});
+    let mediaFileUpload = document.getElementById('mediaFileUpload');
+    let mediaFileUploadNS = document.getElementById('mediaFileUploadNS');
     this.dataService.saveMedia(mediaFileUpload.files, mediaFileUploadNS.value).then(
         () => {
           mediaFileUpload.value = null;

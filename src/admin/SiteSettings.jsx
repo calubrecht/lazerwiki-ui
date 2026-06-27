@@ -28,12 +28,12 @@ export default function SiteSettings(props) {
     DS_instance().saveSiteSettings(props.siteName, siteHostname, siteSettings).then( res => {
             if (!res.success) {
               setErrorMsg(res.msg);
-              setMessage("Settings Saved");
             }
             else
             {
               setOrigHostName(siteHostname);
               setOrigSettings(siteSettings);
+              setMessage("Settings Saved");
               setErrorMsg("");
             }
             setSaveInProgress(false)

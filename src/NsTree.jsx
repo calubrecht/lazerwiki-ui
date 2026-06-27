@@ -19,7 +19,7 @@ export default class NsTree extends Component
     }
     let subTreeClass = level <= 1 ? "open" : "closed";
     return <li className={subTreeClass} key={tree.fullNamespace} onClick= {(evt => this.toggleTreeClass(evt))}><button className="dot button-unstyled" aria-label={"expand-" + tree.fullNamespace}> </button><button className="button-unstyled" onClick={(evt => this.selectNS(evt, tree.fullNamespace))}>{name}</button><ul className="nsTree">{
-      tree.children.map( c => this.renderNSSubtree(c))
+      tree.children.map( c => this.renderNSSubtree(c, level + 1))
     }</ul></li>;
   }
 

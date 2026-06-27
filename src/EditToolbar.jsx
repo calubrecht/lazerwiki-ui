@@ -60,7 +60,7 @@ export default class EditToolbar extends Component
       }}
       
     ];
-    let pluginActions = LAZERWIKI_PLUGINS;
+    const pluginActions = typeof LAZERWIKI_PLUGINS !== 'undefined' ? LAZERWIKI_PLUGINS : [];
     for (let action of pluginActions) {
       let btn = {name: action.name, icon: action.icon,
         click: () => {
@@ -75,7 +75,6 @@ export default class EditToolbar extends Component
          if (actionReturn.action === 'insert') {
            if (actionReturn.atCursor) {
             replacement = currentText.slice(0, selectStart) + actionReturn.value + currentText.slice(selectEnd);
-            currentText + actionReturn.value;
             newEnd = newStart + actionReturn.value.length - (newEnd - newStart);
            } 
            else if (actionReturn.location === -1) {
@@ -84,12 +83,12 @@ export default class EditToolbar extends Component
            }
            else {
              replacement = currentText.slice(0, actionReturn.location) + actionReturn.value + currentText.slice(actionReturn.location);
-             newStart = newEnd = actionReturn.location + actionReturn.value;
+             newStart = newEnd = actionReturn.location + actionReturn.value.length;
            }
          }
          if (actionReturn.action === 'replace') {
              replacement = currentText.slice(0, actionReturn.location) + actionReturn.value + currentText.slice(actionReturn.locationEnd);
-             newStart = newEnd = actionReturn.locationEnd + actionReturn.value;
+             newStart = newEnd = actionReturn.locationEnd + actionReturn.value.length;
          }
          if (actionReturn.action === 'replaceAll') {
              replacement = actionReturn.value;

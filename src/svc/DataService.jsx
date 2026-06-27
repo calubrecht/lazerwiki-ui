@@ -14,15 +14,6 @@ export default class DataService
     this.baseMediaRequest = '/_media/';
   }
 
-  /**
-   * Make sure we have an CSRF token
-   */
-  init() {
-    fetch(this.baseRequest + 'csrf')
-         .then(this.handleErrors);
-  }
-
-
   handleErrors(response)
   {
     if (!response.ok)
@@ -142,15 +133,15 @@ export default class DataService
     return fetch(
       this.baseRequest + 'version')
          .then(this.handleErrors)
-         .then(res => res.text().then(r=> {return r}));
+         .then(res => res.text());
   }
-  
+
   getSiteName()
   {
     return fetch(
       this.baseRequest + 'site/')
          .then(this.handleErrors)
-         .then(res => res.text().then(r=> {return r}));
+         .then(res => res.text());
   }
 
   getPluginMenus()
@@ -158,7 +149,7 @@ export default class DataService
     return fetch(
       this.baseRequest + 'plugin/editPagePlugins')
          .then(this.handleErrors)
-         .then(res => res.json().then(r=> {return r}));
+         .then(res => res.json());
   }
 
   getUser() {

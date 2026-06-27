@@ -73,7 +73,7 @@ export default class RootFrame extends Component
   }
 
   setPageData(pageData) {
-    let stage = (window.location.hash=="#Edit" && pageData.flags.userCanWrite) ? "editing" : "viewing";
+    let stage = (window.location.hash==="#Edit" && pageData.flags.userCanWrite) ? "editing" : "viewing";
     this.setState({pageData: pageData, loaded:true, stage});
     if (pageData.title) {
       this.setState({pageTitle:pageData.title});

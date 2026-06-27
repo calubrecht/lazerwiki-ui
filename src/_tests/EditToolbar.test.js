@@ -426,3 +426,19 @@ test('pluginActions', async () => {
   
   expect(text).toBe("This was here"); 
 });
+
+test('renderBaseButtons noplugins', () => {
+    LAZERWIKI_PLUGINS= undefined;
+    render(<EditToolbar />);
+
+    let btns = screen.getAllByRole("button");
+    expect(btns.length).toBe(7);
+
+    expect(screen.getByRole("button", {name:"Add Header"})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Bold"})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Italic"})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Ordered List"})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Unordered List"})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Page Link"})).toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Image"})).toBeInTheDocument();
+});
