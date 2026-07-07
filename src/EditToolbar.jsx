@@ -51,7 +51,7 @@ export default class EditToolbar extends Component
         }
         this.setState({selectedBtn: "Page Link", showFrame:PageFrame, selectItem:p => this.addPageLink(p)});
       }},
-      {name:"Image", icon:"addImage.png", click:() => {
+      {name:"Image", icon:"addImage.svg", click:() => {
         if (this.state.selectedBtn === 'Image') {
           this.clearFrame();
           return;
