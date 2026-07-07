@@ -1,6 +1,12 @@
 body {
-  background: lightgray;
-  background-image: url("/_resources/Back.png");
+  background-color: #d4d4d4;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    rgba(0,0,0,0.03) 4px,
+    rgba(0,0,0,0.03) 5px
+  );
 }
 
 
@@ -46,20 +52,27 @@ div.UserWidget {
   background: lightgray;
   padding:10px;
   max-height:150px;
+  border: 1px solid #aaa;
+}
+
+div#adminWidget:not(:empty) {
+  border: 1px solid #aaa;
 }
 
 div#appWrapper {
   max-width:1250px;
+  margin: 0 auto;
 }
 
 div#toolbar {
   position: fixed;
-  top: 400px;
+  top: 210px;
+  left: 0;
   background: #dddddd;
   padding: 1em;
-  border-color:black;
+  border-color: #aaa;
   border-style:solid;
-  border-width: 2px 2px 2px 0;
+  border-width: 1px 1px 1px 0;
   width:145px;
   z-index:1;
 }
@@ -77,12 +90,14 @@ div.RootBody {
   background: white;
   margin: 40px;
   max-width: 1000px;
-  border-color:black;
+  border-color: #ccc;
   border-style:solid;
   min-height: 400px;
   padding: .5em;
   padding-bottom: 2em;
-  border-width: 3px;
+  border-width: 1px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   overflow:auto;
 }
 
@@ -102,10 +117,12 @@ div.RootMenu {
 div.RootMenu .rootMenuButton {
   background: white;
   padding: 3px 3px 5px 3px;
-  border-width: 2px 2px 2px 2px;
+  border-width: 1px;
   border-style: solid;
+  border-color: #ccc;
+  border-radius: 3px;
   margin-bottom: .25em;
-  box-shadow: 5px 2px;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.15);
   display: block;
   text-align: left;
 }
@@ -399,13 +416,14 @@ div.clear {clear:both}
 div.UserAdminWidget {display:inline}
 
 div.TOC {
-  border: black 1px solid;
+  border: #ccc 1px solid;
   width: 300px;
-  max-height:500px;
+  max-height: min(500px, calc(100vh - 450px));
   position:fixed;
   overflow-y: scroll;
   background-color: white;
-  left:1220px;
+  right: 10px;
+  top: 438px;
 }
 
 div.previewFrameContent div#lw_TOC_previewPage {
@@ -479,16 +497,23 @@ div.RootMenu button.slideTrigger {
 }
 
 
-@media only screen and (max-width: 1400px) {
-  div#lw_TOC {
-     top:450px;
+@media only screen and (max-width: 1780px) {
+  div.TOC {
+    width: 200px;
   }
+}
 
+@media only screen and (max-width: 1400px) {
   div#banner {
     display:none;
   }
 
+  div.TOC, div#lw_TOC {
+    display: none;
+  }
+}
 
+@media only screen and (max-width: 1100px) {
   div.RootMenu {
     right: -100px;
   }

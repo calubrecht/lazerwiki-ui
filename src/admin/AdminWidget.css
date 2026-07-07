@@ -1,7 +1,6 @@
 div#adminWidget  {
   display: inline-block;
   text-align: right;
-  height:90px;
   vertical-align:top;
   margin-top:1em;
 }
