@@ -21,7 +21,6 @@ body {
 }
 
 div#bannerHeader {
-  max-width:1200px;
   display: flex;
   justify-content: space-between;
 }
@@ -37,6 +36,7 @@ div#banner {
 
 div#topWidgets {
   display: inline-block;  
+  margin-right:10px;
 }
 
 div#userWidget {
