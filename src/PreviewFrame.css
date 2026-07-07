@@ -10,6 +10,17 @@ div#root div.previewFrame {
   z-index: 1;
 }
 
+@media only screen and (max-width: 1100px) {
+  div#root div.previewFrame {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    height: calc(100vh - 20px);
+  }
+}
+
 div.previewFrame button.close {
   float:right;
   margin:1px 3px;
