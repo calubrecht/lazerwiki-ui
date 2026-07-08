@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import clsx from 'clsx';
 import {instance as DS_instance} from './svc/DataService';
 import {instance as RES_instance} from './svc/RenderEnhancerService';
 import {instance as SS_instance} from './svc/SettingsService';
@@ -38,7 +39,7 @@ export default class RootFrame extends Component
         this.pageName = p.length > 2 ? p[2] : "";
       }
     }
-    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, message:'', errorMessage:'', siteTitle: "", pageTitle: this.pageName};
+    this.state = {pageData: {rendered: 'Loading', flags:{exists:false}, tags:[], backlinks:[]}, stage:'viewing', user: this.userService.getUser(), loaded:false, searchTag: null, message:'', errorMessage:'', siteTitle: "", pageTitle: this.pageName, slideMenuHidden: true};
     this.data = DS_instance();
     this.imgDlgRef = React.createRef();
     this.delDlgRef = React.createRef();
@@ -99,11 +100,12 @@ export default class RootFrame extends Component
     let user = this.state.user ? this.state.user.userName : "GUEST";
     let createAction = this.state.pageData.flags.exists ? "Edit Page" : "Create Page";
     let className= "RootBody" + (this.state.pageData.id  ? (" p" + this.state.pageData.id) : "");
+    const menuClasses = clsx("RootMenu", !this.state.slideMenuHidden && "displayNarrow");
     if (this.state.stage === 'viewing') {
       return <div className="RootFrame" ref={this.rootRef}>
         {this.renderDeleteDialog() }
         {this.renderImgDialog() }
-        { this.renderMenu(createAction) }
+        { this.renderMenu(createAction, menuClasses) }
         <div className={className} role="group" aria-label={className}> {HTMLReactParser(this.state.pageData.rendered)}
         { this.renderTags() }
         </div>
@@ -112,7 +114,7 @@ export default class RootFrame extends Component
     }
       return <div className="RootFrame" ref={this.rootRef}>
       {this.renderConfirmRevOverrideDialog()}
-      <div className="RootMenu">
+      <div className={menuClasses}>
         {this.renderSlideTrigger()}
         {this.state.stage === 'editing' && <button className="rootMenuButton button-unstyled" onClick={ev => this.savePage(ev)}>Save Page</button>}<button className="rootMenuButton button-unstyled" onClick={ev => this.cancelEdit(ev)}>Cancel</button>{this.state.stage === 'editing' && <DrawerLink title="Show Preview" initData={{initFnc:()=> this.data.previewPage(this.pageName, this.getText()), pageName: this.pageName}} component={PreviewFrame} extraClasses="rootMenuButton"/>}</div>
       <div className="RootBody"><EditableTextbox text={this.state.pageData.source} tags={this.state.pageData.tags} registerTextCB={data => this.setGetEditCB(data)} setCleanupCB={data => this.setCleanupCB(data)} setCancelCB={data => this.setCancelCB(data)} editable={this.state.stage === 'editing'} savePage={(ev)=>this.savePage(ev)} cancelEdit={ev => this.cancelEdit(ev)} pageName={this.pageName} revision={this.state.pageData.revision}/> </div>
@@ -121,23 +123,24 @@ export default class RootFrame extends Component
   }
 
   renderSlideTrigger() {
-    return <button className="rootMenuButton button-unstyled slideTrigger" onClick={(ev) => {
-      document.getElementsByClassName("RootMenu")[0].classList.toggle("displayNarrow");
-      ev.target.classList.toggle("open");
+    const classes = clsx("rootMenuButton", "button-unstyled", "slideTrigger", !this.state.slideMenuHidden && "open");
+    return <button className={classes} onClick={(ev) => {
+
+      this.setState({slideMenuHidden: !this.state.slideMenuHidden})
       }
     }></button>;
   }
 
-  renderMenu(createAction) {
+  renderMenu(createAction, menuClasses) {
     if (!this.state.loaded) {
-      return <div className="RootMenu"></div>;
+      return <div className={menuClasses}></div>;
         }
         if (!this.state.pageData.flags.userCanWrite ){
-          return <div className="RootMenu">{this.renderSlideTrigger()}
+          return <div className={menuClasses}>{this.renderSlideTrigger()}
             <button className="rootMenuButton button-unstyled" onClick={() => this.viewSource()}>View Source</button>
             <DrawerLink title="Backlinks" component={BacklinksFrame} initData={this.state.pageData.backlinks} extraClasses="rootMenuButton"/><DrawerLink title="History" component={HistoryFrame} initData={this.pageName} extraClasses="rootMenuButton"/></div>;
         }
-        return <div className="RootMenu">
+        return <div className={menuClasses}>
           {this.renderSlideTrigger()}
           <button className="rootMenuButton button-unstyled" onClick={() => this.editPage()}>{createAction}</button>
           {this.pageName !== '' && <DrawerLink title="MovePage" component={MovePageFrame} initData={this.pageName}
