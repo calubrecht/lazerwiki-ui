@@ -25,6 +25,7 @@ div.RootBody {
   border: revert;
   margin: revert;
   padding: revert;
+  overflow: visible;
 }
 
 
