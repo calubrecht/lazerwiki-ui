@@ -545,4 +545,10 @@ div.RootMenu button.slideTrigger {
     content: '\25B6 ';
     color: #aa0000;
   }
+  
+  div.RootBody {
+    margin-left: 0px;
+    margin-top: 0px;
+    margin-right:10px;
+  }
 }
