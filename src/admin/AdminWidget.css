@@ -18,24 +18,22 @@ dialog.AdminDialog {
     width:1000px;
     height:800px;
     padding:0px;
-    background: #b0b0b0;
     text-align: left;
 
   }
 
   dialog.AdminDialog::backdrop {
     z-index:10;
-    background: rgba(0,0,0,0.7);
-  }  
+  }
 
 div#adminSidebar {
     float:left;
-    background: grey;
-    border-right: 5px double black;
+    background: #eaeaea;
+    border-right: 1px solid #ccc;
     padding:1em;
     height: calc(100% - 2em);
     margin-right:1em;
-    
+
 }
 
 div#adminSidebar label {
@@ -54,10 +52,10 @@ div#adminSidebar label {
   }
   
   button.settingsTabBtn.selectedTab  {
-    background: #b0b0b0;
+    background: #f5f5f5;
     border-width: 2px 0px 2px 2px;
     border-radius: 10px 0 0 10px;
-    border-color:black;
+    border-color:#ccc;
     border-style:  solid;
   }
 
@@ -105,10 +103,12 @@ div.VerifyTokenBackdrop {
 
 div.VerifyTokenFrame {
     padding: 1em;
-    border: 3px solid black;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     height:10em;
     width:30em;
-    background:white;
+    background:#f5f5f5;
 }
 
 div.VerifyTokenFrame > div {

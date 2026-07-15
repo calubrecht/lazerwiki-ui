@@ -258,11 +258,21 @@ div.RootBody blockquote,div.previewFrameContent blockquote {
   margin-left: 1em;
 }
 
+dialog:not(.dlgOverlay) {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  background: #f5f5f5;
+}
+
+dialog:not(.dlgOverlay)::backdrop {
+  background: rgba(0,0,0,0.5);
+}
+
 dialog.deletePageDialog {
   position: absolute;
   z-index:10;
   top:60px;
-  background: grey;
 }
 
 dialog.deletePageDialog div.deleteDialogButtons {
@@ -280,17 +290,14 @@ dialog.deletePageDialog div.deleteDialogButtons button.delete {
 
 dialog.deletePageDialog::backdrop {
   z-index:10;
-  background: rgba(0,0,0,0.7);
 }
 
 dialog.showImageDialog {
   z-index:10;
-  background: grey;
 }
 
 dialog.showImageDialog::backdrop {
   z-index:10;
-  background: rgba(0,0,0,0.7);
 }
 
 dialog.showImageDialog div.imgTitle {
@@ -302,7 +309,6 @@ dialog.confirmRevOverrideDialog {
   position: absolute;
   z-index:10;
   top:60px;
-  background: grey;
 }
 
 dialog.confirmRevOverrideDialog div.confirmRevOverrideDialogButtons {
@@ -324,7 +330,6 @@ dialog.confirmRevOverrideDialog div.confirmRevOverrideDialogButtons button.overw
 
 dialog.confirmRevOverrideDialog::backdrop {
   z-index:10;
-  background: rgba(0,0,0,0.7);
 }
 
 table.lazerTable, table.lazerTable td, table.lazerTable th {
@@ -367,16 +372,17 @@ dialog.dlgOverlay {
   height:100%;
   width:100%;
   z-index:1000;
-  background: rgba(0,0,0,.7);
+  background: rgba(0,0,0,.5);
+  border: none;
 }
 
 dialog.dlgOverlay div.confirmDlg {
   display: block;
   position: absolute;
-  background:  white;
-  border-radius: 10px;
-  border-color:black;
-  border-width: 2px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   padding:5px;
   width: max(600px, 45%);
   margin:auto;

@@ -1,7 +1,10 @@
 div.aclWidget {
     max-height:325px;
     overflow-y: scroll;
-    background-color: #d0d0d0;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: .5em;
     margin:.5em;
 }
 
