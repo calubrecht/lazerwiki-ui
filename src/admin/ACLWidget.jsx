@@ -29,7 +29,7 @@ function fetchNamespaces(site, setNamespaces, setParsedNamespaces, setEnabled) {
 function setNSaccess(site, namespace, setNamespaces, parsedNamespaces, setParsedNamespaces, setEnabled, ev) {
     setEnabled(false);
     let restrictionType = ev.target.value;
-    parsedNamespaces[namespace].restriction_type = restrictionType;
+    parsedNamespaces[namespace].restrictionType = restrictionType;
     setParsedNamespaces({...parsedNamespaces});
     DS_instance().setNamespaceRestriction(site, namespace, restrictionType).then( (namespaces) => {
         updateNamespaces(namespaces, setNamespaces, setParsedNamespaces, setEnabled);
@@ -101,8 +101,8 @@ export default function ACLWidget(props) {
 
     }, []);
 
-    const nsAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].restriction_type : "OPEN";
-    const inheritAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].inherited_restriction_type : "OPEN";
+    const nsAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].restrictionType : "OPEN";
+    const inheritAccessType = selectedNs in parsedNamespaces ? parsedNamespaces[selectedNs].inheritedRestrictionType : "OPEN";
     let roleEnable = enabled &&  !(nsAccessType === "OPEN" || nsAccessType === "INHERIT" && inheritAccessType === "OPEN");
 
   return <div className="aclWidget">

@@ -17,6 +17,7 @@
     "collectCoverageFrom": [
       "src/**/*.jsx",
       "!src/main.jsx",
+      "!src/App.jsx",
       "!src/svc/DataService.jsx"
     ]
 }

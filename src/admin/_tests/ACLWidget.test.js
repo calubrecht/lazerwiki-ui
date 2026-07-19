@@ -50,10 +50,10 @@ test('render', async () => {
 });
 
 test('loadRestrictionTypes', async () => {
-    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-        {"fullNamespace": "ro", restriction_type: "WRITE_RESTRICTED",children:[]},
-        {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]},
-        {"fullNamespace": "guestWritable", restriction_type: "GUEST_WRITABLE",children:[]},
+    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+        {"fullNamespace": "ro", restrictionType: "WRITE_RESTRICTED",children:[]},
+        {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]},
+        {"fullNamespace": "guestWritable", restrictionType: "GUEST_WRITABLE",children:[]},
             ]}});
 
     await act(async() => await render(<ACLWidget site="site1" users={["Bob", "Frank"]}/>));
@@ -74,9 +74,9 @@ test('loadRestrictionTypes', async () => {
 });
 
 test('changeRestrictionTypes', async () => {
-    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "WRITE_RESTRICTED",children:[]},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "WRITE_RESTRICTED",children:[]},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}});
 
     await act(async() => await render(<ACLWidget site="site1" users={["Bob", "Frank"]}/>));
@@ -91,9 +91,9 @@ test('changeRestrictionTypes', async () => {
     updateNSPromise = new Promise((resolve,) => resolveCall = resolve);
     await act(() => screen.getByLabelText("Open Access").click());
     expect(screen.getByLabelText("Open Access")).toBeChecked();
-    await act(async () => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "OPEN",children:[]},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    await act(async () => await resolveCall({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "OPEN",children:[]},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Open Access")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[0][2]).toBe("OPEN");
@@ -102,9 +102,9 @@ test('changeRestrictionTypes', async () => {
     await act(() => screen.getByLabelText("Write Restricted").click());
     expect(screen.getByLabelText("Write Restricted")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[1][2]).toBe("WRITE_RESTRICTED");
-    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "WRITE_RESTRICTED",children:[]},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "WRITE_RESTRICTED",children:[]},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Write Restricted")).toBeChecked();
 
@@ -112,9 +112,9 @@ test('changeRestrictionTypes', async () => {
     await act(() => screen.getByLabelText("Read Restricted").click());
     expect(screen.getByLabelText("Read Restricted")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[2][2]).toBe("READ_RESTRICTED");
-    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "READ_RESTRICTED",children:[], inherited_restriction_type:"OPEN"},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "READ_RESTRICTED",children:[], inheritedRestrictionType:"OPEN"},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Read Restricted")).toBeChecked();
 
@@ -122,9 +122,9 @@ test('changeRestrictionTypes', async () => {
     await act(() => screen.getByLabelText("Inherit (OPEN)").click());
     expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[3][2]).toBe("INHERIT");
-    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "INHERIT",children:[], inherited_restriction_type:"OPEN"},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "INHERIT",children:[], inheritedRestrictionType:"OPEN"},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
 
@@ -132,9 +132,9 @@ test('changeRestrictionTypes', async () => {
     await act(() => screen.getByLabelText("Guest Writable").click());
     expect(screen.getByLabelText("Guest Writable")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[4][2]).toBe("GUEST_WRITABLE");
-    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "INHERIT",children:[], inherited_restriction_type:"OPEN"},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    await act(async() => await resolveCall({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "INHERIT",children:[], inheritedRestrictionType:"OPEN"},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Inherit (OPEN)")).toBeChecked();
 
@@ -143,17 +143,17 @@ test('changeRestrictionTypes', async () => {
     await act(() => screen.getByLabelText("Write Restricted").click());
     expect(screen.getByLabelText("Write Restricted")).toBeChecked();
     expect(mockDS.setNamespaceRestriction.mock.calls[1][2]).toBe("WRITE_RESTRICTED");
-    await act(async() =>  await resolveCall({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "OPEN",children:[]},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    await act(async() =>  await resolveCall({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "OPEN",children:[]},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}}));
     expect(screen.getByLabelText("Open Access")).toBeChecked();
 });
 
 test("nsRoles", async () => {
-    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restriction_type: "OPEN", children:[
-                {"fullNamespace": "ro", restriction_type: "WRITE_RESTRICTED",children:[]},
-                {"fullNamespace": "hidden", restriction_type: "READ_RESTRICTED",children:[]}
+    fetchNSPromise = Promise.resolve({"namespaces": {"fullNamespace": "", restrictionType: "OPEN", children:[
+                {"fullNamespace": "ro", restrictionType: "WRITE_RESTRICTED",children:[]},
+                {"fullNamespace": "hidden", restrictionType: "READ_RESTRICTED",children:[]}
             ]}});
 
     let setUserMap = jest.fn(() => {});
