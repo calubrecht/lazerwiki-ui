@@ -174,7 +174,9 @@ a.wikiLinkExternal:link, a.wikiLinkExternal:visited {
 }
 
 img.media, img.mediacenter, img.mediaright, img.medialeft {
-  vertical-align: middle
+  vertical-align: middle;
+  max-width: 100%;
+  height: auto;
 }
 
 img.mediaright {
